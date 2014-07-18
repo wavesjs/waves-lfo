@@ -2,7 +2,7 @@
   "name": "draw-wf",
   "exports": "drawWF",
   "version": "0.1.0",
-  "description": "Wave module",
+  "description": "LFP stream visualisator",
   "author": "Victor Saiz <victor.saiz@ircam.fr>",
   "main": "index.js",
   "scripts": {
