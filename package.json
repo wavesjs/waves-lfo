@@ -2,7 +2,7 @@
   "name": "lfp",
   "exports": "LFP",
   "version": "0.1.0",
-  "description": "Base LFP obbject to be extended.",
+  "description": "Base LFP object to be extended.",
   "author": "Victor Saiz <victor.saiz@ircam.fr>",
   "main": "index.js",
   "scripts": {
