@@ -1,0 +1,32 @@
+{
+  "name": "lfp-graph",
+  "exports": "lfpGraph",
+  "version": "0.1.0",
+  "description": "A tree graph data structure for LFP operators",
+  "author": "Victor Saiz, Norbert Schell",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Erro: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ircam-RnD/lfp-graph"
+  },
+  "dependencies": {
+    "concat-stream": "^1.4.6",
+    "extend": "^1.3.0",
+    "stream-combiner": "^0.2.1",
+    "syntax-error": "^1.1.1",
+    "through2": "^0.5.1"
+  },
+  "devDependencies": {
+    "module-boilerplate": "git://github.com/Ircam-RnD/module-boilerplate.git#master",
+    "fs-utils" : "0.4.3",
+    "browserify": "~4.1.2",
+    "mocha": "~1.17.1",
+    "chai": "~1.9.0",
+    "blanket": "~1.1.6",
+    "gulp": "~3.8.2"
+  },
+  "license": "BSD-3"
+}
