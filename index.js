@@ -14,8 +14,10 @@ Object.defineProperties(_lfp, {
 // pseudo sub-class constructor
 Object.defineProperty(_lfp, 'create', {
   enumerable: true, value: function(object, opts) {
+
     var o = Object.create(object);
     var ins = this.initialize.call(o, opts);
+
     return ins;
   }
 });
@@ -49,7 +51,7 @@ Object.defineProperty(_lfp, 'nextOperator', {
 // initiates the next processor with config
 Object.defineProperty(_lfp, 'pipe', {
   writable: true, enumerable: true, value: function(_next, _cfg) {
-
+    
     // we can still modify the config
     if(this._pipe) this._pipe(_next, _cfg);
 

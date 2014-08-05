@@ -3,7 +3,7 @@
 var utils = {};
 
 Object.defineProperties(utils, {
-  filter: {value: require('../../../wave/ui/utils/filter-object')},
+  filter: {value: require('filter-object')},
   extend: {value: require('extend')} // inherit the extend method from extend
 });
 
