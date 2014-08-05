@@ -1,65 +1,76 @@
+
 "use strict";
 
-var _lfp = require('./utils');
+function isObject(item){
+  return typeof item === 'object';
+}
 
-Object.defineProperties(_lfp, {
-  config: { writable: true },
-  _init: {value: null },
-  _pipe: {value: null },
-  offset: {writable: true, value: 0 },
-  allowedThrough: { writable: true, value: ['sampleRate', 'frameSize', 'frameRate'] },
-  operators: { writable: true }
-});
+class Lfp {
 
-// pseudo sub-class constructor
-Object.defineProperty(_lfp, 'create', {
-  enumerable: true, value: function(object, opts) {
-    var o = Object.create(object);
-    var ins = this.initialize.call(o, opts);
-    return ins;
-  }
-});
+  constructor(previous = null, options = {}) {
 
-Object.defineProperty(_lfp, 'initialize', {
-  writable: true, value: function(opts) {
+    this.declareMembers(['previous', 'operators']);
 
-    this.config = this.filter(opts || {}, this.allowedThrough);
+    if(!previous.type){ // no type, it's options
+      this.extend(options, previous);
+      previous = null;
+    }
+
     this.operators = [];
 
-    if(this.init)
-      this.init(this.extend(this.config, opts));
-
-    this.config.offset = this.offset;
-
-    return this;
-  }
-});
-
-// loop through the branches and call the appropiate method on the next one down the pipe
-Object.defineProperty(_lfp, 'nextOperator', {
-  writable: true, enumerable: true, value: function(time, data) {
-    var operators = this.operators;
-    for (var i = 0; i < operators.length; i++) {
-      var op = operators[i]; // the next operator object 
-      op.process.call(op, time, data); // call the process
+    if(previous) {
+      // add ourselves to the previous operator if its passed
+      previous.add(this);
+      this.previous = previous;
     }
   }
-});
 
-// initiates the next processor with config
-Object.defineProperty(_lfp, 'pipe', {
-  writable: true, enumerable: true, value: function(_next, _cfg) {
+  // sets all the members with there encapsulation properties in the instance
+  declareMembers(members = []) {
+    var that = this;
+    members.forEach(function(member) {
+      var accessors = {};
+      
+      if(isObject(member)){
+        var key = Object.keys(member)[0];
+        if(!member[key]) return;
+        accessors = member[key];
+        member = key;
+      }
 
-    // we can still modify the config
-    if(this._pipe) this._pipe(_next, _cfg);
+      accessors.writable = true; // always
 
-    // inherit config from the previous objects
-    var cfg = this.extend(this.config, _cfg);
-    var nextProcessor = _next(cfg);
-    this.operators.push(nextProcessor);
-
-    return nextProcessor;
+      Object.defineProperty(that, member, accessors);
+    });
   }
-});
 
-module.exports = _lfp;
+  // adds child node to the operators list
+  add(lfp){
+    if(lfp) this.operators.push(lfp);
+    return this.operators.length-1;
+  }
+
+  // removes all children node from the operators list
+  remove(){
+    this.operators = [];
+  }
+
+  // calls alls the operators and passes them the data
+  nextOperators(time, data) {
+    var operators = this.operators;
+    for (var i = 0; i < operators.length; i++) {
+      var op = operators[i]; // the next operator object
+      if(op && op.process) op.process.call(op, time, data); // call the process with its own context
+    }
+  }
+
+  // will delete itself from the parent node
+  destroy(){
+    if(this.previous) this.previous.remove(this);
+  }
+
+}
+
+Object.defineProperty(Lfp.prototype, 'extend', {value: require('extend')})
+
+module.exports = Lfp;
