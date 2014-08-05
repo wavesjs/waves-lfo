@@ -1,40 +1,37 @@
 "use strict";
 
-var pck = require('./package.json');
-var LFP = require('../lfp');
-var _lfp = Object.create(LFP); // inherit from base lfp
+var Lfp = require('../lfp');
 
-Object.defineProperties(_lfp, {
-  type: {value: pck.name},
-  newFrame: {writable: true},
-  frameSize : {writable: true} // freameoutout
-});
+class Magnitude extends Lfp {
 
-Object.defineProperty(_lfp, 'init', {
-  value: function() {
-    this.newFrame = new Float32Array(1);
-    this.frameSize = 1;
-    return this;
+  constructor(previous = null, options = {}) {
+
+    if (!(this instanceof Magnitude)) return new Magnitude(previous, options);
+
+    super(previous, options);
+
+    this.declareMembers(["type", "outFrame", "frameSize", "offset"]);
+
+    this.type = 'mag';
+    this.outFrame = new Float32Array(1);
+    this.frameSize = options.frameSize || 2048;
+
   }
-});
 
-Object.defineProperty(_lfp, 'process', {
-  value: function(time, frame) {
+  process(time, frame) {
 
-    var frameSize = frame.length;
-    var sum = 0;
-    var i;
+    var outFrame = this.outFrame,
+      frameSize = this.frameSize,
+      sum = 0,
+      i;
 
     for (i = 0; i < frameSize; i++)
       sum += (frame[i] * frame[i]);
-    
-    time -= this.offset;
-    this.newFrame.set([Math.sqrt(sum / frameSize)], 0);
-    this.nextOperator(time, this.newFrame);
-  }
-});
 
-module.exports = function(opts) {
-  // creates an instance and returns it initialized
-  return LFP.create(_lfp, opts);
-};
+    time -= this.offset;
+    outFrame.set([Math.sqrt(sum / frameSize)], 0);
+    this.nextOperators(time, outFrame);
+  }
+}
+
+module.exports = Magnitude;
