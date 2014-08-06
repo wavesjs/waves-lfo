@@ -41,6 +41,7 @@ See this example to have a clearer picture:
 graph
   .pipe(biquad, {mode: 'low-pass'}) // will get the id biquad-1
   .pipe(biquad, {mode: 'band-pass'})  // will get the id biquad-2
+
 // we can then start another branch from the first biquad like so
 graph
   .get('biquad-1') // returns the node
