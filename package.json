@@ -1,8 +1,8 @@
 {
-  "name": "draw-wf",
-  "exports": "drawWF",
+  "name": "draw",
+  "exports": "draw",
   "version": "0.1.0",
-  "description": "LFP stream visualisator",
+  "description": "LFP stream visualiser",
   "author": "Victor Saiz <victor.saiz@ircam.fr>",
   "main": "index.js",
   "scripts": {
@@ -10,22 +10,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ircam-RnD/lfp-draw-waveform"
+    "url": "https://github.com/ircam-rnd/lfp"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lfp": "ircam-rnd/lfp.git"
+  },
   "devDependencies": {
-    "fs-utils": "0.4.3",
+    "module-boilerplate": "ircam-rnd/module-boilerplate.git",
+    "fs-utils" : "0.4.3",
     "browserify": "~4.1.2",
     "mocha": "~1.17.1",
     "chai": "~1.9.0",
     "blanket": "~1.1.6",
-    "gulp": "~3.8.2",
-    "gulp-uglify": "~0.3",
-    "vinyl-source-stream": "~0.1.1",
-    "gulp-connect": "~2.0.5",
-    "gulp-streamify": "~0.0.5",
-    "gulp-verb": "0.2.3",
-    "gulp-gh-pages": "0.1.4"
+    "gulp": "~3.8.2"
   },
   "license": "BSD-3"
 }
