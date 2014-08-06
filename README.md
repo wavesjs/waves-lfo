@@ -51,7 +51,7 @@ You can of course at any moment branch straight from the root of the tree via th
 ### Status
 
 This library is under heavy development and subject to change.  
-Evert new API breaking change we will be adding snapshots to the repository so you can always fetch a working copy.
+Every new API breaking change we will be adding snapshots to the repository so you can always fetch a working copy.
 
 ## License
 This module is released under the [BSD-3-Clause license](http://opensource.org/licenses/BSD-3-Clause).
