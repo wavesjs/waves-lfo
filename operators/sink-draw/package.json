@@ -1,0 +1,23 @@
+{
+  "name": "sink-draw",
+  "version": "1.0.0",
+  "description": "LFO drawin sink",
+  "main": "sink-draw",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "es6-transpiler sink-draw.es6.js > sink-draw.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wavesjs/lfo"
+  },
+  "author": "Victor Saiz",
+  "license": "BSD-3",
+  "bugs": {
+    "url": "https://github.com/wavesjs/lfo/issues"
+  },
+  "homepage": "https://github.com/wavesjs/lfo",
+  "devDependencies": {
+    "es6-transpiler": "^0.7.18"
+  }
+}

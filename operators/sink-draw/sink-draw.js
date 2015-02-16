@@ -2,15 +2,14 @@
 "use strict";
 
 var LFO = require('lfo');
-var pck = require('./package.json');
 var extend = Object.assign;
 
-class Draw extends LFO {
+var Draw = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(Draw, super$0);var proto$0={};
 
-  constructor(previous = null, options = {}) {
+  function Draw() {var previous = arguments[0];if(previous === void 0)previous = null;var options = arguments[1];if(options === void 0)options = {};
     if (!(this instanceof Draw)) return new Draw(previous, options);
     
-    this.type = pck.name;
+    this.type = 'sink-draw';
 
     // defaults
     options = extend({
@@ -18,7 +17,7 @@ class Draw extends LFO {
       color: '#000000'
     }, options);
 
-    super(previous, options);
+    super$0.call(this, previous, options);
    
     if(!options.canvas)
       return console.error('Please note: a canvas element is required or this module');
@@ -47,16 +46,16 @@ class Draw extends LFO {
     this.__minVal = -1.0;
     this.__maxVal = 1.0;
 
-  }
+  }if(super$0!==null)SP$0(Draw,super$0);Draw.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":Draw,"configurable":true,"writable":true}});DP$0(Draw,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
   // Private Methods
   // ---------------
 
-  __clearCanvas(cv) { 
+  proto$0.__clearCanvas = function(cv) { 
     cv.height = this.__height; cv.width = this.__width;
-  }
+  };
 
-  __scrollLeft() {
+  proto$0.__scrollLeft = function() {
 
     // clear the buffer
     this.__clearCanvas(this.__buffer);
@@ -76,13 +75,13 @@ class Draw extends LFO {
 
     // re-set the index
     this.__x = this.__width - 1;
-  }
+  };
 
 
   // Public Methods
   // --------------
 
-  process(time, data) {
+  proto$0.process = function(time, data) {
     var min = this.__maxVal;
     var max = this.__minVal;
     var step = data.length;
@@ -106,8 +105,8 @@ class Draw extends LFO {
     }
     
     this.__i++;
-  }
+  };
 
-}
+MIXIN$0(Draw.prototype,proto$0);proto$0=void 0;return Draw;})(LFO);
 
 module.exports = Draw;
