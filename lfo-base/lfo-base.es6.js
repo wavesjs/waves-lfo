@@ -7,6 +7,7 @@ var extend = Object.assign;
 class Lfo extends EventEmitter {
 
   constructor(previous = null, options = {}) {
+    if (!(this instanceof Lfo)) return new Lfo(previous, options);
 
     this.idx = 0;
     
