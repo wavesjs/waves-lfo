@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * @fileoverview WAVE LFP module: biquad filter.
+ * @fileoverview WAVE LFO module: biquad filter.
  * @author Jean-Philippe.Lambert@ircam.fr, Norbert.Schnell@ircam.fr, victor.saiz@ircam.fr
  * @version 0.1.0
  *
@@ -26,8 +26,8 @@
 
 /* a1 is a[0] and a2 is a[1] */
 
-var LFP = require('../lfp');
-var _lfp = Object.create(LFP); // inherit from base lfp
+var LFO = require('lfo');
+var _lfo = Object.create(LFO); // inherit from base lfp
 var pck = require('./package.json');
 
 var sin = Math.sin;
@@ -35,7 +35,7 @@ var cos = Math.cos;
 var M_PI = Math.PI;
 var sqrt = Math.sqrt;
 
-Object.defineProperties(_lfp, {
+Object.defineProperties(_lfo, {
   type: {value: pck.name},
 
   b0 : { writable: true, value: 0},
@@ -51,9 +51,9 @@ Object.defineProperties(_lfp, {
 
 });
 
-Object.defineProperty(_lfp, 'init', {
+Object.defineProperty(_lfo, 'init', {
   enumerable: true, value: function(opts) {
-    LFP.init.call(this, opts);
+    LFO.init.call(this, opts);
     opts = this.extend(this.config, opts);
 
     var type = opts.type || 'lowpass';
@@ -77,7 +77,7 @@ Object.defineProperty(_lfp, 'init', {
 });
 
 /* helper */
-Object.defineProperty(_lfp, 'coefs', {
+Object.defineProperty(_lfo, 'coefs', {
   enumerable: true, value: function coefs(type, f0, q, gain) {
 
     switch(type) {
@@ -148,7 +148,7 @@ Object.defineProperty(_lfp, 'coefs', {
 // ------------------
 
 /* LPF: H(s) = 1 / (s^2 + s/Q + 1) */
-Object.defineProperty(_lfp, 'lowpass_coefs', {
+Object.defineProperty(_lfo, 'lowpass_coefs', {
   enumerable: true, value: function lowpass_coefs(f0, q) {
   
     var w0 = M_PI * f0;
@@ -168,7 +168,7 @@ Object.defineProperty(_lfp, 'lowpass_coefs', {
 });
 
 /* HPF: H(s) = s^2 / (s^2 + s/Q + 1) */
-Object.defineProperty(_lfp, 'highpass_coefs', {
+Object.defineProperty(_lfo, 'highpass_coefs', {
   enumerable: true, value: function highpass_coefs(f0, q) {
     
     var w0 = M_PI * f0;
@@ -188,7 +188,7 @@ Object.defineProperty(_lfp, 'highpass_coefs', {
 });
 
 /* BPF: H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q) */
-Object.defineProperty(_lfp, 'bandpass_constant_skirt_coefs', {
+Object.defineProperty(_lfo, 'bandpass_constant_skirt_coefs', {
   enumerable: true, value: function bandpass_constant_skirt_coefs(f0, q) {
   
     var w0 = M_PI * f0;
@@ -209,7 +209,7 @@ Object.defineProperty(_lfp, 'bandpass_constant_skirt_coefs', {
 });
 
 /* BPF: H(s) = (s/Q) / (s^2 + s/Q + 1)      (constant 0 dB peak gain) */
-Object.defineProperty(_lfp, 'bandpass_constant_peak_coefs', {
+Object.defineProperty(_lfo, 'bandpass_constant_peak_coefs', {
   enumerable: true, value: function bandpass_constant_peak_coefs(f0, q) {
   
     var w0 = M_PI * f0;
@@ -228,7 +228,7 @@ Object.defineProperty(_lfp, 'bandpass_constant_peak_coefs', {
 });
 
 /* notch: H(s) = (s^2 + 1) / (s^2 + s/Q + 1) */
-Object.defineProperty(_lfp, 'notch_coefs', {
+Object.defineProperty(_lfo, 'notch_coefs', {
   enumerable: true, value: function notch_coefs(f0, q) {
 
     var w0 = M_PI * f0;
@@ -248,7 +248,7 @@ Object.defineProperty(_lfp, 'notch_coefs', {
 });
 
 /* APF: H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1) */
-Object.defineProperty(_lfp, 'allpass_coefs', {
+Object.defineProperty(_lfo, 'allpass_coefs', {
   enumerable: true, value: function allpass_coefs(f0, q) {
   
     var w0 = M_PI * f0;
@@ -270,7 +270,7 @@ Object.defineProperty(_lfp, 'allpass_coefs', {
 /* peakingEQ: H(s) = (s^2 + s*(A/Q) + 1) / (s^2 + s/(A*Q) + 1) */
 /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
 /* gain is linear here */
-Object.defineProperty(_lfp, 'peaking_coefs', {
+Object.defineProperty(_lfo, 'peaking_coefs', {
   enumerable: true, value: function peaking_coefs(f0, q, gain) {
   
     var g = sqrt(gain);
@@ -295,7 +295,7 @@ Object.defineProperty(_lfp, 'peaking_coefs', {
 /* lowShelf: H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1) */
 /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
 /* gain is linear here */
-Object.defineProperty(_lfp, 'lowshelf_coefs', {
+Object.defineProperty(_lfo, 'lowshelf_coefs', {
   enumerable: true, value: function lowshelf_coefs(f0, q, gain) {
   
     var g = sqrt(gain);
@@ -319,7 +319,7 @@ Object.defineProperty(_lfp, 'lowshelf_coefs', {
 /* highShelf: H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A) */
 /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
 /* gain is linear here */
-Object.defineProperty(_lfp, 'highshelf_coefs', {
+Object.defineProperty(_lfo, 'highshelf_coefs', {
   enumerable: true, value: function highshelf_coefs(f0, q, gain) {
   
     var g = sqrt(gain);
@@ -342,7 +342,7 @@ Object.defineProperty(_lfp, 'highshelf_coefs', {
 
 
 // Main processing function called
-Object.defineProperty(_lfp, 'processScalar', {
+Object.defineProperty(_lfo, 'processScalar', {
   enumerable: true, value: function(time, data) {
 
     this.nextOperator(time, this.df1(data));
@@ -352,7 +352,7 @@ Object.defineProperty(_lfp, 'processScalar', {
 /* direct form I */
 /* a0 = 1, a1 = a[0], a2 = a[1] */
 /* 4 states (in that order): x(n-1), x(n-2), y(n-1), y(n-2)  */
-Object.defineProperty(_lfp, 'df1', {
+Object.defineProperty(_lfo, 'df1', {
   enumerable: true, value: function df1(x) {
   
     var y = this.b0 * x + this.b1 * this.xn_1 + this.b2 * this.xn_2 - this.a1 * this.yn_1 - this.a2 * this.yn_2;
@@ -371,7 +371,7 @@ Object.defineProperty(_lfp, 'df1', {
 /* transposed direct form II */
 /* a0 = 1, a1 = a[0], a2 = a[1] */
 /* 2 states */
-Object.defineProperty(_lfp, 'df2t', {
+Object.defineProperty(_lfo, 'df2t', {
   enumerable: true, value: function df2t(x) {
 
     var y = this.b0 * x + this.xn_1;
@@ -384,5 +384,5 @@ Object.defineProperty(_lfp, 'df2t', {
 });
 
 module.exports = function(opts) {
-  return Object.create(_lfp).init(opts);
+  return Object.create(_lfo).init(opts);
 };
