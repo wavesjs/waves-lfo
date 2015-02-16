@@ -27,33 +27,15 @@
 /* a1 is a[0] and a2 is a[1] */
 
 var LFO = require('lfo');
-var _lfo = Object.create(LFO); // inherit from base lfp
-var pck = require('./package.json');
 
 var sin = Math.sin;
 var cos = Math.cos;
 var M_PI = Math.PI;
 var sqrt = Math.sqrt;
 
-Object.defineProperties(_lfo, {
-  type: {value: pck.name},
+class Biquad extends LFO {
+  constructor(opts) {
 
-  b0 : { writable: true, value: 0},
-  b1 : { writable: true, value: 0},
-  b2 : { writable: true, value: 0},
-  a1 : { writable: true, value: 0},
-  a2 : { writable: true, value: 0},
-  
-  xn_1 : { writable: true, value: 0},
-  xn_2 : { writable: true, value: 0},
-  yn_1 : { writable: true, value: 0},
-  yn_2 : { writable: true, value: 0}
-
-});
-
-Object.defineProperty(_lfo, 'init', {
-  enumerable: true, value: function(opts) {
-    LFO.init.call(this, opts);
     opts = this.extend(this.config, opts);
 
     var type = opts.type || 'lowpass';
@@ -63,7 +45,7 @@ Object.defineProperty(_lfo, 'init', {
     var gain = opts.gain || 1;
     var q = 1.0;
 
-    if(opts.q) q = opts.q;
+    if(opts.q)  q = opts.q;
     if(opts.bw) q = f0 / opts.bw;
 
     // to implement
@@ -71,14 +53,22 @@ Object.defineProperty(_lfo, 'init', {
     // if(opts.decay) …
     // if(opts.over) …
 
-    this.coefs(type, f0, q, gain);
-    return this;
-  }
-});
+    this.b0  = 0;
+    this.b1  = 0;
+    this.b2  = 0;
+    this.a1  = 0;
+    this.a2  = 0;
 
-/* helper */
-Object.defineProperty(_lfo, 'coefs', {
-  enumerable: true, value: function coefs(type, f0, q, gain) {
+    this.xn_1  = 0;
+    this.xn_2  = 0;
+    this.yn_1  = 0;
+    this.yn_2  = 0;
+
+    this.coefs(type, f0, q, gain);
+  }
+
+  /* helper */
+  coefs(type, f0, q, gain) {
 
     switch(type) {
       case 'lowpass':
@@ -142,15 +132,13 @@ Object.defineProperty(_lfo, 'coefs', {
     }
 
   }
-});
 
-// coefs calculations
-// ------------------
+  // coefs calculations
+  // ------------------
 
-/* LPF: H(s) = 1 / (s^2 + s/Q + 1) */
-Object.defineProperty(_lfo, 'lowpass_coefs', {
-  enumerable: true, value: function lowpass_coefs(f0, q) {
-  
+  /* LPF: H(s) = 1 / (s^2 + s/Q + 1) */
+  lowpass_coefs(f0, q) {
+    
     var w0 = M_PI * f0;
     var alpha = sin(w0) / (2.0 * q);
     var c = cos(w0);
@@ -165,11 +153,9 @@ Object.defineProperty(_lfo, 'lowpass_coefs', {
     this.b2 = this.b0;
 
   }
-});
 
-/* HPF: H(s) = s^2 / (s^2 + s/Q + 1) */
-Object.defineProperty(_lfo, 'highpass_coefs', {
-  enumerable: true, value: function highpass_coefs(f0, q) {
+  /* HPF: H(s) = s^2 / (s^2 + s/Q + 1) */
+  highpass_coefs(f0, q) {
     
     var w0 = M_PI * f0;
     var alpha = sin(w0) / (2.0 * q);
@@ -185,12 +171,10 @@ Object.defineProperty(_lfo, 'highpass_coefs', {
     this.b2 = this.b0;
 
   }
-});
 
-/* BPF: H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q) */
-Object.defineProperty(_lfo, 'bandpass_constant_skirt_coefs', {
-  enumerable: true, value: function bandpass_constant_skirt_coefs(f0, q) {
-  
+  /* BPF: H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q) */
+  bandpass_constant_skirt_coefs(f0, q) {
+
     var w0 = M_PI * f0;
     var s = sin(w0);
     var alpha = s / (2.0 * q);
@@ -206,12 +190,10 @@ Object.defineProperty(_lfo, 'bandpass_constant_skirt_coefs', {
     this.b2 = -this.b0;
 
   }
-});
 
-/* BPF: H(s) = (s/Q) / (s^2 + s/Q + 1)      (constant 0 dB peak gain) */
-Object.defineProperty(_lfo, 'bandpass_constant_peak_coefs', {
-  enumerable: true, value: function bandpass_constant_peak_coefs(f0, q) {
-  
+  /* BPF: H(s) = (s/Q) / (s^2 + s/Q + 1)      (constant 0 dB peak gain) */
+  bandpass_constant_peak_coefs(f0, q) {
+    
     var w0 = M_PI * f0;
     var alpha = sin(w0) / (2.0 * q);
     var c = cos(w0);
@@ -225,11 +207,9 @@ Object.defineProperty(_lfo, 'bandpass_constant_peak_coefs', {
     this.b1 = 0.0;
     this.b2 = -this.b0;
   }
-});
 
-/* notch: H(s) = (s^2 + 1) / (s^2 + s/Q + 1) */
-Object.defineProperty(_lfo, 'notch_coefs', {
-  enumerable: true, value: function notch_coefs(f0, q) {
+  /* notch: H(s) = (s^2 + 1) / (s^2 + s/Q + 1) */
+  notch_coefs(f0, q) {
 
     var w0 = M_PI * f0;
     var alpha = sin(w0) / (2.0 * q);
@@ -245,12 +225,10 @@ Object.defineProperty(_lfo, 'notch_coefs', {
     this.b2 = this.b0;
 
   }
-});
 
-/* APF: H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1) */
-Object.defineProperty(_lfo, 'allpass_coefs', {
-  enumerable: true, value: function allpass_coefs(f0, q) {
-  
+  /* APF: H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1) */
+  allpass_coefs(f0, q) {
+
     var w0 = M_PI * f0;
     var alpha = sin(w0) / (2.0 * q);
     var c = cos(w0);
@@ -265,14 +243,12 @@ Object.defineProperty(_lfo, 'allpass_coefs', {
     this.b2 = 1.0;
 
   }
-});
 
-/* peakingEQ: H(s) = (s^2 + s*(A/Q) + 1) / (s^2 + s/(A*Q) + 1) */
-/* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
-/* gain is linear here */
-Object.defineProperty(_lfo, 'peaking_coefs', {
-  enumerable: true, value: function peaking_coefs(f0, q, gain) {
-  
+  /* peakingEQ: H(s) = (s^2 + s*(A/Q) + 1) / (s^2 + s/(A*Q) + 1) */
+  /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
+  /* gain is linear here */
+  peaking_coefs(f0, q, gain) {
+    
     var g = sqrt(gain);
     var g_inv = 1.0 / g;
 
@@ -290,14 +266,12 @@ Object.defineProperty(_lfo, 'peaking_coefs', {
     this.b2 = (1.0 - alpha * g) * a0_inv;
 
   }
-});
 
-/* lowShelf: H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1) */
-/* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
-/* gain is linear here */
-Object.defineProperty(_lfo, 'lowshelf_coefs', {
-  enumerable: true, value: function lowshelf_coefs(f0, q, gain) {
-  
+  /* lowShelf: H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1) */
+  /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
+  /* gain is linear here */
+  lowshelf_coefs(f0, q, gain) {
+
     var g = sqrt(gain);
 
     var w0 = M_PI * f0;
@@ -314,14 +288,12 @@ Object.defineProperty(_lfo, 'lowshelf_coefs', {
     this.b2 = (       g * ( (g+1.0) - (g-1.0) * c - alpha_2_sqrtg) ) * a0_inv;
 
   }
-});
 
-/* highShelf: H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A) */
-/* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
-/* gain is linear here */
-Object.defineProperty(_lfo, 'highshelf_coefs', {
-  enumerable: true, value: function highshelf_coefs(f0, q, gain) {
-  
+  /* highShelf: H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A) */
+  /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
+  /* gain is linear here */
+  highshelf_coefs(f0, q, gain) {
+    
     var g = sqrt(gain);
 
     var w0 = M_PI * f0;
@@ -338,23 +310,18 @@ Object.defineProperty(_lfo, 'highshelf_coefs', {
     this.b2 = (      g * (  (g+1.0) + (g-1.0) * c - alpha_2_sqrtg) ) * a0_inv;
 
   }
-});
 
-
-// Main processing function called
-Object.defineProperty(_lfo, 'processScalar', {
-  enumerable: true, value: function(time, data) {
+  // Main processing function called
+  processScalar(time, data) {
 
     this.nextOperator(time, this.df1(data));
   }
-});
 
-/* direct form I */
-/* a0 = 1, a1 = a[0], a2 = a[1] */
-/* 4 states (in that order): x(n-1), x(n-2), y(n-1), y(n-2)  */
-Object.defineProperty(_lfo, 'df1', {
-  enumerable: true, value: function df1(x) {
-  
+  /* direct form I */
+  /* a0 = 1, a1 = a[0], a2 = a[1] */
+  /* 4 states (in that order): x(n-1), x(n-2), y(n-1), y(n-2)  */
+  df1(x) {
+    
     var y = this.b0 * x + this.b1 * this.xn_1 + this.b2 * this.xn_2 - this.a1 * this.yn_1 - this.a2 * this.yn_2;
 
     // update states
@@ -366,13 +333,11 @@ Object.defineProperty(_lfo, 'df1', {
 
     return y;
   }
-});
 
-/* transposed direct form II */
-/* a0 = 1, a1 = a[0], a2 = a[1] */
-/* 2 states */
-Object.defineProperty(_lfo, 'df2t', {
-  enumerable: true, value: function df2t(x) {
+  /* transposed direct form II */
+  /* a0 = 1, a1 = a[0], a2 = a[1] */
+  /* 2 states */
+  df2t(x) {
 
     var y = this.b0 * x + this.xn_1;
     
@@ -381,8 +346,7 @@ Object.defineProperty(_lfo, 'df2t', {
 
     return y;
   }
-});
 
-module.exports = function(opts) {
-  return Object.create(_lfo).init(opts);
-};
+}
+
+module.exports = Biquad;
