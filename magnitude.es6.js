@@ -1,8 +1,9 @@
+
 "use strict";
 
-var Lfp = require('../lfp');
+var Lfo = require('lfo');
 
-class Magnitude extends Lfp {
+class Magnitude extends Lfo {
 
   constructor(previous = null, options = {}) {
 
@@ -10,27 +11,28 @@ class Magnitude extends Lfp {
 
     super(previous, options);
 
-    this.declareMembers(["type", "outFrame", "frameSize", "offset"]);
-
+    // pubs
     this.type = 'mag';
-    this.outFrame = new Float32Array(1);
-    this.frameSize = options.frameSize || 2048;
-
+    // privs
+    this.__outFrame = new Float32Array(1);
+    this.__frameSize = options.frameSize || 2048;
+    this.__offset = options.offset || 0;
   }
+
 
   process(time, frame) {
 
-    var outFrame = this.outFrame,
-      frameSize = this.frameSize,
+    var outFrame = this.__outFrame,
+      frameSize  = this.__frameSize,
       sum = 0,
       i;
 
     for (i = 0; i < frameSize; i++)
       sum += (frame[i] * frame[i]);
 
-    time -= this.offset;
+    time -= this.__offset;
     outFrame.set([Math.sqrt(sum / frameSize)], 0);
-    this.nextOperators(time, outFrame);
+    this.emit('frame', time, outFrame);
   }
 }
 

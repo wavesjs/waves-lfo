@@ -2,15 +2,15 @@
   "name": "magnitude",
   "exports": "magnitude",
   "version": "0.1.0",
-  "description": "Magnitude LFP",
-  "author": "Victor Saiz <victor.saiz@ircam.fr>",
-  "main": "index.js",
+  "description": "Magnitude LFo",
+  "author": "Victor Saiz",
+  "main": "magnitude.js",
   "scripts": {
     "test": "echo \"Erro: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ircam-rnd/lfp-magnitude"
+    "url": "https://github.com/ircam-rnd/lfo-magnitude"
   },
   "dependencies": {},
   "devDependencies": {},
