@@ -1,0 +1,20 @@
+{
+  "name": "lfo-graph",
+  "version": "1.0.0",
+  "description": "LFO graph structure",
+  "main": "lfo-graph.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel -t lfo-graph.es6.js | sed -e 's/  _class/  \\/\\/_class/g' > lfo-graph.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "wavesjs/lfo"
+  },
+  "author": "Victor Saiz",
+  "license": "BSD-3",
+  "bugs": {
+    "url": "https://github.com/wavesjs/lfo/issues"
+  },
+  "homepage": "https://github.com/wavesjs/lfo"
+}
