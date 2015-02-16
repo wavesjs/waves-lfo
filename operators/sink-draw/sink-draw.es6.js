@@ -1,7 +1,7 @@
 
 "use strict";
 
-var LFO = require('lfo');
+var LFO = require('../../lfo-base');
 var extend = Object.assign;
 
 class Draw extends LFO {

@@ -1,7 +1,7 @@
 
 "use strict";
 
-var Lfo = require('lfo/lfo-base');
+var Lfo = require('../../../lfo-base');
 var audioContext = require('audio-context');
 var extend = Object.assign;
 
