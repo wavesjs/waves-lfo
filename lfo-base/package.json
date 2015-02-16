@@ -1,0 +1,23 @@
+{
+  "name": "lfo-base",
+  "version": "1.0.0",
+  "description": "Base class to be extended by other LFOs",
+  "main": "lfo-base.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel -t lfo-base.es6.js | sed -e 's/  _class/  \\/\\/_class/g' > lfo-base.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "wavesjs/lfo"
+  },
+  "devDependencies": {
+    "babel": "^4.0.1"
+  },
+  "author": "Victor Saiz",
+  "license": "BSD-3",
+  "bugs": {
+    "url": "https://github.com/wavesjs/lfo/issues"
+  },
+  "homepage": "https://github.com/wavesjs/lfo"
+}
