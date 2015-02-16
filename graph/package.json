@@ -1,11 +1,11 @@
 {
-  "name": "lfo-graph",
+  "name": "graph",
   "version": "1.0.0",
   "description": "LFO graph structure",
-  "main": "lfo-graph.js",
+  "main": "graph.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel -t lfo-graph.es6.js | sed -e 's/  _class/  \\/\\/_class/g' > lfo-graph.js"
+    "build": "babel -t graph.es6.js | sed -e 's/  _class/  \\/\\/_class/g' > graph.js"
   },
   "repository": {
     "type": "git",
