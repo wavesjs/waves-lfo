@@ -1,7 +1,7 @@
 
 "use strict";
 
-var Lfo = require('lfo');
+var Lfo = require('../../lfo-base');
 
 class Magnitude extends Lfo {
 
