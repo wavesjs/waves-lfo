@@ -2,9 +2,7 @@
 "use strict";
 
 let AudioIn = require('./audio-in');
-let Reslicer = require('./reslicer');
 let Framer = require('./framer');
-
 
 // web audio API node as a source
 class AudioInNode extends AudioIn {
@@ -15,7 +13,7 @@ class AudioInNode extends AudioIn {
     
     this.type = 'audio-in-node';
 
-    this.reslicer = new Framer(this.outFrame, this.hopSize, (time, frame) => {
+    this.reslicer = new Framer(this.outFrame, this.hopSize, this._ctx.sampleRate, (time, frame) => {
       this.output(this.time);
     });
 
