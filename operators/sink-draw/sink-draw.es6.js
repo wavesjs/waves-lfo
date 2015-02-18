@@ -92,7 +92,7 @@ class Draw extends LFO {
         if (datum > max) max = datum;
       }
 
-      var pos = (1 - max * this._amp) + this._amp;
+      var pos = (this._maxVal - max * this._amp) + this._amp;
       var h = (max - min) * this._amp;
 
       this._cvCtx.fillStyle = this.color;

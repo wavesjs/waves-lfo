@@ -11,14 +11,13 @@ class Magnitude extends Lfo {
 
     super(previous, options, {normalize: false});
 
-    this.type = 'mag';
+    this.type = 'magnitude';
 
-    // sets all the necessary logic based on the params
+    // sets the necessary logic based on the params
     this.setupStream({frameSize: 1});
   }
 
   process(time, frame) {
-
     var frameSize = this.streamParams.frameSize,
       normalize = this.params.normalize,
       sum = 0,
@@ -27,8 +26,7 @@ class Magnitude extends Lfo {
     for (i = 0; i < frameSize; i++)
       sum += (frame[i] * frame[i]);
 
-    if(normalize)
-      sum /= frameSize;
+    if(normalize) sum /= frameSize;
 
     this.outFrame.set([Math.sqrt(sum)], 0);
     this.output(time);

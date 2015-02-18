@@ -11,14 +11,13 @@ var Magnitude = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a
 
     super$0.call(this, previous, options, {normalize: false});
 
-    this.type = 'mag';
+    this.type = 'magnitude';
 
-    // sets all the necessary logic based on the params
+    // sets the necessary logic based on the params
     this.setupStream({frameSize: 1});
   }if(super$0!==null)SP$0(Magnitude,super$0);Magnitude.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":Magnitude,"configurable":true,"writable":true}});DP$0(Magnitude,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
   proto$0.process = function(time, frame) {
-
     var frameSize = this.streamParams.frameSize,
       normalize = this.params.normalize,
       sum = 0,
@@ -27,8 +26,7 @@ var Magnitude = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a
     for (i = 0; i < frameSize; i++)
       sum += (frame[i] * frame[i]);
 
-    if(normalize)
-      sum /= frameSize;
+    if(normalize) sum /= frameSize;
 
     this.outFrame.set([Math.sqrt(sum)], 0);
     this.output(time);
