@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "LFP biquad filter and coefficients calculator",
   "author": "Jean-Philippe.Lambert@ircam.fr, Norbert.Schnell@ircam.fr, victor.saiz@ircam.fr",
-  "main": "index.js",
+  "main": "biquad.js",
   "scripts": {
     "test": "echo \"Erro: no test specified\" && exit 1"
   },
