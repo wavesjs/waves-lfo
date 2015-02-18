@@ -2,49 +2,40 @@
 "use strict";
 
 let AudioIn = require('./audio-in');
+let Reslicer = require('./reslicer');
+let Framer = require('./framer');
+
 
 // web audio API node as a source
 class AudioInNode extends AudioIn {
 
-  constructor(previous = null, options = {}) {
-    if (!(this instanceof AudioInNode)) return new AudioInNode(previous, options);
-    super(previous, options);
+  constructor(options = {}) {
+    if (!(this instanceof AudioInNode)) return new AudioInNode(options);
+    super(options);
     
     this.type = 'audio-in-node';
 
-    this.__frameRate = this.sampleRate / this.hopSize;
-    this.__proc = this.__ctx.createScriptProcessor(this.hopSize, 1, 1);
+    this.reslicer = new Framer(this.outFrame, this.hopSize, (time, frame) => {
+      this.output(this.time);
+    });
+
+    this._proc = this._ctx.createScriptProcessor(this.hopSize, 1, 1);
     // keepalive
-    this.__ctx['_process-' + new Date().getTime()] = this.__proc;
+    this._ctx['_process-' + new Date().getTime()] = this._proc;
   }
 
   // connect the audio nodes to start streaming
   start() {
 
-    var recBuffer = new Float32Array(this.__buferSize);
-
-    this.__proc.onaudioprocess = (e) => {
-
-      recBuffer.set(e.inputBuffer.getChannelData(this.channel), this.__currentIndex);
-
-      this.__currentIndex += this.blockSize;
-     
-      // hop broadcast
-      while(this.__currentIndex >= this.frameSize){
-
-        // call the generic process method that loops through the operators
-        this.emit('frame', this.__currentTime - this.offset, recBuffer.subarray(0, this.frameSize));
-
-        recBuffer.set( recBuffer.subarray(this.hopSize, this.__currentIndex) , 0);
-        this.__currentIndex -= this.hopSize;
-        this.__currentTime += (this.hopSize / this.sampleRate);
-      }
-
+    this._proc.onaudioprocess = (e) => {
+      var block = e.inputBuffer.getChannelData(this.channel);
+      this.reslicer.input(this.time, block);
+      this.time += block.length / this.sampleRate;
     };
 
     // start "the patch" ;) 
-    this.__src.connect(this.__proc);
-    this.__proc.connect(this.__ctx.destination);
+    this._src.connect(this._proc);
+    this._proc.connect(this._ctx.destination);
   }
 
 }

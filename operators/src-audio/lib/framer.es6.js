@@ -1,6 +1,7 @@
 "use strict";
 
 class Framer {
+  
    constructor(outFrame, hopSize, callback) {
       this._outFrame = outFrame;
       this._hopSize = hopSize;
@@ -24,7 +25,7 @@ class Framer {
 
          // output zero padded frame
          var frameTime = 0; // @@@
-         this.callback(frameTime, outFrame);
+         this._callback(frameTime, outFrame);
       }
    }
 
@@ -65,11 +66,11 @@ class Framer {
 
                // output complete frame
                var frameTime = 0; // @@@
-               this.callback(frameTime, outFrame);
+               this._callback(frameTime, outFrame);
 
                // shift frame left
                if (this._hopSize < frameSize)
-                  outFrame.set(outFrame.subarray(this._hopSize, frameSize), frameIndex);
+                  outFrame.set(outFrame.subarray(this._hopSize, frameSize), 0);
 
                frameIndex -= this._hopSize; // hop forward
             }

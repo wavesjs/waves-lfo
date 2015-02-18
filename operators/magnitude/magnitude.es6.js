@@ -9,30 +9,29 @@ class Magnitude extends Lfo {
 
     if (!(this instanceof Magnitude)) return new Magnitude(previous, options);
 
-    super(previous, options);
+    super(previous, options, {normalize: false});
 
-    // pubs
     this.type = 'mag';
-    // privs
-    this.__outFrame = new Float32Array(1);
-    this.__frameSize = options.frameSize || 2048;
-    this.__offset = options.offset || 0;
-  }
 
+    // sets all the necessary logic based on the params
+    this.setupStream({frameSize: 1});
+  }
 
   process(time, frame) {
 
-    var outFrame = this.__outFrame,
-      frameSize  = this.__frameSize,
+    var frameSize = this.streamParams.frameSize,
+      normalize = this.params.normalize,
       sum = 0,
       i;
 
     for (i = 0; i < frameSize; i++)
       sum += (frame[i] * frame[i]);
 
-    time -= this.__offset;
-    outFrame.set([Math.sqrt(sum / frameSize)], 0);
-    this.emit('frame', time, outFrame);
+    if(normalize)
+      sum /= frameSize;
+
+    this.outFrame.set([Math.sqrt(sum)], 0);
+    this.output(time);
   }
 }
 

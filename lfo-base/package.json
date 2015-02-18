@@ -12,7 +12,8 @@
     "url": "wavesjs/lfo"
   },
   "devDependencies": {
-    "babel": "^4.0.1"
+    "babel": "^4.0.1",
+    "object-assign": "^2.0.0"
   },
   "author": "Victor Saiz",
   "license": "BSD-3",

@@ -25,6 +25,7 @@ class Node {
   }
 }
 
+
 class LfpGraph {
 
   constructor(ctor, options = {}, id = null) {
@@ -112,7 +113,6 @@ class LfpGraph {
   get(id) {
     return this.nodes[id];
   }
-
 
   toString(){
     return this.nodes;

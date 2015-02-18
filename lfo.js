@@ -1,7 +1,8 @@
 
 module.exports = {
-  "sink-draw": require('./operators/sink-draw'),
-  "src-audio": require('./operators/src-audio'),
+  "sinkDraw": require('./operators/sink-draw'),
+  "srcAudio": require('./operators/src-audio'),
   "magnitude": require('./operators/magnitude'),
+  "biquad": require('./operators/biquad'),
   "graph": require('./graph')
 };

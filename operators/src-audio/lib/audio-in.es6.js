@@ -3,45 +3,42 @@
 
 var Lfo = require('../../../lfo-base');
 var audioContext = require('audio-context');
-var extend = Object.assign;
 
 class AudioIn extends Lfo {
 
-  constructor(previous = null, options = {}) {
-    if (!(this instanceof AudioIn)) return new AudioIn(previous, options);
+  constructor(options = {}) {
+    if (!(this instanceof AudioIn)) return new AudioIn(options);
     
     this.type = 'audio-in';
-   
-    // if no process in the duck, then it's an options duck
-    if(previous && !('process' in previous)){
-      extend(options, previous);
-      previous = null;
-    }
-
+    
     // defaults
-    options = extend({
+    var defaults = {
       frameSize: 2048,
       blockSize: 256,
       hopSize: 256,
       channel: 0
-    }, options);
+    };
 
-    super(previous, options);
-
+    super(null, options, defaults);
+   
     // pubs
-    this.frameSize = options.frameSize;
-    this.blockSize = options.blockSize;
-    this.hopSize = options.hopSize;
-    this.channel = options.channel;
-    this.offset = 0;
+    this.frameSize = this.params.frameSize;
+    this.blockSize = this.params.blockSize;
+    this.hopSize = this.params.hopSize;
+    this.channel = this.params.channel;
+    this.frameOffset = 0;
     this.sampleRate = audioContext.sampleRate;
 
     // privs
-    this.__buferSize = this.frameSize + this.blockSize;
-    this.__ctx = audioContext;
-    this.__currentTime = 0;
-    this.__currentIndex = 0;
-    this.__src = options.src;
+    this._ctx = audioContext;
+    this._currentTime = 0;
+    this._src = this.params.src;
+
+    this.setupStream({
+      frameRate: this.sampleRate / this.hopSize,
+      frameSize: this.frameSize,
+      audioSampleRate: this._ctx.sampleRate
+    });
   }
 
   start() {}
