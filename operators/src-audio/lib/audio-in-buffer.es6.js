@@ -2,6 +2,7 @@
 "use strict";
 
 let AudioIn = require('./audio-in');
+let Framer = require('./framer');
 var fs = require('fs');
 
 // BinaryArray as source
@@ -13,13 +14,23 @@ class AudioInBuffer extends AudioIn {
    
     this.type = 'audio-in-buffer';
 
+    this.framer = new Framer(this.outFrame, this.hopSize, this._ctx.sampleRate, (time, frame) => {
+      this.output(time);
+    });
+
     var wrk = fs.readFileSync(__dirname + '/process-worker.js', 'utf8');
     var blob = new Blob([wrk], { type: "text/javascript" });
     
-    var workerMessage = (e) => this.emit('frame', e.data.time, e.data.frame);
+
+    var workerMessage = (e) => {
+      var block = e.data.block;
+      var time = e.data.time;
+
+      this.framer.input(time, block);
+    };
     
-    this.__proc = new Worker(window.URL.createObjectURL(blob));
-    this.__proc.addEventListener('message', workerMessage, false);
+    this._proc = new Worker(window.URL.createObjectURL(blob));
+    this._proc.addEventListener('message', workerMessage, false);
   }
 
   start() {
@@ -27,12 +38,13 @@ class AudioInBuffer extends AudioIn {
       options: {
         sampleRate: this.sampleRate,
         hopSize: this.hopSize,
+        blockSize: this.blockSize,
         frameSize: this.frameSize
       },
-      data: this.__src.getChannelData(this.channel)
+      data: this._src.getChannelData(this.channel)
     };
 
-    this.__proc.postMessage(message);
+    this._proc.postMessage(message);
   }
 }
 

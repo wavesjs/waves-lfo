@@ -13,9 +13,9 @@ class AudioIn extends Lfo {
     
     // defaults
     var defaults = {
-      frameSize: 2048,
-      blockSize: 256,
-      hopSize: 256,
+      frameSize: 512,
+      blockSize: 2048,
+      hopSize: 512,
       channel: 0
     };
 
