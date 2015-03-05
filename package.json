@@ -1,19 +1,46 @@
 {
-  "name": "LFO",
-  "version": "1.0.0",
+  "name": "waves-lfo",
+  "version": "0.1.0",
   "description": "Low Frequency Operators",
-  "main": "lfo.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "waves-lfo.js",
+  "standalone": "wavesLFO",
+  "license": "BSD-3",
   "repository": {
     "type": "git",
-    "url": "wavesjs/lfo"
+    "url": "https://github.com/wavesjs/lfo"
   },
   "author": "Victor Saiz",
-  "license": "BSD-3",
   "bugs": {
     "url": "https://github.com/wavesjs/lfo/issues"
   },
-  "homepage": "https://github.com/wavesjs/lfo"
+  "homepage": "https://github.com/wavesjs/lfo",
+  "scripts": {
+    "transpile": "node ./bin/scripts.js --transpile",
+    "prebundle": "npm run hint && npm run transpile",
+    "bundle": "node ./bin/scripts.js --bundle",
+    "postbundle": "npm run uglify",
+    "uglify": "node ./bin/scripts.js --uglify",
+    "watch": "node ./bin/scripts.js --watch",
+    "test": "tac6 -- ./tests/test-lfo-base.js",
+    "pretest": "npm run hint",
+    "hint": "find src -type f | while read -r line; do jshint $line; done;"
+  },
+  "jshintConfig": {
+    "esnext": true,
+    "browser": true,
+    "node": true,
+    "devel": true
+  },
+  "dependencies": {
+    "babel-runtime": "^4.6.5"
+  },
+  "devDependencies": {
+    "babel": "^4.5.0",
+    "browserify": "^9.0.3",
+    "fs-extra": "^0.16.3",
+    "jshint": "^2.6.0",
+    "node-watch": "^0.3.4",
+    "tac6": "git://github.com/ircam-rnd/tac6",
+    "uglify-js": "^2.4.16"
+  }
 }

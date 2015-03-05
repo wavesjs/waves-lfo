@@ -1,30 +1,29 @@
-
 "use strict";
 
-var LFO = require('../../lfo-base');
+var LFO = require('../core/lfo-base');
 
 class Draw extends LFO {
 
   constructor(previous = null, options = {}) {
     if (!(this instanceof Draw)) return new Draw(previous, options);
-    
+
     this.type = 'sink-draw';
-    
+
     var defaults = {
       scroll: true,
       color: '#000000'
     };
 
     super(previous, options, defaults);
-   
+
     if(!this.params.canvas)
       return console.error('Please note: a canvas element is required or this module');
-    
+
     // pubs
     this.scrolls = this.params.scroll;
     this.canvas  = this.params.canvas;
     this.color   = this.params.color;
-     
+
     // privs
     this._buffer = document.createElement("canvas");
     this._buffer.width = this.canvas.width;
@@ -49,7 +48,7 @@ class Draw extends LFO {
   // Private Methods
   // ---------------
 
-  _clearCanvas(cv) { 
+  _clearCanvas(cv) {
     cv.height = this._height; cv.width = this._width;
   }
 
@@ -97,11 +96,11 @@ class Draw extends LFO {
 
       this._cvCtx.fillStyle = this.color;
       this._cvCtx.fillRect(this._x, pos, 1, Math.max(1, h));
-      
+
       this._x++;
       if(this._x >= this._width) this._scrollLeft();
     }
-    
+
     this._i++;
   }
 

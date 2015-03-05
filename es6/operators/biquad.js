@@ -6,10 +6,10 @@
  * @version 0.1.0
  *
  * @brief  Biquad filter and coefficients calculator
- * 
+ *
  * Based on the "Cookbook formulae for audio EQ biquad filter
  * coefficients" by Robert Bristow-Johnson
- * 
+ *
  */
 
 /* y(n) = b0 x(n) + b1 x(n-1) + b2 x(n-2)  */
@@ -26,7 +26,7 @@
 
 /* a1 is a[0] and a2 is a[1] */
 
-var Lfo = require('../../lfo-base');
+var Lfo = require('../core/lfo-base');
 
 var sin = Math.sin;
 var cos = Math.cos;
@@ -38,7 +38,7 @@ var sqrt = Math.sqrt;
 
   /* LPF: H(s) = 1 / (s^2 + s/Q + 1) */
 function lowpass_coefs(f0, q, coefs) {
-    
+
     var w0 = M_PI * f0;
     var alpha = sin(w0) / (2.0 * q);
     var c = cos(w0);
@@ -56,7 +56,7 @@ function lowpass_coefs(f0, q, coefs) {
 
   /* HPF: H(s) = s^2 / (s^2 + s/Q + 1) */
 function highpass_coefs(f0, q, coefs) {
-    
+
     var w0 = M_PI * f0;
     var alpha = sin(w0) / (2.0 * q);
     var c = cos(w0);
@@ -93,7 +93,7 @@ function bandpass_constant_skirt_coefs(f0, q, coefs) {
 
   /* BPF: H(s) = (s/Q) / (s^2 + s/Q + 1)      (constant 0 dB peak gain) */
 function bandpass_constant_peak_coefs(f0, q, coefs) {
-    
+
     var w0 = M_PI * f0;
     var alpha = sin(w0) / (2.0 * q);
     var c = cos(w0);
@@ -148,7 +148,7 @@ function allpass_coefs(f0, q, coefs) {
   /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
   /* gain is linear here */
 function peaking_coefs(f0, q, gain, coefs) {
-    
+
     var g = sqrt(gain);
     var g_inv = 1.0 / g;
 
@@ -193,7 +193,7 @@ function lowshelf_coefs(f0, q, gain, coefs) {
   /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
   /* gain is linear here */
 function highshelf_coefs(f0, q, gain, coefs) {
-    
+
     var g = sqrt(gain);
 
     var w0 = M_PI * f0;
@@ -281,7 +281,7 @@ function calculateCoefs(type, f0, q, gain, coefs) {
 /* a0 = 1, a1 = a[0], a2 = a[1] */
 /* 4 states (in that order): x(n-1), x(n-2), y(n-1), y(n-2)  */
 function biquadArrayDf1(coefs, state, inFrame, outFrame, size) {
-  for(var i = 0; i < size; i++) {
+  for(let i = 0; i < size; i++) {
     var y = coefs.b0 * inFrame[i] + coefs.b1 * state.xn_1[i] + coefs.b2 * state.xn_2[i] - coefs.a1 * state.yn_1[i] - coefs.a2 * state.yn_2[i];
 
     outFrame[i] = y;
@@ -299,7 +299,7 @@ function biquadArrayDf1(coefs, state, inFrame, outFrame, size) {
 /* a0 = 1, a1 = a[0], a2 = a[1] */
 /* 2 states */
 function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
-  for(var i = 0; i < size; i++) {
+  for(let i = 0; i < size; i++) {
     outFrame[i] = coefs.b0 * inFrame[i] + state.xn_1[i];
 
     // update states
@@ -308,9 +308,9 @@ function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
   }
 }
 
-var Biquad = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(Biquad, super$0);var proto$0={};
+class Biquad extends Lfo {
 
-  function Biquad(previous, options) {
+  constructor(previous, options) {
     if (!(this instanceof Biquad)) return new Biquad(previous, options);
 
     var defaults = {
@@ -321,8 +321,8 @@ var Biquad = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t
     };
 
     this.type = 'biquad';
-   
-    super$0.call(this, previous, options, defaults);
+
+    super(previous, options, defaults);
     // from here on options is this.params
 
     // to implement
@@ -359,12 +359,12 @@ var Biquad = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t
 
     calculateCoefs(this.params.filterType, normF0, q, gain, this.coefs);
     this.setupStream();
-  }if(super$0!==null)SP$0(Biquad,super$0);Biquad.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":Biquad,"configurable":true,"writable":true}});DP$0(Biquad,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+  }
 
-  proto$0.process = function(time, frame) {
+  process(time, frame) {
     biquadArrayDf1(this.coefs, this.state, frame, this.outFrame, frame.length);
     this.output(time);
-  };
-MIXIN$0(Biquad.prototype,proto$0);proto$0=void 0;return Biquad;})(Lfo);
+  }
+}
 
 module.exports = Biquad;

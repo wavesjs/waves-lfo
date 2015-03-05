@@ -1,16 +1,16 @@
 
 "use strict";
 
-var Lfo = require('../../../lfo-base');
+var Lfo = require('../../core/lfo-base');
 var audioContext = require('audio-context');
 
 class AudioIn extends Lfo {
 
   constructor(options = {}) {
     if (!(this instanceof AudioIn)) return new AudioIn(options);
-    
+
     this.type = 'audio-in';
-    
+
     // defaults
     var defaults = {
       frameSize: 512,
@@ -20,7 +20,7 @@ class AudioIn extends Lfo {
     };
 
     super(null, options, defaults);
-   
+
     // pubs
     this.frameSize = this.params.frameSize;
     this.blockSize = this.params.blockSize;

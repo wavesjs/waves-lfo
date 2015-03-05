@@ -3,6 +3,7 @@
 
 let AudioIn = require('./audio-in');
 let Framer = require('./framer');
+// remove fs, avoid brfs transform
 var fs = require('fs');
 
 // BinaryArray as source
@@ -11,7 +12,7 @@ class AudioInBuffer extends AudioIn {
   constructor(options = {}) {
     if (!(this instanceof AudioInBuffer)) return new AudioInBuffer(options);
     super(options);
-   
+
     this.type = 'audio-in-buffer';
 
     this.framer = new Framer(this.outFrame, this.hopSize, this._ctx.sampleRate, (time, frame) => {
@@ -20,7 +21,7 @@ class AudioInBuffer extends AudioIn {
 
     var wrk = fs.readFileSync(__dirname + '/process-worker.js', 'utf8');
     var blob = new Blob([wrk], { type: "text/javascript" });
-    
+
 
     var workerMessage = (e) => {
       var block = e.data.block;
@@ -28,7 +29,7 @@ class AudioInBuffer extends AudioIn {
 
       this.framer.input(time, block);
     };
-    
+
     this._proc = new Worker(window.URL.createObjectURL(blob));
     this._proc.addEventListener('message', workerMessage, false);
   }
