@@ -2,7 +2,7 @@
 "use strict";
 
 var EventEmitter = require('events').EventEmitter;
-var extend = require('object-assign');
+// var extend = require('object-assign');
 
 class Lfo extends EventEmitter {
 
@@ -15,14 +15,14 @@ class Lfo extends EventEmitter {
       frameSize: 1,
       frameRate: 0
     };
-    
-    this.params = extend(defaults, options);
+
+    this.params = Object.assign(defaults, options);
 
     if(previous) {
       // add ourselves to the previous operator if its passed
       previous.add(this);
       // pass on stream params
-      this.streamParams = extend({}, previous.streamParams);
+      this.streamParams = Object.assign({}, previous.streamParams);
     }
   }
 

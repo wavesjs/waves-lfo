@@ -1,8 +1,8 @@
 
 "use strict";
 
-var Lfo = require('../../core/lfo-base');
-var audioContext = require('audio-context');
+var Lfo = require('../core/lfo-base');
+var audioContext = new AudioContext();
 
 class AudioIn extends Lfo {
 
