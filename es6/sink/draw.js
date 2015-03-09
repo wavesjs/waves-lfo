@@ -1,12 +1,10 @@
 "use strict";
 
-var LFO = require('../core/lfo-base');
+var { Lfo } = require('../core/lfo-base');
 
-class Draw extends LFO {
+class Draw extends Lfo {
 
   constructor(previous = null, options = {}) {
-    if (!(this instanceof Draw)) return new Draw(previous, options);
-
     this.type = 'sink-draw';
 
     var defaults = {
@@ -106,4 +104,9 @@ class Draw extends LFO {
 
 }
 
-module.exports = Draw;
+function factory(previous, options) {
+  return new Draw(previous, options);
+}
+factory.Draw = Draw;
+
+module.exports = factory;

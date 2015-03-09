@@ -26,7 +26,7 @@
 
 /* a1 is a[0] and a2 is a[1] */
 
-var Lfo = require('../core/lfo-base');
+var { Lfo } = require('../core/lfo-base');
 
 var sin = Math.sin;
 var cos = Math.cos;
@@ -311,8 +311,6 @@ function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
 class Biquad extends Lfo {
 
   constructor(previous, options) {
-    if (!(this instanceof Biquad)) return new Biquad(previous, options);
-
     var defaults = {
       filterType:'lowpass',
       f0: 1.0,
@@ -320,9 +318,9 @@ class Biquad extends Lfo {
       q: 1.0
     };
 
+    super(previous, options, defaults);
     this.type = 'biquad';
 
-    super(previous, options, defaults);
     // from here on options is this.params
 
     // to implement
@@ -367,4 +365,10 @@ class Biquad extends Lfo {
   }
 }
 
-module.exports = Biquad;
+function factory(previous, options) {
+  return new Biquad(previous, options);
+}
+factory.Biquad = Biquad;
+
+module.exports = factory;
+

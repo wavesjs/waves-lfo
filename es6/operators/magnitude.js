@@ -1,20 +1,15 @@
 
 "use strict";
 
-var Lfo = require('../core/lfo-base');
+var { Lfo } = require('../core/lfo-base');
 
 class Magnitude extends Lfo {
 
   constructor(previous = null, options = {}) {
-
-    if (!(this instanceof Magnitude)) return new Magnitude(previous, options);
-
-    super(previous, options, {normalize: false});
-
+    super(previous, options, { normalize: false });
     this.type = 'magnitude';
-
     // sets the necessary logic based on the params
-    this.setupStream({frameSize: 1});
+    this.setupStream({ frameSize: 1 });
   }
 
   process(time, frame) {
@@ -33,4 +28,9 @@ class Magnitude extends Lfo {
   }
 }
 
-module.exports = Magnitude;
+function factory(previous, options) {
+  return new Magnitude(previous, options);
+}
+factory.Magnitude = Magnitude;
+
+module.exports = factory;

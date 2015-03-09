@@ -1,14 +1,12 @@
 
 "use strict";
 
-var Lfo = require('../core/lfo-base');
-var audioContext = new AudioContext();
+var { Lfo } = require('../core/lfo-base');
+var audioContext = new window.AudioContext();
 
 class AudioIn extends Lfo {
 
   constructor(options = {}) {
-    if (!(this instanceof AudioIn)) return new AudioIn(options);
-
     this.type = 'audio-in';
 
     // defaults
@@ -45,4 +43,9 @@ class AudioIn extends Lfo {
 
 }
 
-module.exports = AudioIn;
+function factory(options) {
+  return new AudioIn(options);
+}
+factory.AudioIn = AudioIn;
+
+module.exports = factory;

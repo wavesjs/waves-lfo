@@ -1,7 +1,7 @@
 
 "use strict";
 
-let AudioIn = require('./audio-in');
+let { AudioIn } = require('./audio-in');
 let Framer = require('./framer');
 // remove fs, avoid brfs transform
 var fs = require('fs');
@@ -10,7 +10,6 @@ var fs = require('fs');
 class AudioInBuffer extends AudioIn {
 
   constructor(options = {}) {
-    if (!(this instanceof AudioInBuffer)) return new AudioInBuffer(options);
     super(options);
 
     this.type = 'audio-in-buffer';
@@ -49,4 +48,9 @@ class AudioInBuffer extends AudioIn {
   }
 }
 
-module.exports = AudioInBuffer;
+function factory(options) {
+  return new AudioInBuffer(options);
+}
+factory.AudioInBuffer = AudioInBuffer;
+
+module.exports = factory;
