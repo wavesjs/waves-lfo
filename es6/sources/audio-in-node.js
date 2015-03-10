@@ -12,12 +12,14 @@ class AudioInNode extends AudioIn {
 
     this.type = 'audio-in-node';
 
+    console.log(this.params);
+
     this.reslicer = new Framer(this.outFrame, this.hopSize, this._ctx.sampleRate, (time, frame) => {
       this.output(this.time);
     });
 
     this._proc = this._ctx.createScriptProcessor(this.hopSize, 1, 1);
-    // keepalive
+    // keep the script processor alive
     this._ctx['_process-' + new Date().getTime()] = this._proc;
   }
 
@@ -27,14 +29,15 @@ class AudioInNode extends AudioIn {
     this._proc.onaudioprocess = (e) => {
       var block = e.inputBuffer.getChannelData(this.channel);
       this.reslicer.input(this.time, block);
+      // @FIXME: `this.time` is always `NaN`
       this.time += block.length / this.sampleRate;
     };
 
     // start "the patch" ;)
     this._src.connect(this._proc);
+    // does it make sens ?
     this._proc.connect(this._ctx.destination);
   }
-
 }
 
 function factory(options) {

@@ -14,8 +14,9 @@ class Draw extends Lfo {
 
     super(previous, options, defaults);
 
-    if(!this.params.canvas)
-      return console.error('Please note: a canvas element is required or this module');
+    if (!this.params.canvas) {
+      return console.error('Please note: a canvas element is required for this module');
+    }
 
     // pubs
     this.scrolls = this.params.scroll;
@@ -36,7 +37,7 @@ class Draw extends Lfo {
 
     this._x = 0;
     this._i = 0;
-    this._rate = 0.1;
+    this._rate = 0.1; // not used ?
 
     this._minVal = -1.0;
     this._maxVal = 1.0;
@@ -81,12 +82,13 @@ class Draw extends Lfo {
     var max = this._minVal;
     var step = data.length;
 
-    if(this.scrolls && (this._i % 4 === 0)){
+    // this._i % 4 looks like really hardcoded
+    if (this.scrolls && (this._i % 4 === 0)) {
 
       for (var j = 0; j < step; j++) {
         var datum = data[j];
-        if (datum < min) min = datum;
-        if (datum > max) max = datum;
+        if (datum < min) { min = datum; }
+        if (datum > max) { max = datum; }
       }
 
       var pos = (this._maxVal - max * this._amp) + this._amp;
@@ -96,7 +98,7 @@ class Draw extends Lfo {
       this._cvCtx.fillRect(this._x, pos, 1, Math.max(1, h));
 
       this._x++;
-      if(this._x >= this._width) this._scrollLeft();
+      if (this._x >= this._width) this._scrollLeft();
     }
 
     this._i++;

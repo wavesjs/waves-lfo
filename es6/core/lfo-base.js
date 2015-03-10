@@ -26,15 +26,17 @@ class Lfo extends EventEmitter {
 
   // common stream config based on the instantiated params
   setupStream(opts = {}) {
-    if (opts.frameRate) this.streamParams.frameRate = opts.frameRate;
-    if (opts.frameSize) this.streamParams.frameSize = opts.frameSize;
+    if (opts.frameRate) { this.streamParams.frameRate = opts.frameRate; }
+    if (opts.frameSize) { this.streamParams.frameSize = opts.frameSize; }
 
     this.outFrame = new Float32Array(this.streamParams.frameSize);
   }
 
   // bind child node
   add(lfo = null) {
-    this.on('frame', (t, d) => lfo.process(t, d));
+    this.on('frame', (t, d) => {
+      lfo.process(t, d);
+    });
   }
 
   // we take care of the emit ourselves
@@ -48,12 +50,16 @@ class Lfo extends EventEmitter {
     this.removeAllListeners('frame');
   }
 
-  process(time, data) { console.error('process not implemented'); }
+  process(time, data) {
+    console.error('process not implemented');
+  }
 
   // will delete itself from the parent node
+  // @NOTE this node and all his children will never garbage collected
+  // `this.previous = null` fixes the first problem but not the second one
   destroy() {
-    if (this.previous)
-      this.previous.removeListener('frame', this);
+    if (!this.previous) { return; }
+    this.previous.removeListener('frame', this);
   }
 
 }

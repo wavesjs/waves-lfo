@@ -3,9 +3,9 @@ self.addEventListener('message', function(e) { process(e.data); }, false);
 function process(message) {
 
   var that = message.options;
-  var hopSize = that.hopSize;
-  var frameSize = that.frameSize;
-  var blockSize = that.blockSize;
+  var hopSize = that.hopSize; // not used ?
+  var frameSize = that.frameSize; // not used ?
+  var blockSize = that.blockSize; // which difference with frameSize ?
   var sampleRate = that.sampleRate;
   var buffer = message.data;
   var length = buffer.length;
@@ -15,15 +15,17 @@ function process(message) {
   for (var index = 0; index < length; index += blockSize) {
     var copySize = length - index;
 
-    if(copySize > blockSize)
+    if (copySize > blockSize) {
       copySize = blockSize;
+    }
 
     var bufferSegment = buffer.subarray(index, index + copySize);
 
     block.set(bufferSegment, 0);
 
-    for(var i = copySize; i < blockSize; i++)
+    for (var i = copySize; i < blockSize; i++) {
       block[i] = 0;
+    }
 
     postMessage({block: block, time: index / sampleRate});
   }

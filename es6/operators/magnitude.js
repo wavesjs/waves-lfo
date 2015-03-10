@@ -18,10 +18,11 @@ class Magnitude extends Lfo {
       sum = 0,
       i;
 
-    for (i = 0; i < frameSize; i++)
+    for (i = 0; i < frameSize; i++) {
       sum += (frame[i] * frame[i]);
+    }
 
-    if(normalize) sum /= frameSize;
+    if (normalize) { sum /= frameSize; }
 
     this.outFrame.set([Math.sqrt(sum)], 0);
     this.output(time);

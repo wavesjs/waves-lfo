@@ -7,6 +7,8 @@ let Framer = require('./framer');
 var fs = require('fs');
 
 // BinaryArray as source
+// slice it blocks through process-worker
+// forward to the framer and output in framer callback ?
 class AudioInBuffer extends AudioIn {
 
   constructor(options = {}) {

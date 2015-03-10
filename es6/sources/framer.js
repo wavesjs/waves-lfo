@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 class Framer {
   constructor(outFrame, hopSize, sampleRate, callback) {
@@ -30,6 +30,7 @@ class Framer {
   }
 
   input(time, block) {
+    // console.log(time, block);
     var frameIndex = this._frameIndex;
     var frameSize = this._outFrame.length;
     var blockSize = block.length;
@@ -46,7 +47,7 @@ class Framer {
       if (numSkip < blockSize) {
         blockIndex += numSkip; // skip block segment
 
-        var numCopy = blockSize - blockIndex; // can copy all the rest of teh incoming block
+        var numCopy = blockSize - blockIndex; // can copy all the rest of the incoming block
         var maxCopy = frameSize - frameIndex; // connot copy more than what fits into the frame
 
         if (numCopy >= maxCopy)
