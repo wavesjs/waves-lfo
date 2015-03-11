@@ -252,7 +252,7 @@ function calculateCoefs(type, f0, q, gain, coefs) {
         break;
     }
 
-    switch(type) {
+    switch (type) {
       case 'lowpass':
       case 'highpass':
       case 'bandpass_constant_skirt':
@@ -260,7 +260,7 @@ function calculateCoefs(type, f0, q, gain, coefs) {
       case 'notch':
       case 'allpass':
 
-       if(gain != 1.0) {
+       if (gain != 1.0) {
          coefs.b0 *= gain;
          coefs.b1 *= gain;
          coefs.b2 *= gain;
@@ -330,14 +330,16 @@ class Biquad extends Lfo {
 
     var frameRate = this.streamParams.frameRate;
     // if no frameRate or framerate is 0 we shall halt!
-    if(!frameRate || frameRate <= 0) throw new Error('This Operator requires a frameRate higher than 0.');
+    if (!frameRate || frameRate <= 0) {
+      throw new Error('This Operator requires a frameRate higher than 0.');
+    }
 
     var normF0 = this.params.f0 / frameRate,
         gain = this.params.gain,
         q;
 
-    if(this.params.q)  q = this.params.q;
-    if(this.params.bw) q = this.params.f0 / this.params.bw;
+    if (this.params.q)  { q = this.params.q; }
+    if (this.params.bw) { q = this.params.f0 / this.params.bw; }
 
     this.coefs = {
       b0: 0,

@@ -13,18 +13,22 @@ class Magnitude extends Lfo {
   }
 
   process(time, frame) {
-    var frameSize = this.streamParams.frameSize,
-      normalize = this.params.normalize,
-      sum = 0,
-      i;
+    // var frameSize = this.streamParams.frameSize,
+    var frameSize = frame.length;
+    var sum = 0;
+    var i, output;
 
     for (i = 0; i < frameSize; i++) {
       sum += (frame[i] * frame[i]);
     }
 
-    if (normalize) { sum /= frameSize; }
+    if (this.params.normalize) {
+      // sum is a mean here (for rms)
+      sum /= frameSize;
+    }
 
-    this.outFrame.set([Math.sqrt(sum)], 0);
+    this.outFrame[0] = Math.sqrt(sum);
+    // this.outFrame.set([Math.sqrt(sum)], 0);
     this.output(time);
   }
 }
