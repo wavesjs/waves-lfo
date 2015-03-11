@@ -24,6 +24,15 @@ class Lfo extends EventEmitter {
     }
   }
 
+  // reset `outFrame` and call reset on children
+  reset() {}
+
+  // fill the on-going buffer with 0
+  // output it, then call reset on all the children
+  // @NOTE the event based system (async) could produce that the reset
+  //       could be called before the child finalize
+  finalize() {}
+
   // common stream config based on the instantiated params
   setupStream(opts = {}) {
     if (opts.frameRate) { this.streamParams.frameRate = opts.frameRate; }
@@ -50,7 +59,7 @@ class Lfo extends EventEmitter {
     this.removeAllListeners('frame');
   }
 
-  process(time, data) {
+  process(time, data, metadata) {
     console.error('process not implemented');
   }
 

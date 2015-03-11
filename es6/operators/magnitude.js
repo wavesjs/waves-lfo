@@ -16,7 +16,7 @@ class Magnitude extends Lfo {
     // var frameSize = this.streamParams.frameSize,
     var frameSize = frame.length;
     var sum = 0;
-    var i, output;
+    var i = 0;
 
     for (i = 0; i < frameSize; i++) {
       sum += (frame[i] * frame[i]);
@@ -29,6 +29,7 @@ class Magnitude extends Lfo {
 
     this.outFrame[0] = Math.sqrt(sum);
     // this.outFrame.set([Math.sqrt(sum)], 0);
+
     this.output(time);
   }
 }
