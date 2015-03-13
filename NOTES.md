@@ -16,7 +16,7 @@ general notes
     min-max
     fft...
 
-    splitter / merger ?
+    splitter (=> select) / merger ?
       @NOTE will probably need to override `output` method
 
   sources
@@ -97,6 +97,9 @@ general notes
     - is the input time in the middle of the frame or not ?
     do we need to compute the outputTime according to the frame Size and sampleRate ?
     if yes, where do we find the sampleRate ?
+
+
+Add the notion of `sourceSampleRate` in metaData
 
 
 ## Framer

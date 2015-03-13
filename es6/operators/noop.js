@@ -7,10 +7,10 @@ class Noop {
     super(previous, options);
   }
 
-  process(time, frame) {
+  process(time, frame, metadata) {
     this.outputFrame = frame;
 
-    this.output(time);
+    this.output(time, metadata);
   }
 }
 

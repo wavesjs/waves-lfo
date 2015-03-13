@@ -17,53 +17,63 @@ class EventIn extends Lfo {
   constructor(options) {
 
     var defaults = {
-      timeType: 'absolute', // 'absolute', 'relative', 'slave'
-      audioContext: new AudioContext(), // should overriden in options
-      frameSize: 1,
+      timeType: 'absolute',
+      frameSize: 1
     };
     // cannot have previous
     super(null, options, defaults);
 
-    /*
-      frameSize: 1,
-      frameRate: 0
-      // are ok ?
-    */
+    if (!this.params.audioContext) {
+      this.params.audioContext = new AudioContext();
+    }
+
+    this.startTime = undefined;
+    this.isStarted = false;
+
     this.setupStream({ frameSize: this.params.frameSize });
   }
 
   start() {
-    this.startTime = this.params.currentTime;
+    // should be setted in the first process call
+    this.startTime = undefined;
     this.isStarted = true;
   }
 
   stop() {
     this.finalize();
+    this.startTime = undefined;
     this.isStarted = false;
   }
 
-  process(time, frame) {
+  process(time, frame, metadata) {
     if (!this.isStarted) { return; }
-    var frameTime;
+
     var audioContext = this.params.audioContext;
-    // handle time according to config
-    switch (this.params.timeType) {
-      case 'relative':
-        frameTime = audioContext.currentTime - this.startTime;
-        break;
-      case 'absolute':
-        frameTime = audioContext.currentTime;
-        break;
-      case 'slave':
-      default:
-        frameTime = time;
-        break;
+    var frameTime;
+
+    // à revoir
+    // if no time provided, use audioContext.currentTime
+    time = !isNaN(parseFloat(time)) && isFinite(time) ?
+      time : audioContext.currentTime;
+
+    // set `startTime` if first call of the method
+    if (!this.startTime) {
+      this.startTime = time;
     }
 
+    // handle time according to config
+    if (this.params.timeType === 'relative') {
+      frameTime = time - this.startTime;
+    } else {
+      frameTime = time;
+    }
+
+    // if scalar, create a vector
+    if (frame.length === undefined) { frame = [frame]; }
     // works if frame is an array
     this.outFrame.set(frame, 0);
-    // fallback if number ?
-    this.output(time);
+    this.time = frameTime;
+    this.output();
   }
 }
 

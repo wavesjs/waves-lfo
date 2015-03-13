@@ -49,9 +49,8 @@ class Lfo extends EventEmitter {
   }
 
   // we take care of the emit ourselves
-  output(outTime = null) {
-    if (!outTime) outTime = this.time;
-    this.emit('frame', outTime, this.outFrame);
+  output(outTime = this.time, outFrame = this.outFrame, metaData = this.metaData) {
+    this.emit('frame', outTime, outFrame, metaData);
   }
 
   // removes all children from listening
@@ -60,6 +59,7 @@ class Lfo extends EventEmitter {
   }
 
   process(time, data, metadata) {
+    this.time = time;
     console.error('process not implemented');
   }
 
