@@ -10,6 +10,7 @@ module.exports = {
   // sink
   sinkDraw: require('./dist/sink/draw'),
   sinkBpf: require('./dist/sink/bpf'),
+  sinkTrace: require('./dist/sink/trace'),
   // operators
   magnitude: require('./dist/operators/magnitude'),
   biquad: require('./dist/operators/biquad')

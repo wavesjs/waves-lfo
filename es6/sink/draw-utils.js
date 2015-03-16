@@ -1,4 +1,5 @@
 
+// http://stackoverflow.com/questions/1484506/random-color-generator-in-javascript
 module.exports.getRandomColor = function() {
   var letters = '0123456789ABCDEF'.split('');
   var color = '#';
