@@ -140,8 +140,7 @@ class Bpf extends Lfo {
     // draw the right part
     ctx.save();
     ctx.translate(this.currentXPosition, 0);
-    // @NOTE: why we need to add 1 pixels to remove artifacts ?
-    ctx.clearRect(-iShift, 0, iShift + 1, height);
+    ctx.clearRect(-iShift, 0, iShift, height);
     this.drawCurve(frame, iShift);
     ctx.restore();
 
@@ -152,7 +151,7 @@ class Bpf extends Lfo {
 
       ctx.save();
       ctx.translate(this.currentXPosition, 0);
-      ctx.clearRect(-iShift, 0, iShift + 1, height);
+      ctx.clearRect(-iShift, 0, iShift, height);
       this.drawCurve(frame, iShift);
       ctx.restore();
     }
