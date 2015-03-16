@@ -102,9 +102,9 @@ class Bpf extends Lfo {
   process(time, frame) {
     // @TODO: compare dt - if dt < fps return;
     if (this.params.trigger) {
-      this.loopDraw(frame, time);
+      this.triggerModeDraw(frame, time);
     } else {
-      this.scrollDraw(frame, time);
+      this.scrollModeDraw(frame, time);
     }
 
     // save previous frame values
@@ -119,7 +119,7 @@ class Bpf extends Lfo {
   // ----------------------------------------
 
   // draw from left to right, go back to left when > width
-  loopDraw(frame, time) {
+  triggerModeDraw(frame, time) {
     var width  = this.params.width;
     var height = this.params.height;
     var duration = this.params.duration;
@@ -157,8 +157,9 @@ class Bpf extends Lfo {
     }
   }
 
+  // @default mode
   // draw from the right side of the canvas and scroll
-  scrollDraw(frame, time) {
+  scrollModeDraw(frame, time) {
     var width  = this.params.width;
     var height = this.params.height;
     var duration = this.params.duration;
