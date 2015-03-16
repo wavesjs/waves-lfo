@@ -1,6 +1,9 @@
 NOTES
 ===========================================
 
+notes on dB:
+http://stackoverflow.com/questions/22604500/web-audio-api-working-with-decibels
+
 general notes
 
 - is the time tag of a frame at the begining or at the middle of the frame (cf. Norbert) ?

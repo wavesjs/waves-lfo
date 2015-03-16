@@ -20,13 +20,16 @@ class Bpf extends Lfo {
       max: 1,
       scale: 1,
       width: 300,
-      height: 100
+      height: 100,
+      trigger: false,
+      radius: 0,
+      line: true
     };
 
     super(previous, options, defaults);
 
     if (!this.params.canvas) {
-      throw new Error('bpf: a canvas must be given to this module');
+      throw new Error('bpf: params.canvas is mandatory and must be canvas DOM element');
     }
 
     // prepare canvas
@@ -41,6 +44,10 @@ class Bpf extends Lfo {
 
     this.previousFrame = null;
     this.previousTime = null;
+
+    // for loop mode
+    this.currentXPosition = 0;
+    this.lastShiftError = 0;
 
     // create an array of colors according to the
     if (!this.params.colors) {
@@ -57,10 +64,7 @@ class Bpf extends Lfo {
   //          (b-a)(x - min)
   // f(x) = --------------  + a
   //           max - min
-  getPosition(value) {
-    // var a = this.params.height / (this.params.min - this.params.max);
-    // return a * value + (this.params.height / 2);
-
+  getYPosition(value) {
     // a = height
     // b = 0
     var min = this.params.min;
@@ -70,6 +74,7 @@ class Bpf extends Lfo {
     return (((0 - height) * (value - min)) / (max - min)) + height;
   }
 
+  // params modifier
   setDuration(duration) {
     this.params.duration = duration;
   }
@@ -82,45 +87,140 @@ class Bpf extends Lfo {
     this.params.max = max;
   }
 
+  // allow to witch easily between the 2 modes
+  setTrigger(bool) {
+    this.params.trigger = bool;
+    // clear canvas and cache
+    this.ctx.clearRect(0, 0, this.params.width, this.params.height);
+    this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
+    // reset currentXPosition
+    this.currentXPosition = 0;
+    this.lastShiftError = 0;
+  }
+
+  // main
   process(time, frame) {
+    // @TODO: compare dt - if dt < fps return;
+    if (this.params.trigger) {
+      this.loopDraw(frame, time);
+    } else {
+      this.scrollDraw(frame, time);
+    }
+
+    // save previous frame values
+    this.previousFrame = new Float32Array(frame);
+    this.previousTime  = time;
+
+    // forward data ?
+  }
+
+  // ----------------------------------------
+  // drawing strategies
+  // ----------------------------------------
+
+  // draw from left to right, go back to left when > width
+  loopDraw(frame, time) {
+    var width  = this.params.width;
+    var height = this.params.height;
+    var duration = this.params.duration;
+    var ctx = this.ctx;
+    var iShift = 0;
+
+    // check boundaries
+    if (this.previousTime) {
+      var dt = time - this.previousTime;
+      var fShift = (dt / duration) * width - this.lastShiftError; // px
+
+      iShift = Math.round(fShift);
+      this.lastShiftError = iShift - fShift;
+    }
+
+    this.currentXPosition += iShift;
+
+    // draw the right part
+    ctx.save();
+    ctx.translate(this.currentXPosition, 0);
+    // @NOTE: why we need to add 1 pixels to remove artifacts ?
+    ctx.clearRect(-iShift, 0, iShift + 1, height);
+    this.drawCurve(frame, iShift);
+    ctx.restore();
+
+    // go back to the left of the canvas and redraw the same thing
+    if (this.currentXPosition > width) {
+      // go back to start
+      this.currentXPosition -= width;
+
+      ctx.save();
+      ctx.translate(this.currentXPosition, 0);
+      ctx.clearRect(-iShift, 0, iShift + 1, height);
+      this.drawCurve(frame, iShift);
+      ctx.restore();
+    }
+  }
+
+  // draw from the right side of the canvas and scroll
+  scrollDraw(frame, time) {
     var width  = this.params.width;
     var height = this.params.height;
     var duration = this.params.duration;
     var colors = this.params.colors;
     var ctx = this.ctx;
+    var iShift = 0;
 
     // clear canvas
     ctx.clearRect(0, 0, width, height);
 
     ctx.save();
     // translate canvas according to dt
-    // @TODO should handle scale factor
     if (this.previousTime) {
       var dt = time - this.previousTime;
-      var decay = (dt / duration) * width;
+      // handle average pixel errors between frames
+      var fShift = (dt / duration) * width - this.lastShiftError; // px
 
-      ctx.translate(-decay, 0);
-      ctx.drawImage(this.cachedCanvas, 0, 0, width, height);
+      iShift = Math.round(fShift);
+      this.lastShiftError = iShift - fShift;
+      // scroll canvas to the left
+      ctx.drawImage(this.cachedCanvas,
+        iShift, 0, width - iShift, height,
+        0, 0, width - iShift, height
+      );
     }
 
     ctx.restore();
 
-    // foreach frame index
+    ctx.save();
+    ctx.translate(width, 0);
+    this.drawCurve(frame, iShift);
+    ctx.restore();
+    // save current state into buffer canvas
+    this.cachedCtx.clearRect(0, 0, width, height);
+    this.cachedCtx.drawImage(this.canvas, 0, 0, width, height);
+  }
+
+  // @private
+  drawCurve(frame, decay) {
+    var colors = this.params.colors;
+    var ctx = this.ctx;
+    var radius = this.params.radius;
+    // @TODO this can and should be abstracted
     for (var i = 0, l = frame.length; i < l; i++) {
       ctx.save();
       // color should bechosen according to index
       ctx.fillStyle = colors[i];
       ctx.strokeStyle = colors[i];
 
-      ctx.translate(width, 0);
-      // draw new point
-      var posY = this.getPosition(frame[i]);
+      var posY = this.getYPosition(frame[i]);
 
-      ctx.arc(0, posY, 1, 0, Math.PI * 2, false);
-      ctx.fill();
+      // as an options ? radius ?
+      if (radius > 0) {
+        ctx.beginPath();
+        ctx.arc(0, posY, radius, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.closePath();
+      }
 
-      if (this.previousFrame) {
-        var lastPosY = this.getPosition(this.previousFrame[i]);
+      if (this.previousFrame && this.params.line) {
+        var lastPosY = this.getYPosition(this.previousFrame[i]);
         // draw line
         ctx.beginPath();
         ctx.moveTo(-decay, lastPosY);
@@ -131,14 +231,6 @@ class Bpf extends Lfo {
 
       ctx.restore();
     }
-
-    // save current state into buffer canvas
-    this.cachedCtx.clearRect(0, 0, width, height);
-    this.cachedCtx.drawImage(this.canvas, 0, 0, width, height);
-
-    // save values
-    this.previousFrame = new Float32Array(frame);
-    this.previousTime  = time;
   }
 }
 
