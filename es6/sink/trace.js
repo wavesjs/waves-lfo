@@ -1,14 +1,18 @@
 'use strict';
 
 var BaseDraw = require('./base-draw');
-var { getRandomColor } = require('./draw-utils');
+var { getRandomColor, getHue, hexToRGB } = require('./draw-utils');
 
 class Trace extends BaseDraw {
 
   constructor(previous, options) {
+    var extendDefaults = {
+      colorScheme: 'none' // color, opacity
+    };
+
     super(previous, options);
     // create an array of colors according to the
-    if (this.streamParams.frameSize === 2 && !this.params.color) {
+    if (!this.params.color) {
       this.params.color = getRandomColor();
     }
   }
@@ -19,8 +23,8 @@ class Trace extends BaseDraw {
   }
 
   drawCurve(frame, prevFrame, iShift) {
-    var color = this.params.color;
     var ctx = this.ctx;
+    var color;
 
     var halfRange = frame[1] / 2;
     var mean = this.getYPosition(frame[0]);
@@ -33,9 +37,36 @@ class Trace extends BaseDraw {
       var prevMax = this.getYPosition(prevFrame[0] + prevHalfRange);
     }
 
-    // draw range
-    ctx.fillStyle = color;
-    ctx.strokeStyle = color;
+    switch (this.params.colorScheme) {
+      case 'none':
+        ctx.fillStyle = this.params.color;
+      break;
+      case 'hue':
+        var gradient = ctx.createLinearGradient(-iShift, 0, 0, 0);
+
+        if (prevFrame) {
+          gradient.addColorStop(0, 'hsl(' + getHue(prevFrame[2]) + ', 100%, 50%)');
+        } else {
+          gradient.addColorStop(0, 'hsl(' + getHue(frame[2]) + ', 100%, 50%)');
+        }
+
+        gradient.addColorStop(1, 'hsl(' + getHue(frame[2]) + ', 100%, 50%)');
+        ctx.fillStyle = gradient;
+      break;
+      case 'opacity':
+        var rgb = hexToRGB(this.params.color);
+        var gradient = ctx.createLinearGradient(-iShift, 0, 0, 0);
+
+        if (prevFrame) {
+          gradient.addColorStop(0, 'rgba(' + rgb.join(',') + ',' + prevFrame[2] + ')');
+        } else {
+          gradient.addColorStop(0, 'rgba(' + rgb.join(',') + ',' + frame[2] + ')');
+        }
+
+        gradient.addColorStop(1, 'rgba(' + rgb.join(',') + ',' + frame[2] + ')');
+        ctx.fillStyle = gradient;
+      break;
+    }
 
     ctx.save();
     ctx.beginPath();
