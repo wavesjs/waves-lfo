@@ -96,12 +96,11 @@ class BaseDraw extends Lfo {
     ctx.translate(width, 0);
     this.drawCurve(frame, this.previousFrame, iShift);
     ctx.restore();
+    // update `currentPartialShift`
+    this.currentPartialShift -= iShift;
     // save current state into buffer canvas
     this.cachedCtx.clearRect(0, 0, width, height);
     this.cachedCtx.drawImage(this.canvas, 0, 0, width, height);
-
-    // reset currentPartialShift
-    this.currentPartialShift = 0;
   }
 
   shiftCanvas(shift) {
@@ -122,8 +121,9 @@ class BaseDraw extends Lfo {
     ctx.restore();
   }
 
-  // must implement the logic to draw between the previous frame and the current frame
-  // assuming the context is centered on the current frame
+  // Must implement the logic to draw the shape between
+  // the previous and the current frame.
+  // Assuming the context is centered on the current frame
   drawCurve(frame, prevFrame, iShift) {
     console.error('must be implemented');
   }
