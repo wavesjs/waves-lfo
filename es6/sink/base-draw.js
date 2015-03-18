@@ -10,7 +10,8 @@ class BaseDraw extends Lfo {
       min: -1,
       max: 1,
       width: 300,
-      height: 100
+      height: 100,
+      isSynchronized: false // is set to true if used in a synchronizedSink
     }, extendDefaults);
 
     super(previous, options, defaults);
@@ -30,9 +31,10 @@ class BaseDraw extends Lfo {
     this.ctx.canvas.height = this.cachedCtx.canvas.height = this.params.height;
 
     this.previousFrame = null;
-    this.previousTime = null;
+    this.previousTime = 0;
 
     this.lastShiftError = 0;
+    this.currentPartialShift = 0;
   }
 
   // http://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
@@ -75,41 +77,55 @@ class BaseDraw extends Lfo {
     var height = this.params.height;
     var duration = this.params.duration;
     var ctx = this.ctx;
-    var iShift = 0;
 
-    // clear canvas
-    ctx.clearRect(0, 0, width, height);
+    var dt = time - this.previousTime;
+    var fShift = (dt / duration) * width - this.lastShiftError;
+    var iShift = Math.round(fShift);
+    this.lastShiftError = iShift - fShift;
 
-    ctx.save();
-    // copy cached canvas according to dt
-    if (this.previousTime) {
-      var dt = time - this.previousTime;
-      var fShift = (dt / duration) * width - this.lastShiftError;
+    var partialShift = iShift - this.currentPartialShift;
+    this.shiftCanvas(partialShift);
 
-      iShift = Math.round(fShift);
-      this.lastShiftError = iShift - fShift;
-
-      ctx.drawImage(this.cachedCanvas,
-        iShift, 0, width - iShift, height,
-        0, 0, width - iShift, height
-      );
+    // shift all siblings if synchronized
+    if (this.params.isSynchronized && this.synchronizer) {
+      this.synchronizer.shiftSiblings(partialShift, this);
     }
 
-    ctx.restore();
-    // draw new polygon
+    // translate to the current frame and draw a new polygon
     ctx.save();
-    ctx.translate(width, iShift);
+    ctx.translate(width, 0);
     this.drawCurve(frame, this.previousFrame, iShift);
     ctx.restore();
     // save current state into buffer canvas
     this.cachedCtx.clearRect(0, 0, width, height);
     this.cachedCtx.drawImage(this.canvas, 0, 0, width, height);
+
+    // reset currentPartialShift
+    this.currentPartialShift = 0;
+  }
+
+  shiftCanvas(shift) {
+    var width = this.params.width;
+    var height = this.params.height;
+    var ctx = this.ctx;
+
+    this.currentPartialShift += shift;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.save();
+
+    ctx.drawImage(this.cachedCanvas,
+      this.currentPartialShift, 0, width - this.currentPartialShift, height,
+      0, 0, width - this.currentPartialShift, height
+    );
+
+    ctx.restore();
   }
 
   // must implement the logic to draw between the previous frame and the current frame
   // assuming the context is centered on the current frame
   drawCurve(frame, prevFrame, iShift) {
-    console.log('must be implemented');
+    console.error('must be implemented');
   }
 }
 

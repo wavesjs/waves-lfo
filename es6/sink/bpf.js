@@ -12,7 +12,6 @@ class Bpf extends BaseDraw {
     };
 
     super(previous, options, extendDefaults);
-
     // for loop mode
     this.currentXPosition = 0;
     // create an array of colors according to the
@@ -43,7 +42,7 @@ class Bpf extends BaseDraw {
       this.scrollModeDraw(time, frame);
     }
 
-    super(time, frame);
+    super.process(time, frame);
   }
 
   // add an alternative drawing mode
@@ -53,16 +52,11 @@ class Bpf extends BaseDraw {
     var height = this.params.height;
     var duration = this.params.duration;
     var ctx = this.ctx;
-    var iShift = 0;
 
-    // check boundaries
-    if (this.previousTime) {
-      var dt = time - this.previousTime;
-      var fShift = (dt / duration) * width - this.lastShiftError; // px
-
-      iShift = Math.round(fShift);
-      this.lastShiftError = iShift - fShift;
-    }
+    var dt = time - this.previousTime;
+    var fShift = (dt / duration) * width - this.lastShiftError; // px
+    var iShift = Math.round(fShift);
+    this.lastShiftError = iShift - fShift;
 
     this.currentXPosition += iShift;
 
@@ -99,7 +93,6 @@ class Bpf extends BaseDraw {
       ctx.strokeStyle = colors[i];
 
       var posY = this.getYPosition(frame[i]);
-
       // as an options ? radius ?
       if (radius > 0) {
         ctx.beginPath();

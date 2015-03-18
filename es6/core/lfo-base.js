@@ -14,7 +14,7 @@ class Lfo extends EventEmitter {
       frameRate: 0
     };
 
-    this.params = Object.assign(defaults, options);
+    this.params = Object.assign({}, defaults, options);
 
     if (previous) {
       // add ourselves to the previous operator if its passed
@@ -60,7 +60,7 @@ class Lfo extends EventEmitter {
 
   process(time, data, metadata) {
     this.time = time;
-    console.error('process not implemented');
+    // console.error('process not implemented');
   }
 
   // will delete itself from the parent node
