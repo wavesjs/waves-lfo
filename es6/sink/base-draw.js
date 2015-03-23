@@ -69,6 +69,7 @@ class BaseDraw extends Lfo {
   process(time, frame) {
     this.previousFrame = new Float32Array(frame);
     this.previousTime = time;
+    super.process(time, frame);
   }
 
   // default draw mode
@@ -110,7 +111,7 @@ class BaseDraw extends Lfo {
 
     this.currentPartialShift += shift;
 
-    ctx.clearRect(0, 0, width, height);
+    this.clear();
     ctx.save();
 
     ctx.drawImage(this.cachedCanvas,
@@ -119,6 +120,10 @@ class BaseDraw extends Lfo {
     );
 
     ctx.restore();
+  }
+
+  clear() {
+    this.ctx.clearRect(0, 0, this.params.width, this.params.height);
   }
 
   // Must implement the logic to draw the shape between

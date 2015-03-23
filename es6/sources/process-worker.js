@@ -27,6 +27,6 @@ function process(message) {
       block[i] = 0;
     }
 
-    postMessage({block: block, time: index / sampleRate});
+    postMessage({ block: block, time: index / sampleRate });
   }
 }

@@ -41,8 +41,9 @@ class Framer {
       var numSkip = 0;
 
       // skip block samples for negative frameIndex
-      if (frameIndex < 0)
+      if (frameIndex < 0) {
         numSkip = -frameIndex;
+      }
 
       if (numSkip < blockSize) {
         blockIndex += numSkip; // skip block segment
@@ -50,8 +51,9 @@ class Framer {
         var numCopy = blockSize - blockIndex; // can copy all the rest of the incoming block
         var maxCopy = frameSize - frameIndex; // connot copy more than what fits into the frame
 
-        if (numCopy >= maxCopy)
+        if (numCopy >= maxCopy) {
           numCopy = maxCopy;
+        }
 
         // copy block segment into frame
         var copy = block.subarray(blockIndex, blockIndex + numCopy);
@@ -70,8 +72,9 @@ class Framer {
           this._callback(frameTime, outFrame);
 
           // shift frame left
-          if (this._hopSize < frameSize)
+          if (this._hopSize < frameSize) {
             outFrame.set(outFrame.subarray(this._hopSize, frameSize), 0);
+          }
 
           frameIndex -= this._hopSize; // hop forward
         }

@@ -30,7 +30,11 @@ class EventIn extends Lfo {
     this.startTime = undefined;
     this.isStarted = false;
 
-    this.setupStream({ frameSize: this.params.frameSize });
+    this.setupStream({
+      frameSize: this.params.frameSize,
+      frameRate: this.params.frameRate,
+      blockSampleRate: this.params.frameRate * this.params.frameSize
+    });
   }
 
   start() {
@@ -45,7 +49,7 @@ class EventIn extends Lfo {
     this.isStarted = false;
   }
 
-  process(time, frame, metadata) {
+  process(time, frame, metaData) {
     if (!this.isStarted) { return; }
 
     var audioContext = this.params.audioContext;
@@ -56,10 +60,8 @@ class EventIn extends Lfo {
     time = !isNaN(parseFloat(time)) && isFinite(time) ?
       time : audioContext.currentTime;
 
-    // set `startTime` if first call of the method
-    if (!this.startTime) {
-      this.startTime = time;
-    }
+    // set `startTime` if first call after a `start`
+    if (!this.startTime) { this.startTime = time; }
 
     // handle time according to config
     if (this.params.timeType === 'relative') {
@@ -73,6 +75,8 @@ class EventIn extends Lfo {
     // works if frame is an array
     this.outFrame.set(frame, 0);
     this.time = frameTime;
+    this.metaData = metaData;
+
     this.output();
   }
 }

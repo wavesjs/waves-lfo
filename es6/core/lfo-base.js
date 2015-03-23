@@ -37,14 +37,15 @@ class Lfo extends EventEmitter {
   setupStream(opts = {}) {
     if (opts.frameRate) { this.streamParams.frameRate = opts.frameRate; }
     if (opts.frameSize) { this.streamParams.frameSize = opts.frameSize; }
+    if (opts.blockSampleRate) { this.streamParams.blockSampleRate = opts.blockSampleRate; }
 
     this.outFrame = new Float32Array(this.streamParams.frameSize);
   }
 
   // bind child node
   add(lfo = null) {
-    this.on('frame', (t, d) => {
-      lfo.process(t, d);
+    this.on('frame', function(time, frame, metaData) {
+      lfo.process(time, frame, metaData);
     });
   }
 
@@ -58,9 +59,8 @@ class Lfo extends EventEmitter {
     this.removeAllListeners('frame');
   }
 
-  process(time, data, metadata) {
+  process(time, frame, metadata) {
     this.time = time;
-    // console.error('process not implemented');
   }
 
   // will delete itself from the parent node

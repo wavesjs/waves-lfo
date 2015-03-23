@@ -15,5 +15,9 @@ module.exports = {
   synchronizedSink: require('./dist/sink/synchronized-sink'),
   // operators
   magnitude: require('./dist/operators/magnitude'),
-  biquad: require('./dist/operators/biquad')
+  framer: require('./dist/operators/framer'),
+  biquad: require('./dist/operators/biquad'),
+  minMax: require('./dist/operators/min-max'),
+
+  noop: require('./dist/operators/noop')
 };

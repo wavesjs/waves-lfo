@@ -1,4 +1,3 @@
-
 "use strict";
 
 let { AudioIn } = require('./audio-in');
@@ -22,7 +21,6 @@ class AudioInBuffer extends AudioIn {
 
     var wrk = fs.readFileSync(__dirname + '/process-worker.js', 'utf8');
     var blob = new Blob([wrk], { type: "text/javascript" });
-
 
     var workerMessage = (e) => {
       var block = e.data.block;

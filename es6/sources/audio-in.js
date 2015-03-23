@@ -12,31 +12,36 @@ class AudioIn extends Lfo {
     // defaults
     var defaults = {
       frameSize: 512,
-      blockSize: 2048,
-      hopSize: 512,
+      // blockSize: 2048,
+      // hopSize: 512,
       channel: 0
     };
 
     super(null, options, defaults);
 
     // private
-    this._ctx = this.params.ctx || new window.AudioContext();
-    this._currentTime = 0;
-    this._src = this.params.src;
+    this.ctx = this.params.ctx || new window.AudioContext();
+    // this._currentTime = 0;
+    this.src = this.params.src;
+
+    this.time = 0;
+    this.metaData = {};
 
     // public
     this.frameSize = this.params.frameSize;
-    this.blockSize = this.params.blockSize;
-    this.hopSize = this.params.hopSize;
+    // this.blockSize = this.params.blockSize;
+    // this.hopSize = this.params.hopSize;
     this.channel = this.params.channel;
     this.frameOffset = 0;
-    this.sampleRate = this._ctx.sampleRate;
+    this.sampleRate = this.ctx.sampleRate;
 
     this.setupStream({
-      frameRate: this.sampleRate / this.hopSize,
+      frameRate: this.sampleRate / this.frameSize,
       frameSize: this.frameSize,
-      audioSampleRate: this._ctx.sampleRate // cannot be used ... why is this here ?
+      blockSampleRate: this.sampleRate
     });
+
+    // console.log(this.streamParams);
   }
 
   start() {}

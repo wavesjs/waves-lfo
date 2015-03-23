@@ -10,9 +10,9 @@ general notes
 
 ### lfo to create
   sink:
-    [multi-]wave => uses min max
-    [multi-]bpf  => uses vector of any size, draw one bpf per index
-    trace        => mubu like visualisation, use a vector of [mean, range, color]
+    (ok)  [multi-]wave => uses min max
+    (ok)  [multi-]bpf  => uses vector of any size, draw one bpf per index
+    (ok)  trace        => mubu like visualisation, use a vector of [mean, range, color]
 
   operators:
     framer

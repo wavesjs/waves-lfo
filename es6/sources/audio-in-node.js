@@ -1,4 +1,3 @@
-
 "use strict";
 
 let { AudioIn } = require('./audio-in');
@@ -14,35 +13,37 @@ class AudioInNode extends AudioIn {
 
     console.log(this.params);
 
-    this.reslicer = new Framer(this.outFrame, this.hopSize, this._ctx.sampleRate, (time, frame) => {
-      this.output(this.time);
-    });
+    // this.reslicer = new Framer(this.outFrame, this.hopSize, this._ctx.sampleRate, (time, frame) => {
+    //   this.output(this.time);
+    // });
 
-    this._proc = this._ctx.createScriptProcessor(this.hopSize, 1, 1);
+    this.scriptProcessor = this.ctx.createScriptProcessor(this.frameSize, 1, 1);
     // keep the script processor alive
-    this._ctx['_process-' + new Date().getTime()] = this._proc;
+    this.ctx['_process-' + new Date().getTime()] = this.scriptProcessor;
   }
 
   // connect the audio nodes to start streaming
   start() {
 
-    this._proc.onaudioprocess = (e) => {
+    this.scriptProcessor.onaudioprocess = (e) => {
       var block = e.inputBuffer.getChannelData(this.channel);
-      this.reslicer.input(this.time, block);
+      // this.reslicer.input(this.time, block);
       // @FIXME: `this.time` is always `NaN`
       this.time += block.length / this.sampleRate;
+      this.outFrame.set(block, 0);
+      this.output();
     };
 
     // start "the patch" ;)
-    this._src.connect(this._proc);
-    // does it make sens ?
-    this._proc.connect(this._ctx.destination);
+    this.src.connect(this.scriptProcessor);
+    this.scriptProcessor.connect(this.ctx.destination);
   }
 }
 
-function factory(options) {
-  return new AudioInNode(options);
-}
-factory.AudioInNode = AudioInNode;
+// function factory(options) {
+//   return new AudioInNode(options);
+// }
+// factory.AudioInNode = AudioInNode;
 
-module.exports = factory;
+// module.exports = factory;
+module.exports = AudioInNode;
