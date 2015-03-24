@@ -1,6 +1,6 @@
 "use strict";
 
-var { AudioIn } = require('./audio-in');
+var AudioIn = require('./audio-in');
 
 var worker = 'self.addEventListener("message", function process(e) {    \
   var message = e.data;                                                 \

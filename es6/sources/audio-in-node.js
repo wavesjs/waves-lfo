@@ -1,6 +1,6 @@
 "use strict";
 
-let { AudioIn } = require('./audio-in');
+let AudioIn = require('./audio-in');
 
 // web audio API node as a source
 class AudioInNode extends AudioIn {
@@ -13,7 +13,7 @@ class AudioInNode extends AudioIn {
     this.scriptProcessor = this.ctx.createScriptProcessor(blockSize, 1, 1);
 
     // keep the script processor alive
-    this.ctx['_process-' + new Date().getTime()] = this.scriptProcessor;
+    // this.ctx['_process-' + new Date().getTime()] = this.scriptProcessor;
     this.scriptProcessor.onaudioprocess = this.process.bind(this);
   }
 

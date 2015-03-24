@@ -1,6 +1,6 @@
 'use strict';
 
-var { Lfo } = require('../core/lfo-base');
+var Lfo = require('../core/lfo-base');
 
 var isPowerOfTwo = function(number) {
   while ((number % 2 === 0) && number > 1) {

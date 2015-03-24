@@ -26,7 +26,7 @@
 
 /* a1 is a[0] and a2 is a[1] */
 
-var { Lfo } = require('../core/lfo-base');
+var Lfo = require('../core/lfo-base');
 
 var sin = Math.sin;
 var cos = Math.cos;

@@ -12,10 +12,10 @@ class Node {
   pipe(ctor, options = {}, id = null) {
     var lfo = ctor(options);
     var nextNode = new Node(this.graph, lfo);
-    
+
     this.lfo.add(lfo); // add to operators
     this.graph.add(this, nextNode, id); // add to graph: parent, child, id
-    
+
     return nextNode;
   }
 
@@ -30,13 +30,13 @@ class LfpGraph {
 
   constructor(ctor, options = {}, id = null) {
     if (!(this instanceof LfpGraph)) return new LfpGraph(ctor, options, id);
-    
+
     this.nodes = {};
     this.typeCount = {};
     this.rootNode = null;
 
     var node = new Node(this, ctor(options));
-    
+
     this.add(null, node, id);
   }
 
@@ -56,11 +56,11 @@ class LfpGraph {
 
       // add node as nodes in the graph
       p.nodes.push(node.id);
-      
+
       // removing logic, clean up when code is ready
       // node.parent = p.lfo; // bind the parnt for removing later
       // node.index = idx; // necessary?
-    
+
     } else {
       this.rootNode = id;
     }
@@ -79,7 +79,7 @@ class LfpGraph {
 
     // only if it has nodes
     if(item.nodes.length > 0) {
-      
+
       // subnodes
       item.nodes.forEach(id => {
         var node = this.get(id);
@@ -95,7 +95,7 @@ class LfpGraph {
   pipe(ctor, options = {}, id = null) {
     var lfo = ctor(options);
     var node = new Node(this, lfo);
-   
+
     var parent = this.get(this.rootNode);
     parent.lfo.add(lfo);
     this.add(parent, node, id);
@@ -106,7 +106,7 @@ class LfpGraph {
   start(){
     for(let key in this.nodes) {
       var node = this.nodes[key].lfo;
-      if('start' in node) node.start();
+      if ('start' in node) node.start();
     }
   }
 

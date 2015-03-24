@@ -1,4 +1,4 @@
-
+// @TODO pass * uppercase as it is constructors
 module.exports = {
   // core
   graph: require('./dist/core/graph'),
@@ -8,7 +8,6 @@ module.exports = {
   sourceAudioBuffer: require('./dist/sources/audio-in-buffer'),
   sourceEventIn: require('./dist/sources/event-in'),
   // sink
-  sinkDraw: require('./dist/sink/draw'),
   sinkBpf: require('./dist/sink/bpf'),
   sinkTrace: require('./dist/sink/trace'),
   sinkWaveform: require('./dist/sink/waveform'),

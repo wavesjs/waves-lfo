@@ -1,6 +1,6 @@
 'use strict';
 
-var { Lfo } = require('../core/lfo-base');
+var Lfo = require('../core/lfo-base');
 
 class BaseDraw extends Lfo {
   constructor(previous, options, extendDefaults = {}) {

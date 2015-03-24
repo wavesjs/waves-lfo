@@ -1,6 +1,6 @@
 'use strict';
 
-var { Lfo } = require('../core/lfo-base');
+var Lfo = require('../core/lfo-base');
 
 // apply a given function on each frame
 class Operator extends Lfo {

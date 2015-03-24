@@ -1,8 +1,8 @@
 
 "use strict";
 
-var { Lfo } = require('../core/lfo-base');
-// var audioContext = new window.AudioContext();
+var Lfo = require('../core/lfo-base');
+var audioContext; // for lazy audioContext creation
 
 class AudioIn extends Lfo {
 
@@ -20,37 +20,26 @@ class AudioIn extends Lfo {
     super(null, options, defaults);
 
     // private
-    this.ctx = this.params.ctx || new window.AudioContext();
-    // this._currentTime = 0;
-    this.src = this.params.src;
+    if (!this.params.ctx) {
+      audioContext = new AudioContext();
+      this.ctx = audioContext;
+    } else {
+      this.ctx = this.params.ctx;
+    }
 
+    this.src = this.params.src;
     this.time = 0;
     this.metaData = {};
-
-    // public
-    // this.frameSize = this.params.frameSize;
-    // this.blockSize = this.params.blockSize;
-    // this.hopSize = this.params.hopSize;
-    // this.channel = this.params.channel;
-    this.frameOffset = 0;
-    // this.sampleRate = this.ctx.sampleRate;
+    // this.frameOffset = 0;
 
     this.setupStream({
       frameRate: this.ctx.sampleRate / this.params.frameSize,
       frameSize: this.params.frameSize,
       blockSampleRate: this.ctx.sampleRate
     });
-
-    // console.log(this.streamParams);
   }
 
   start() {}
-
 }
 
-function factory(options) {
-  return new AudioIn(options);
-}
-factory.AudioIn = AudioIn;
-
-module.exports = factory;
+module.exports = AudioIn;

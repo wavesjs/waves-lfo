@@ -1,9 +1,10 @@
 'use strict';
 
-class Lfo {
+var id = 0;
 
+class Lfo {
   constructor(parent = null, options = {}, defaults = {}) {
-    this.idx = 0;
+    this.cid = id++;
     this.params = {};
     this.streamParams = {
       frameSize: 1,
@@ -14,6 +15,9 @@ class Lfo {
     this.children = [];
 
     if (parent) {
+      if (parent.streamParams === null) {
+        throw new Error('cannot connect to as dead node');
+      }
       // add ourselves to the parent operator if its passed
       parent.add(this);
       // pass on stream params
@@ -26,11 +30,9 @@ class Lfo {
 
   // fill the on-going buffer with 0
   // output it, then call reset on all the children
-  // @NOTE the event based system (async) could produce that the reset
-  //       could be called before the child finalize
   finalize() {}
 
-  // common stream config based on the instantiated params
+  // common stream configuration based on the given params
   setupStream(opts = {}) {
     if (opts.frameRate) {
       this.streamParams.frameRate = opts.frameRate;
@@ -49,43 +51,43 @@ class Lfo {
 
   // bind child node
   add(lfo = null) {
-    // this.on('frame', function(time, frame, metaData) {
-    //   lfo.process(time, frame, metaData);
-    // });
     this.children.push(lfo);
   }
 
-  // we take care of the emit ourselves
+  // forward the current state (time, frame, metaData) to all the children
   output(time = this.time, outFrame = this.outFrame, metaData = this.metaData) {
-    // this.emit('frame', outTime, outFrame, metaData);
     for (var i = 0, l = this.children.length; i < l; i++) {
       this.children[i].process(time, outFrame, metaData);
     }
   }
 
-  // removes all children from listening
-  remove() {
-    // this.removeAllListeners('frame');
-    // call remove on all childs
-  }
-
-  process(time, frame, metadata) {
+  // main function to override, defaults to noop
+  process(time, frame, metaData) {
     this.time = time;
+    this.outFrame = frame;
+    this.metaData = metaData;
+
+    this.output();
   }
 
-  // will delete itself from the parent node
-  // @NOTE this node and all his children will never garbage collected
-  // `this.previous = null` fixes the first problem but not the second one
   destroy() {
-    if (!this.previous) { return; }
-    this.previous.removeListener('frame', this);
+    // call `destroy` in all it's children
+    for (var i = 0, l = this.children.length; i < l; i++) {
+      this.children[i].destroy();
+    }
+
+    // delete itself from the parent node
+    if (this.previous) {
+      var index =  parent.children.indexOf(this);
+      parent.children.splice(index, 1);
+    }
+
+    // cannot use a dead object as parent
+    this.streamParams = null;
+
+    // clean it's own references / disconnect audio nodes if needed
   }
 
 }
 
-function factory(previous, options, defaults) {
-  return new Lfo(previous, options, defaults);
-}
-factory.Lfo = Lfo;
-
-module.exports = factory;
+module.exports = Lfo;

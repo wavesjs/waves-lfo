@@ -1,6 +1,6 @@
 'use strict';
 
-var { Lfo } = require('../core/lfo-base');
+var Lfo = require('../core/lfo-base');
 
 class Noop extends Lfo {
   constructor(previous, options = {}) {
