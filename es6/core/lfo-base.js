@@ -8,7 +8,8 @@ class Lfo {
     this.params = {};
     this.streamParams = {
       frameSize: 1,
-      frameRate: 0
+      frameRate: 0,
+      blockSampleRate: 0
     };
 
     this.params = Object.assign({}, defaults, options);
@@ -16,21 +17,38 @@ class Lfo {
 
     if (parent) {
       if (parent.streamParams === null) {
-        throw new Error('cannot connect to as dead node');
+        throw new Error('cannot connect to as dead lfo node');
       }
+
+      this.parent = parent;
       // add ourselves to the parent operator if its passed
-      parent.add(this);
+      this.parent.add(this);
       // pass on stream params
-      this.streamParams = Object.assign({}, parent.streamParams);
+      this.streamParams = Object.assign({}, this.parent.streamParams);
     }
   }
 
   // reset `outFrame` and call reset on children
-  reset() {}
+  reset() {
+    for (let i = 0, l = this.children.length; i < l; i++) {
+      this.children[i].reset();
+    }
+
+    // this.outFrame.fill(0); // probably better but doesn't work yet
+    for (let i = 0, l = this.outFrame.length; i < l; i++) {
+      this.outFrame[i] = 0;
+    }
+  }
 
   // fill the on-going buffer with 0
-  // output it, then call reset on all the children
-  finalize() {}
+  // output it, then call reset on all the children (sure ?)
+  // @NOTE: what about calling `reset` in `sources.start`
+  //  if `reset` is called here, it will be called more than once in a child node
+  finalize() {
+    for (let i = 0, l = this.children.length; i < l; i++) {
+      this.children[i].finalize();
+    }
+  }
 
   // common stream configuration based on the given params
   setupStream(opts = {}) {
@@ -72,14 +90,15 @@ class Lfo {
 
   destroy() {
     // call `destroy` in all it's children
-    for (var i = 0, l = this.children.length; i < l; i++) {
-      this.children[i].destroy();
+    var index = this.children.length;
+    while (index--) {
+      this.children[index].destroy();
     }
 
     // delete itself from the parent node
-    if (this.previous) {
-      var index =  parent.children.indexOf(this);
-      parent.children.splice(index, 1);
+    if (this.parent) {
+      var index =  this.parent.children.indexOf(this);
+      this.parent.children.splice(index, 1);
     }
 
     // cannot use a dead object as parent

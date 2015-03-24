@@ -15,15 +15,22 @@ class AudioInNode extends AudioIn {
     // keep the script processor alive
     // this.ctx['_process-' + new Date().getTime()] = this.scriptProcessor;
     this.scriptProcessor.onaudioprocess = this.process.bind(this);
+    this.src.connect(this.scriptProcessor);
   }
 
   // connect the audio nodes to start streaming
   start() {
+    this.reset();
     // start "the patch" ;)
-    this.src.connect(this.scriptProcessor);
     this.scriptProcessor.connect(this.ctx.destination);
   }
 
+  stop() {
+    this.finalize();
+    this.scriptProcessor.disconnect();
+  }
+
+  // is basically the `scriptProcessor.onaudioprocess` callback
   process(e) {
     var block = e.inputBuffer.getChannelData(this.params.channel);
 
@@ -33,10 +40,4 @@ class AudioInNode extends AudioIn {
   }
 }
 
-// function factory(options) {
-//   return new AudioInNode(options);
-// }
-// factory.AudioInNode = AudioInNode;
-
-// module.exports = factory;
 module.exports = AudioInNode;

@@ -33,6 +33,7 @@ class EventIn extends Lfo {
     this.setupStream({
       frameSize: this.params.frameSize,
       frameRate: this.params.frameRate,
+      // @NOTE does it make sens ?
       blockSampleRate: this.params.frameRate * this.params.frameSize
     });
   }
@@ -41,12 +42,13 @@ class EventIn extends Lfo {
     // should be setted in the first process call
     this.startTime = undefined;
     this.isStarted = true;
+    this.reset();
   }
 
   stop() {
-    this.finalize();
     this.startTime = undefined;
     this.isStarted = false;
+    this.finalize();
   }
 
   process(time, frame, metaData = {}) {

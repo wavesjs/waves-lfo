@@ -53,6 +53,8 @@ class AudioInBuffer extends AudioIn {
   }
 
   start() {
+    this.reset();
+
     this.worker.postMessage({
       options: {
         sampleRate: this.streamParams.blockSampleRate,
@@ -62,6 +64,11 @@ class AudioInBuffer extends AudioIn {
     });
   }
 
+  stop() {
+    this.finalize();
+  }
+
+  // callback of the worker
   process(e) {
     this.outFrame = e.data.block;
     this.time = e.data.time;
@@ -69,10 +76,5 @@ class AudioInBuffer extends AudioIn {
     this.output();
   }
 }
-
-// function factory(options) {
-//   return new AudioInBuffer(options);
-// }
-// factory.AudioInBuffer = AudioInBuffer;
 
 module.exports = AudioInBuffer;

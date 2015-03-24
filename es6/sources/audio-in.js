@@ -40,6 +40,7 @@ class AudioIn extends Lfo {
   }
 
   start() {}
+  stop() {}
 }
 
 module.exports = AudioIn;

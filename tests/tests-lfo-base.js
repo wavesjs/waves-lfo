@@ -69,16 +69,76 @@ describe('Lfo-base', function() {
 
   });
 
-  describe('#remove', function() {
-
-  });
-
   describe('#process', function() {
 
   });
 
-  describe('#destroy', function() {
+  describe('#reset', function() {
+    // class DestroyLogger extends lfo.noop {
+    //   destroy() {
+    //     super();
+    //     console.log('destroy', this.params.id);
+    //   }
 
+    //   reset() {
+    //     super();
+    //     console.log('reset', this.params.id, this.outFrame);
+    //   }
+    // }
+
+    // var source = new lfo.sourceEventIn({
+    //   frameSize: 3
+    // });
+
+    // var child1 = new DestroyLogger(source, { id: 'child1' });
+    // var child11 = new DestroyLogger(child1, { id: 'child11' });
+    // var child111 = new DestroyLogger(child11, { id: 'child111' });
+
+    // source.start();
+    // source.process(null, [1, 2, 3]);
+    // => should be equal to [1, 2, 3]
+    // console.log(child111.outFrame);
+
+    // // test reset
+    // source.reset();
+    // outFrame of all children should be [0, 0, 0]
+  });
+
+  describe('#destroy', function() {
+    it('should destroy its children recursivly', function(done) {
+      // class DestroyLogger extends lfo.noop {
+      //   destroy() {
+      //     super();
+      //     console.log(this.params.id, 'destroyed');
+      //   }
+      // }
+
+      // var source = new lfo.sourceEventIn({
+      //   frameSize: 3
+      // });
+
+      // var child1 = new DestroyLogger(source, { id: 'child1' });
+      // var child11 = new DestroyLogger(child1, { id: 'child11' });
+      // var child111 = new DestroyLogger(child11, { id: 'child111' });
+
+
+      // var child2 = new DestroyLogger(source, { id: 'child2' });
+      // var child21 = new DestroyLogger(child2, { id: 'child21' });
+      // var child22 = new DestroyLogger(child2, { id: 'child22' });
+
+      // child1.destroy();
+
+      // // should throw an error
+      // var noop = new lfo.noop(child1);
+    });
+
+    it('should destroy all its children', function(done) {
+
+    });
+
+    it('should set `streamParams` to `null` to all dead nodes', function(done) {
+
+    });
   });
 });
 

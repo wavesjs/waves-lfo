@@ -15,7 +15,7 @@ class Framer extends Lfo {
     var defaults = {
       frameSize: 512,
       // define a good name cf. Nobert
-      centeredTimeTag: false // ('start'||'center')
+      centeredTimeTag: false
     };
 
     super(previous, options, defaults);
@@ -36,8 +36,24 @@ class Framer extends Lfo {
     if (!isPowerOfTwo(this.streamParams.frameSize)) {
       // throw Error() ?
     }
+  }
 
-    // console.log(this.streamParams);
+  // @NOTE must be tested
+  reset() {
+    this.frameIndex = 0;
+    super.reset();
+  }
+
+  finalize() {
+    // @NOTE what about time ?
+    // fill the ongoing buffer with 0
+    for (let i = this.frameIndex, l = this.outFrame.length; i < l; i++) {
+      this.outFrame[i] = 0;
+    }
+    // output it
+    this.output();
+
+    super.finalize();
   }
 
   process(time, block, metadata) {
