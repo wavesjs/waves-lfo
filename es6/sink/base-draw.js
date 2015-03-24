@@ -17,7 +17,7 @@ class BaseDraw extends Lfo {
     super(previous, options, defaults);
 
     if (!this.params.canvas) {
-      throw new Error('bpf: params.canvas is mandatory and must be canvas DOM element');
+      throw new Error('params.canvas is mandatory and must be canvas DOM element');
     }
 
     // prepare canvas

@@ -1,56 +1,81 @@
 "use strict";
 
-let { AudioIn } = require('./audio-in');
-let Framer = require('./framer');
-// remove fs, avoid brfs transform
-var fs = require('fs');
+var { AudioIn } = require('./audio-in');
+var Framer = require('./framer');
 
-// BinaryArray as source
-// slice it blocks through process-worker
-// forward to the framer and output in framer callback ?
+var worker = 'self.addEventListener("message", function process(e) {
+  var message = e.data;
+  var blockSize = message.options.blockSize;
+  var sampleRate = message.options.sampleRate;
+  var buffer = message.data;
+  var length = buffer.length;
+  var block = new Float32Array(blockSize);
+
+  for (var index = 0; index < length; index += blockSize) {
+    var copySize = length - index;
+
+    if (copySize > blockSize) { copySize = blockSize; }
+
+    var bufferSegment = buffer.subarray(index, index + copySize);
+    block.set(bufferSegment, 0);
+
+    // no need for that, handled natively by Float32Array
+    // for (var i = copySize; i < blockSize; i++) { block[i] = 0; }
+
+    postMessage({ block: block, time: index / sampleRate });
+  }
+}, false);';
+
+// AudioBuffer as source
+// slice it in blocks through a worker
 class AudioInBuffer extends AudioIn {
 
   constructor(options = {}) {
     super(options);
 
-    this.type = 'audio-in-buffer';
+    if (!this.params.src || !(this.params.src instanceof AudioBuffer)) {
+      throw new Error('An AudioBuffer source must be given');
+    }
 
-    this.framer = new Framer(this.outFrame, this.hopSize, this._ctx.sampleRate, (time, frame) => {
-      this.output(time);
+    this.type = 'audio-in-buffer';
+    this.metaData = {};
+
+    // init worker
+    var blob = new Blob([worker], { type: "text/javascript" });
+    this.worker = new Worker(window.URL.createObjectURL(blob));
+
+    this.setupStream({
+      frameSize: this.params.frameSize,
+      frameRate: this.params.src.sampleRate / this.frameSize,
+      blockSampleRate: this.params.src.sampleRate
     });
 
-    var wrk = fs.readFileSync(__dirname + '/process-worker.js', 'utf8');
-    var blob = new Blob([wrk], { type: "text/javascript" });
-
-    var workerMessage = (e) => {
-      var block = e.data.block;
-      var time = e.data.time;
-
-      this.framer.input(time, block);
-    };
-
-    this._proc = new Worker(window.URL.createObjectURL(blob));
-    this._proc.addEventListener('message', workerMessage, false);
+    this.worker.addEventListener('message', this.process.bind(this), false);
   }
 
   start() {
     var message = {
       options: {
-        sampleRate: this.sampleRate,
-        hopSize: this.hopSize,
-        blockSize: this.blockSize,
-        frameSize: this.frameSize
+        sampleRate: this.streamParams.blockSampleRate,
+        blockSize: this.streamParams.frameSize
       },
-      data: this._src.getChannelData(this.channel)
+      data: this.src.getChannelData(this.channel)
     };
 
-    this._proc.postMessage(message);
+    this.worker.postMessage(message);
+  }
+
+  process(e) {
+    this.outFrame = e.data.block;
+    this.time = e.data.time;
+
+    this.output();
   }
 }
 
-function factory(options) {
-  return new AudioInBuffer(options);
-}
-factory.AudioInBuffer = AudioInBuffer;
+// function factory(options) {
+//   return new AudioInBuffer(options);
+// }
+// factory.AudioInBuffer = AudioInBuffer;
 
-module.exports = factory;
+module.exports = AudioInBuffer;
