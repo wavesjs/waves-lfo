@@ -2,28 +2,28 @@
 
 var { AudioIn } = require('./audio-in');
 
-var worker = 'self.addEventListener("message", function process(e) {
-  var message = e.data;
-  var blockSize = message.options.blockSize;
-  var sampleRate = message.options.sampleRate;
-  var buffer = message.data;
-  var length = buffer.length;
-  var block = new Float32Array(blockSize);
-
-  for (var index = 0; index < length; index += blockSize) {
-    var copySize = length - index;
-
-    if (copySize > blockSize) { copySize = blockSize; }
-
-    var bufferSegment = buffer.subarray(index, index + copySize);
-    block.set(bufferSegment, 0);
-
-    // no need for that, handled natively by Float32Array
-    // for (var i = copySize; i < blockSize; i++) { block[i] = 0; }
-
-    postMessage({ block: block, time: index / sampleRate });
-  }
-}, false);';
+var worker = 'self.addEventListener("message", function process(e) {    \
+  var message = e.data;                                                 \
+  var blockSize = message.options.blockSize;                            \
+  var sampleRate = message.options.sampleRate;                          \
+  var buffer = message.data;                                            \
+  var length = buffer.length;                                           \
+  var block = new Float32Array(blockSize);                              \
+                                                                        \
+  for (var index = 0; index < length; index += blockSize) {             \
+    var copySize = length - index;                                      \
+                                                                        \
+    if (copySize > blockSize) { copySize = blockSize; }                 \
+                                                                        \
+    var bufferSegment = buffer.subarray(index, index + copySize);       \
+    block.set(bufferSegment, 0);                                        \
+                                                                        \
+    /* no need for that, handled natively by Float32Array */            \
+    /* for (var i = copySize; i < blockSize; i++) { block[i] = 0; } */  \
+                                                                        \
+    postMessage({ block: block, time: index / sampleRate });            \
+  }                                                                     \
+}, false);'.replace(/\s+/g, ' ');
 
 // AudioBuffer as source
 // slice it in blocks through a worker

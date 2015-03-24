@@ -1,12 +1,8 @@
+'use strict';
 
-"use strict";
+class Lfo {
 
-var EventEmitter = require('events').EventEmitter;
-// var extend = require('object-assign');
-
-class Lfo extends EventEmitter {
-
-  constructor(previous = null, options = {}, defaults = {}) {
+  constructor(parent = null, options = {}, defaults = {}) {
     this.idx = 0;
     this.params = {};
     this.streamParams = {
@@ -15,12 +11,13 @@ class Lfo extends EventEmitter {
     };
 
     this.params = Object.assign({}, defaults, options);
+    this.children = [];
 
-    if (previous) {
-      // add ourselves to the previous operator if its passed
-      previous.add(this);
+    if (parent) {
+      // add ourselves to the parent operator if its passed
+      parent.add(this);
       // pass on stream params
-      this.streamParams = Object.assign({}, previous.streamParams);
+      this.streamParams = Object.assign({}, parent.streamParams);
     }
   }
 
@@ -52,19 +49,24 @@ class Lfo extends EventEmitter {
 
   // bind child node
   add(lfo = null) {
-    this.on('frame', function(time, frame, metaData) {
-      lfo.process(time, frame, metaData);
-    });
+    // this.on('frame', function(time, frame, metaData) {
+    //   lfo.process(time, frame, metaData);
+    // });
+    this.children.push(lfo);
   }
 
   // we take care of the emit ourselves
-  output(outTime = this.time, outFrame = this.outFrame, metaData = this.metaData) {
-    this.emit('frame', outTime, outFrame, metaData);
+  output(time = this.time, outFrame = this.outFrame, metaData = this.metaData) {
+    // this.emit('frame', outTime, outFrame, metaData);
+    for (var i = 0, l = this.children.length; i < l; i++) {
+      this.children[i].process(time, outFrame, metaData);
+    }
   }
 
   // removes all children from listening
   remove() {
-    this.removeAllListeners('frame');
+    // this.removeAllListeners('frame');
+    // call remove on all childs
   }
 
   process(time, frame, metadata) {
