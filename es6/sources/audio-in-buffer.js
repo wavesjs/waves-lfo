@@ -1,7 +1,6 @@
 "use strict";
 
 var { AudioIn } = require('./audio-in');
-var Framer = require('./framer');
 
 var worker = 'self.addEventListener("message", function process(e) {
   var message = e.data;
@@ -54,15 +53,13 @@ class AudioInBuffer extends AudioIn {
   }
 
   start() {
-    var message = {
+    this.worker.postMessage({
       options: {
         sampleRate: this.streamParams.blockSampleRate,
         blockSize: this.streamParams.frameSize
       },
       data: this.src.getChannelData(this.channel)
-    };
-
-    this.worker.postMessage(message);
+    });
   }
 
   process(e) {
