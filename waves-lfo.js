@@ -18,6 +18,7 @@ module.exports = {
   framer: require('./dist/operators/framer'),
   biquad: require('./dist/operators/biquad'),
   minMax: require('./dist/operators/min-max'),
+  operator: require('./dist/operators/operator'),
 
   noop: require('./dist/operators/noop')
 };

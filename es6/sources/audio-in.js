@@ -28,17 +28,17 @@ class AudioIn extends Lfo {
     this.metaData = {};
 
     // public
-    this.frameSize = this.params.frameSize;
+    // this.frameSize = this.params.frameSize;
     // this.blockSize = this.params.blockSize;
     // this.hopSize = this.params.hopSize;
-    this.channel = this.params.channel;
+    // this.channel = this.params.channel;
     this.frameOffset = 0;
-    this.sampleRate = this.ctx.sampleRate;
+    // this.sampleRate = this.ctx.sampleRate;
 
     this.setupStream({
-      frameRate: this.sampleRate / this.frameSize,
-      frameSize: this.frameSize,
-      blockSampleRate: this.sampleRate
+      frameRate: this.ctx.sampleRate / this.params.frameSize,
+      frameSize: this.params.frameSize,
+      blockSampleRate: this.ctx.sampleRate
     });
 
     // console.log(this.streamParams);

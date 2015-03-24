@@ -15,7 +15,7 @@ class Framer extends Lfo {
     var defaults = {
       frameSize: 512,
       // define a good name cf. Nobert
-      timeTagPosition: 'start' // ('start'||'center')
+      centeredTimeTag: false // ('start'||'center')
     };
 
     super(previous, options, defaults);
@@ -83,7 +83,7 @@ class Framer extends Lfo {
         // send frame when completed
         if (frameIndex === frameSize) {
           // define time tag for the outFrame according to configuration
-          if (this.params.timeTagPosition === 'center') {
+          if (this.params.centeredTimeTag) {
             this.time = time + (blockIndex - frameSize / 2) * samplePeriod;
           } else {
             this.time = time + (blockIndex - frameSize) * samplePeriod;

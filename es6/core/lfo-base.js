@@ -35,9 +35,17 @@ class Lfo extends EventEmitter {
 
   // common stream config based on the instantiated params
   setupStream(opts = {}) {
-    if (opts.frameRate) { this.streamParams.frameRate = opts.frameRate; }
-    if (opts.frameSize) { this.streamParams.frameSize = opts.frameSize; }
-    if (opts.blockSampleRate) { this.streamParams.blockSampleRate = opts.blockSampleRate; }
+    if (opts.frameRate) {
+      this.streamParams.frameRate = opts.frameRate;
+    }
+
+    if (opts.frameSize) {
+      this.streamParams.frameSize = opts.frameSize;
+    }
+
+    if (opts.blockSampleRate) {
+      this.streamParams.blockSampleRate = opts.blockSampleRate;
+    }
 
     this.outFrame = new Float32Array(this.streamParams.frameSize);
   }

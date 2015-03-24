@@ -49,7 +49,7 @@ class EventIn extends Lfo {
     this.isStarted = false;
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metaData = {}) {
     if (!this.isStarted) { return; }
 
     var audioContext = this.params.audioContext;
@@ -57,7 +57,7 @@ class EventIn extends Lfo {
 
     // à revoir
     // if no time provided, use audioContext.currentTime
-    time = !isNaN(parseFloat(time)) && isFinite(time) ?
+    frameTime = !isNaN(parseFloat(time)) && isFinite(time) ?
       time : audioContext.currentTime;
 
     // set `startTime` if first call after a `start`
@@ -66,8 +66,6 @@ class EventIn extends Lfo {
     // handle time according to config
     if (this.params.timeType === 'relative') {
       frameTime = time - this.startTime;
-    } else {
-      frameTime = time;
     }
 
     // if scalar, create a vector
