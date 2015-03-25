@@ -34,6 +34,9 @@ class Lfo {
       this.children[i].reset();
     }
 
+    // sinks have no `outFrame`
+    if (!this.outFrame) { return }
+
     // this.outFrame.fill(0); // probably better but doesn't work yet
     for (let i = 0, l = this.outFrame.length; i < l; i++) {
       this.outFrame[i] = 0;
