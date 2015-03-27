@@ -2,6 +2,8 @@
 
 var Lfo = require('../core/lfo-base');
 
+
+// @TODO create a single instance of ArrayBuffer of the last frame
 class BaseDraw extends Lfo {
   constructor(previous, options, extendDefaults = {}) {
 

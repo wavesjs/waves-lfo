@@ -1,7 +1,7 @@
 'use strict';
 
 var BaseDraw = require('./base-draw');
-var { getRandomColor, getHue, hexToRGB } = require('./draw-utils');
+var { getRandomColor, getHue, hexToRGB } = require('../utils/draw-utils');
 
 class Trace extends BaseDraw {
 

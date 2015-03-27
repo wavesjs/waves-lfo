@@ -1,23 +1,23 @@
 // @TODO pass * uppercase as it is constructors
 module.exports = {
   // core
-  graph: require('./dist/core/graph'),
-  lfoBase: require('./dist/core/lfo-base'),
+  Graph: require('./dist/core/graph'),
+  LfoBase: require('./dist/core/lfo-base'),
   // sources
-  sourceAudioNode: require('./dist/sources/audio-in-node'),
-  sourceAudioBuffer: require('./dist/sources/audio-in-buffer'),
-  sourceEventIn: require('./dist/sources/event-in'),
+  SourceAudioNode: require('./dist/sources/audio-in-node'),
+  SourceAudioBuffer: require('./dist/sources/audio-in-buffer'),
+  SourceEventIn: require('./dist/sources/event-in'),
   // sink
-  sinkBpf: require('./dist/sink/bpf'),
-  sinkTrace: require('./dist/sink/trace'),
-  sinkWaveform: require('./dist/sink/waveform'),
-  synchronizedSink: require('./dist/sink/synchronized-sink'),
+  SinkBpf: require('./dist/sink/bpf'),
+  SinkTrace: require('./dist/sink/trace'),
+  SinkWaveform: require('./dist/sink/waveform'),
+  SynchronizedSink: require('./dist/sink/synchronized-sink'),
   // operators
-  magnitude: require('./dist/operators/magnitude'),
-  framer: require('./dist/operators/framer'),
-  biquad: require('./dist/operators/biquad'),
-  minMax: require('./dist/operators/min-max'),
-  operator: require('./dist/operators/operator'),
+  Magnitude: require('./dist/operators/magnitude'),
+  Framer: require('./dist/operators/framer'),
+  Biquad: require('./dist/operators/biquad'),
+  MinMax: require('./dist/operators/min-max'),
+  Operator: require('./dist/operators/operator'),
 
-  noop: require('./dist/operators/noop')
+  Noop: require('./dist/operators/noop')
 };

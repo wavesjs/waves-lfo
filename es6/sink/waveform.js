@@ -1,7 +1,7 @@
 'use strict';
 
 var BaseDraw = require('./base-draw');
-var { getRandomColor } = require('./draw-utils');
+var { getRandomColor } = require('../utils/draw-utils');
 
 class Waveform extends BaseDraw {
   constructor(previous, options) {

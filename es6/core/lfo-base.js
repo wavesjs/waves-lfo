@@ -45,8 +45,9 @@ class Lfo {
 
   // fill the on-going buffer with 0
   // output it, then call reset on all the children (sure ?)
-  // @NOTE: what about calling `reset` in `sources.start`
-  //  if `reset` is called here, it will be called more than once in a child node
+  // @NOTE: `reset` is called in `sources.start`,
+  //  if is called here, it will be called more than once in a child node
+  //  is this a problem ?
   finalize() {
     for (let i = 0, l = this.children.length; i < l; i++) {
       this.children[i].finalize();
@@ -71,7 +72,7 @@ class Lfo {
   }
 
   // bind child node
-  add(lfo = null) {
+  add(lfo) {
     this.children.push(lfo);
   }
 
