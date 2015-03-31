@@ -3,9 +3,10 @@
 var id = 0;
 
 class Lfo {
-  constructor(parent = null, options = {}, defaults = {}) {
+  constructor(options = {}, defaults = {}) {
     this.cid = id++;
     this.params = {};
+
     this.streamParams = {
       frameSize: 1,
       frameRate: 0,
@@ -15,17 +16,77 @@ class Lfo {
     this.params = Object.assign({}, defaults, options);
     this.children = [];
 
-    if (parent) {
-      if (parent.streamParams === null) {
-        throw new Error('cannot connect to as dead lfo node');
-      }
+    // if (parent) {
+    //   if (parent.streamParams === null) {
+    //     throw new Error('cannot connect to as dead lfo node');
+    //   }
 
-      this.parent = parent;
-      // add ourselves to the parent operator if its passed
-      this.parent.add(this);
-      // pass on stream params
-      this.streamParams = Object.assign({}, this.parent.streamParams);
+    //   this.parent = parent;
+    //   // add ourselves to the parent operator if its passed
+    //   this.parent.add(this);
+    //   // pass on stream params
+    //   this.streamParams = Object.assign({}, this.parent.streamParams);
+    //   // console.log(parent, this.streamParams);
+    //   // this.setupStream();
+    // }
+  }
+
+  // webAudioAPI connect like method
+  connect(child) {
+    if (this.streamParams === null) {
+      throw new Error('cannot connect to a dead lfo node');
     }
+
+    this.children.push(child);
+    child.parent = this;
+  }
+
+  // initialize the current node stream and propagate to it's children
+  initialize() {
+    if (this.parent) {
+      // defaults to inherit parent's stream parameters
+      // reuse the same object each time
+      this.streamParams = Object.assign(this.streamParams, this.parent.streamParams);
+    }
+
+    // entry point for stream params configuration in derived class
+    this.configureStream();
+    // create the `outStream` arrayBuffer
+    this.setupStream();
+
+    // propagate initialization in lfo chain
+    for (var i = 0, l = this.children.length; i < l; i++) {
+      this.children[i].initialize();
+    }
+  }
+
+  // for sources only
+  // start() {
+  //   this.initialize();
+  //   this.reset();
+  // }
+
+  //
+  configureStream() {
+    if (this.params.frameSize) {
+      this.streamParams.frameSize = this.params.frameSize;
+    }
+
+    if (this.params.frameRate) {
+      this.streamParams.frameRate = this.params.frameRate;
+    }
+
+    if (this.params.blockSampleRate) {
+      this.streamParams.blockSampleRate = this.params.blockSampleRate;
+    }
+  }
+  // common stream configuration based on the given params
+  setupStream(/* opts = {} */) {
+    // if (opts.frameRate) { this.streamParams.frameRate = opts.frameRate; }
+    // if (opts.frameSize) { this.streamParams.frameSize = opts.frameSize; }
+    // if (opts.blockSampleRate) { this.streamParams.blockSampleRate = opts.blockSampleRate; }
+
+    this.outFrame = new Float32Array(this.streamParams.frameSize);
   }
 
   // reset `outFrame` and call reset on children
@@ -54,27 +115,10 @@ class Lfo {
     }
   }
 
-  // common stream configuration based on the given params
-  setupStream(opts = {}) {
-    if (opts.frameRate) {
-      this.streamParams.frameRate = opts.frameRate;
-    }
-
-    if (opts.frameSize) {
-      this.streamParams.frameSize = opts.frameSize;
-    }
-
-    if (opts.blockSampleRate) {
-      this.streamParams.blockSampleRate = opts.blockSampleRate;
-    }
-
-    this.outFrame = new Float32Array(this.streamParams.frameSize);
-  }
-
   // bind child node
-  add(lfo) {
-    this.children.push(lfo);
-  }
+  // add(lfo) {
+  //   this.children.push(lfo);
+  // }
 
   // forward the current state (time, frame, metaData) to all the children
   output(time = this.time, outFrame = this.outFrame, metaData = this.metaData) {

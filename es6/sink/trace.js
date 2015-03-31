@@ -5,16 +5,18 @@ var { getRandomColor, getHue, hexToRGB } = require('../utils/draw-utils');
 
 class Trace extends BaseDraw {
 
-  constructor(previous, options) {
-    var extendDefaults = {
+  constructor(options) {
+    var defaults = {
       colorScheme: 'none' // color, opacity
     };
 
-    super(previous, options);
-    // create an array of colors according to the
-    if (!this.params.color) {
-      this.params.color = getRandomColor();
-    }
+    super(options, defaults);
+  }
+
+  initialize() {
+    super.initialize();
+
+    if (!this.params.color) { this.params.color = getRandomColor(); }
   }
 
   process(time, frame) {

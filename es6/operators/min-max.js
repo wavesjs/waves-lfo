@@ -3,12 +3,14 @@
 var Lfo = require('../core/lfo-base');
 
 class MinMax extends Lfo {
-  constructor(previous, options) {
+  constructor(options) {
     var defaults = {};
 
-    super(previous, options, defaults);
+    super(options, defaults);
+  }
 
-    this.setupStream({ frameSize: 2 });
+  configureStream() {
+    this.streamParams.frameSize = 2;
   }
 
   process(time, frame, metaData) {
@@ -17,12 +19,13 @@ class MinMax extends Lfo {
 
     for (var i = 0, l = frame.length; i < l; i++) {
       var value = frame[i];
-      if (value < min) { min = value }
-      if (value > max) { max = value }
+      if (value < min) { min = value; }
+      if (value > max) { max = value; }
     }
 
     this.time = time;
-    this.outFrame.set([min, max], 0);
+    this.outFrame[0] = min;
+    this.outFrame[1] = max;
     this.metaData = metaData;
 
     this.output();

@@ -5,14 +5,21 @@ var Lfo = require('../core/lfo-base');
 
 class Magnitude extends Lfo {
 
-  constructor(previous = null, options = {}) {
-    super(previous, options, { normalize: false });
-    this.type = 'magnitude';
-    // sets the necessary logic based on the params
-    this.setupStream({ frameSize: 1 });
+  constructor(options = {}) {
+    var defaults = {
+      normalize: false
+    };
+
+    super(options, defaults);
+
+    // this.type = 'magnitude';
   }
 
-  process(time, frame) {
+  configureStream() {
+    this.streamParams.frameSize = 1;
+  }
+
+  process(time, frame, metaData) {
     var frameSize = frame.length;
     var sum = 0;
     var i = 0;
@@ -26,14 +33,12 @@ class Magnitude extends Lfo {
       sum /= frameSize;
     }
 
+    this.time = time;
     this.outFrame[0] = Math.sqrt(sum);
-    this.output(time);
+    this.metaData = metaData;
+
+    this.output();
   }
 }
 
-function factory(previous, options) {
-  return new Magnitude(previous, options);
-}
-factory.Magnitude = Magnitude;
-
-module.exports = factory;
+module.exports = Magnitude;

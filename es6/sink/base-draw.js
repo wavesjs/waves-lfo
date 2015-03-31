@@ -5,7 +5,7 @@ var Lfo = require('../core/lfo-base');
 
 // @TODO create a single instance of ArrayBuffer of the last frame
 class BaseDraw extends Lfo {
-  constructor(previous, options, extendDefaults = {}) {
+  constructor(options = {}, extendDefaults = {}) {
 
     var defaults = Object.assign({
       duration: 1,
@@ -16,7 +16,7 @@ class BaseDraw extends Lfo {
       isSynchronized: false // is set to true if used in a synchronizedSink
     }, extendDefaults);
 
-    super(previous, options, defaults);
+    super(options, defaults);
 
     if (!this.params.canvas) {
       throw new Error('params.canvas is mandatory and must be canvas DOM element');
@@ -32,11 +32,22 @@ class BaseDraw extends Lfo {
     this.ctx.canvas.width  = this.cachedCtx.canvas.width  = this.params.width;
     this.ctx.canvas.height = this.cachedCtx.canvas.height = this.params.height;
 
-    this.previousFrame = null;
     this.previousTime = 0;
 
     this.lastShiftError = 0;
     this.currentPartialShift = 0;
+  }
+
+  reset() {
+    super.reset();
+
+    this.ctx.clearRect(0, 0, this.params.width, this.params.height);
+    this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
+  }
+
+  setupStream() {
+    super.setupStream();
+    this.previousFrame = new Float32Array(this.streamParams.frameSize);
   }
 
   // http://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
@@ -69,7 +80,7 @@ class BaseDraw extends Lfo {
 
   // main process method
   process(time, frame) {
-    this.previousFrame = new Float32Array(frame);
+    this.previousFrame.set(frame, 0);
     this.previousTime = time;
     super.process(time, frame);
   }
@@ -113,7 +124,7 @@ class BaseDraw extends Lfo {
 
     this.currentPartialShift += shift;
 
-    this.clear();
+    this.ctx.clearRect(0, 0, this.params.width, this.params.height);
     ctx.save();
 
     ctx.drawImage(this.cachedCanvas,
@@ -122,10 +133,6 @@ class BaseDraw extends Lfo {
     );
 
     ctx.restore();
-  }
-
-  clear() {
-    this.ctx.clearRect(0, 0, this.params.width, this.params.height);
   }
 
   // Must implement the logic to draw the shape between

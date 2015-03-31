@@ -7,19 +7,29 @@ class AudioInNode extends AudioIn {
 
   constructor(options = {}) {
     super(options);
-    this.type = 'audio-in-node';
+    // this.type = 'audio-in-node';
+  }
+
+  configureStream() {
+    this.streamParams.frameSize = this.params.frameSize;
+    this.streamParams.frameRate = this.ctx.sampleRate / this.params.frameSize;
+    this.streamParams.blockSampleRate = this.ctx.sampleRate;
+  }
+
+  initialize() {
+    super.initialize();
 
     var blockSize = this.streamParams.frameSize;
     this.scriptProcessor = this.ctx.createScriptProcessor(blockSize, 1, 1);
-
-    // keep the script processor alive
-    // this.ctx['_process-' + new Date().getTime()] = this.scriptProcessor;
+    // audio process callback
     this.scriptProcessor.onaudioprocess = this.process.bind(this);
+    // prepare connection
     this.src.connect(this.scriptProcessor);
   }
 
   // connect the audio nodes to start streaming
   start() {
+    this.initialize();
     this.reset();
     // start "the patch" ;)
     this.scriptProcessor.connect(this.ctx.destination);

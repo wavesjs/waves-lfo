@@ -5,16 +5,19 @@ var Lfo = require('../core/lfo-base');
 // apply a given function on each frame
 class Operator extends Lfo {
 
-  constructor(previous, options) {
-    super(previous, options, {});
+  constructor(options) {
+    super(options, {});
 
     this.params.type = this.params.type || 'scalar';
 
+    if (this.params.onProcess) {
+      this.onProcess(this.params.onProcess);
+    }
+  }
+
+  configureStream() {
     if (this.params.type === 'vector' && this.params.frameSize) {
-      this.setupStream({ frameSize: this.params.frameSize });
-    } else {
-      // if type `scalar` outFrame.length === inFrame.length
-      this.setupStream();
+      this.streamParams.frameSize = this.params.frameSize;
     }
   }
 
@@ -30,7 +33,7 @@ class Operator extends Lfo {
   //   outFrame.set(inFrame, 0);
   //   return time + 1;
   // }
-  callback(func) {
+  onProcess(func) {
     // bind current context
     this.callback = func.bind(this);
   }

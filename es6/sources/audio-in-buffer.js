@@ -30,29 +30,32 @@ var worker = 'self.addEventListener("message", function process(e) {    \
 class AudioInBuffer extends AudioIn {
 
   constructor(options = {}) {
-    super(options);
+    var defaults = {};
+    this.metaData = {};
+
+    super(options, defaults);
 
     if (!this.params.src || !(this.params.src instanceof AudioBuffer)) {
       throw new Error('An AudioBuffer source must be given');
     }
+  }
 
-    this.type = 'audio-in-buffer';
-    this.metaData = {};
+  configureStream() {
+    this.streamParams.frameSize = this.params.frameSize;
+    this.streamParams.frameRate = this.params.src.sampleRate / this.frameSize;
+    this.streamParams.blockSampleRate = this.params.src.sampleRate;
+  }
 
+  initialize() {
+    super.initialize();
     // init worker
     var blob = new Blob([worker], { type: "text/javascript" });
     this.worker = new Worker(window.URL.createObjectURL(blob));
-
-    this.setupStream({
-      frameSize: this.params.frameSize,
-      frameRate: this.params.src.sampleRate / this.frameSize,
-      blockSampleRate: this.params.src.sampleRate
-    });
-
     this.worker.addEventListener('message', this.process.bind(this), false);
   }
 
   start() {
+    this.initialize();
     this.reset();
 
     this.worker.postMessage({

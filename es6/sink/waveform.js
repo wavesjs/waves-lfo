@@ -4,14 +4,16 @@ var BaseDraw = require('./base-draw');
 var { getRandomColor } = require('../utils/draw-utils');
 
 class Waveform extends BaseDraw {
-  constructor(previous, options) {
-    var extendDefaults = {};
+  constructor(options) {
+    var defaults = {};
 
-    super(previous, options, extendDefaults);
+    super(options, defaults);
+  }
 
-    if (!this.params.color) {
-      this.params.color = getRandomColor();
-    }
+  initialize() {
+    super.initialize();
+
+    if (!this.params.color) { this.params.color = getRandomColor(); }
   }
 
   process(time, frame) {

@@ -2,40 +2,40 @@
 
 var Lfo = require('../core/lfo-base');
 
-var isPowerOfTwo = function(number) {
-  while ((number % 2 === 0) && number > 1) {
-    number = number / 2;
-  }
+// var isPowerOfTwo = function(number) {
+//   while ((number % 2 === 0) && number > 1) {
+//     number = number / 2;
+//   }
 
-  return number === 1;
-}
+//   return number === 1;
+// }
 
 class Framer extends Lfo {
-  constructor(previous, options) {
+  constructor(options) {
     var defaults = {
       frameSize: 512,
       // define a good name cf. Nobert
       centeredTimeTag: false
     };
 
-    super(previous, options, defaults);
+    super(options, defaults);
 
     this.frameIndex = 0;
 
+    // throw error if frameSize is not a power of 2 ?
+    // if (!isPowerOfTwo(this.streamParams.frameSize)) {
+    //   // throw Error() ?
+    // }
+  }
+
+  configureStream() {
+    // defaults to `hopSize` === `frameSize`
     if (!this.params.hopSize) {
       this.params.hopSize = this.params.frameSize;
     }
 
-    // setup stream
-    this.setupStream({
-      frameSize: this.params.frameSize,
-      frameRate: this.streamParams.blockSampleRate / this.params.hopSize
-    });
-
-    // throw error if frameSize is not a power of 2 ?
-    if (!isPowerOfTwo(this.streamParams.frameSize)) {
-      // throw Error() ?
-    }
+    this.streamParams.frameSize = this.params.frameSize;
+    this.streamParams.frameRate = this.streamParams.blockSampleRate / this.params.hopSize;
   }
 
   // @NOTE must be tested

@@ -7,7 +7,7 @@ var audioContext; // for lazy audioContext creation
 class AudioIn extends Lfo {
 
   constructor(options = {}) {
-    this.type = 'audio-in';
+    // this.type = 'audio-in';
 
     // defaults
     var defaults = {
@@ -17,7 +17,7 @@ class AudioIn extends Lfo {
       channel: 0
     };
 
-    super(null, options, defaults);
+    super(options, defaults);
 
     // private
     if (!this.params.ctx) {
@@ -30,14 +30,11 @@ class AudioIn extends Lfo {
     this.src = this.params.src;
     this.time = 0;
     this.metaData = {};
-    // this.frameOffset = 0;
-
-    this.setupStream({
-      frameRate: this.ctx.sampleRate / this.params.frameSize,
-      frameSize: this.params.frameSize,
-      blockSampleRate: this.ctx.sampleRate
-    });
   }
+
+  // configureStream() {
+
+  // }
 
   start() {}
   stop() {}

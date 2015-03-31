@@ -4,17 +4,22 @@ var BaseDraw = require('./base-draw');
 var { getRandomColor } = require('../utils/draw-utils');
 
 class Bpf extends BaseDraw {
-  constructor(previous, options) {
-    var extendDefaults = {
+  constructor(options) {
+    var defaults = {
       trigger: false,
       radius: 0,
       line: true
     };
 
-    super(previous, options, extendDefaults);
+    super(options, defaults);
     // for loop mode
     this.currentXPosition = 0;
-    // create an array of colors according to the
+  }
+
+  initialize() {
+    super.initialize();
+
+    // create an array of colors according to the `outFrame` size
     if (!this.params.colors) {
       this.params.colors = [];
       for (var i = 0, l = this.streamParams.frameSize; i < l; i++) {

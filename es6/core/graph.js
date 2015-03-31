@@ -1,4 +1,4 @@
-
+/* DEPRECATED */
 "use strict";
 
 class Node {
