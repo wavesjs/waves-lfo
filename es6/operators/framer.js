@@ -56,7 +56,7 @@ class Framer extends Lfo {
     super.finalize();
   }
 
-  process(time, block, metadata) {
+  process(time, block, metaData) {
     var sampleRate = this.streamParams.blockSampleRate;
     var samplePeriod = 1 / sampleRate;
 
@@ -104,6 +104,9 @@ class Framer extends Lfo {
           } else {
             this.time = time + (blockIndex - frameSize) * samplePeriod;
           }
+
+          // forward metaData ?
+          this.metaData = metaData;
 
           // forward to next nodes
           this.output();

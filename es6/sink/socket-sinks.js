@@ -4,27 +4,8 @@ var Lfo = require('../core/lfo-base');
 var WebSocketServer = require('ws').Server;
 var { encodeMessage, decodeMessage, arrayBufferToBuffer } = require('../utils/socket-utils');
 
-/*
-class SocketSynk {
-  constructor() {
-
-  }
-
-  // prepare the buffer to send over the network
-  formatMessage() {
-
-  }
-
-  // onmessage callback
-  // dispatch handchecks and data message
-  routeMessage() {
-
-  }
-}
-*/
-
 // send an Lfo stream from the browser over the network
-// throught a WebSocket - should be paired with a SocketSourceServer
+// through a WebSocket - should be paired with a SocketSourceServer
 // @NOTE: does it need to implement some ping process to maintain connection ?
 class SocketSinkClient extends Lfo {
   constructor(options) {
@@ -54,17 +35,17 @@ class SocketSinkClient extends Lfo {
     };
 
     this.socket.onmessage = () => {
-      // should not receive messages
-      // maybe handshakes form the server ?
+
     };
 
-    this.socket.onerror = () => {
-      // repoen socket ?
+    this.socket.onerror = (err) => {
+      console.log(err);
     };
   }
 
   process(time, frame, metaData) {
     var buffer = encodeMessage(time, frame, metaData);
+
     this.socket.send(buffer);
   }
 }
@@ -90,6 +71,7 @@ class SocketSinkServer extends Lfo {
     var buffer = arrayBufferToBuffer(arrayBuffer);
 
     this.server.clients.forEach(function(client) {
+      // console.timeEnd('ServerProcess');
       client.send(buffer);
     });
   }

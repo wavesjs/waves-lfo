@@ -33,7 +33,6 @@ class BaseDraw extends Lfo {
     this.ctx.canvas.height = this.cachedCtx.canvas.height = this.params.height;
 
     this.previousTime = 0;
-
     this.lastShiftError = 0;
     this.currentPartialShift = 0;
   }

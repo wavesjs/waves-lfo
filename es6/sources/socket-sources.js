@@ -81,7 +81,6 @@ class SocketSourceClient extends Lfo {
 
     // callback to start to when WebSocket is connected
     this.socket.onopen = () => {
-      // this.socket.on('message', this.process.bind(this));
       this.start();
     };
 
@@ -91,13 +90,10 @@ class SocketSourceClient extends Lfo {
 
     this.socket.onmessage = (message) => {
       this.process(message.data);
-
-      // should not receive messages
-      // maybe handshakes form the server ?
     };
 
     this.socket.onerror = () => {
-      // repoen socket ?
+      console.log(err);
     };
   }
 

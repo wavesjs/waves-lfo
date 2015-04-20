@@ -5,7 +5,7 @@ function Uint16Array2str(buf) {
 }
 
 function str2Uint16Array(str) {
-  var buffer = new ArrayBuffer(str.length*2); // 2 bytes for each char
+  var buffer = new ArrayBuffer(str.length * 2); // 2 bytes for each char
   var bufferView = new Uint16Array(buffer);
 
   for (var i = 0, l = str.length; i < l; i++) {

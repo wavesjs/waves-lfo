@@ -8,6 +8,7 @@ class AudioInNode extends AudioIn {
   constructor(options = {}) {
     super(options);
     // this.type = 'audio-in-node';
+    this.metaData = {};
   }
 
   configureStream() {
