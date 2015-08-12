@@ -22,9 +22,8 @@ class AudioInNode extends AudioIn {
 
     var blockSize = this.streamParams.frameSize;
     this.scriptProcessor = this.ctx.createScriptProcessor(blockSize, 1, 1);
-    // audio process callback
+    // prepare audio graph
     this.scriptProcessor.onaudioprocess = this.process.bind(this);
-    // prepare connection
     this.src.connect(this.scriptProcessor);
   }
 

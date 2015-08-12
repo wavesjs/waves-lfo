@@ -1,39 +1,32 @@
-"use strict";
+import AudioIn from './audio-in';
 
-var AudioIn = require('./audio-in');
+const worker = `
+self.addEventListener('message', function process(e) {
+  var blockSize = e.data.options.blockSize;
+  var sampleRate = e.data.options.sampleRate;
+  var buffer = new Float32Array(e.data.buffer);
 
-var worker = 'self.addEventListener("message", function process(e) {    \
-  var message = e.data;                                                 \
-  var blockSize = message.options.blockSize;                            \
-  var sampleRate = message.options.sampleRate;                          \
-  var buffer = message.data;                                            \
-  var length = buffer.length;                                           \
-  var block = new Float32Array(blockSize);                              \
-                                                                        \
-  for (var index = 0; index < length; index += blockSize) {             \
-    var copySize = length - index;                                      \
-                                                                        \
-    if (copySize > blockSize) { copySize = blockSize; }                 \
-                                                                        \
-    var bufferSegment = buffer.subarray(index, index + copySize);       \
-    block.set(bufferSegment, 0);                                        \
-                                                                        \
-    /* no need for that, handled natively by Float32Array */            \
-    /* for (var i = copySize; i < blockSize; i++) { block[i] = 0; } */  \
-                                                                        \
-    postMessage({ block: block, time: index / sampleRate });            \
-  }                                                                     \
-}, false);'.replace(/\s+/g, ' ');
+  var length = buffer.length;
+  // var block = new Float32Array(blockSize);
 
-// AudioBuffer as source
-// slice it in blocks through a worker
-class AudioInBuffer extends AudioIn {
+  for (var index = 0; index < length; index += blockSize) {
+    var copySize = length - index;
+    if (copySize > blockSize) { copySize = blockSize; }
 
+    var block = buffer.subarray(index, index + copySize);
+    block = new Float32Array(block);
+
+    postMessage({ buffer: block.buffer, time: index / sampleRate }, [block.buffer]);
+  }
+}, false)`;
+
+/**
+ * AudioBuffer as source, sliced it in blocks through a worker
+ */
+export default class AudioInBuffer extends AudioIn {
   constructor(options = {}) {
-    var defaults = {};
+    super(options, {});
     this.metaData = {};
-
-    super(options, defaults);
 
     if (!this.params.src || !(this.params.src instanceof AudioBuffer)) {
       throw new Error('An AudioBuffer source must be given');
@@ -42,42 +35,46 @@ class AudioInBuffer extends AudioIn {
 
   configureStream() {
     this.streamParams.frameSize = this.params.frameSize;
-    this.streamParams.frameRate = this.params.src.sampleRate / this.frameSize;
-    this.streamParams.blockSampleRate = this.params.src.sampleRate;
+    this.streamParams.frameRate = this.params.src.sampleRate / this.params.frameSize;
+    this.streamParams.sourceSampleRate = this.params.src.sampleRate;
   }
 
   initialize() {
     super.initialize();
     // init worker
-    var blob = new Blob([worker], { type: "text/javascript" });
+    // @NOTE: could be done once in constructor ?
+    const blob = new Blob([worker], { type: "text/javascript" });
     this.worker = new Worker(window.URL.createObjectURL(blob));
     this.worker.addEventListener('message', this.process.bind(this), false);
   }
 
   start() {
+    // propagate to the whole chain
     this.initialize();
     this.reset();
 
+    const buffer = this.src.getChannelData(this.channel).buffer
+
     this.worker.postMessage({
       options: {
-        sampleRate: this.streamParams.blockSampleRate,
+        sampleRate: this.streamParams.sourceSampleRate,
         blockSize: this.streamParams.frameSize
       },
-      data: this.src.getChannelData(this.channel)
-    });
+      buffer: buffer
+    }, [buffer]);
   }
 
   stop() {
+    // propagate to the whole chain
     this.finalize();
   }
 
   // callback of the worker
   process(e) {
-    this.outFrame = e.data.block;
+    const block = new Float32Array(e.data.buffer);
+    this.outFrame.set(block, 0);
     this.time = e.data.time;
 
     this.output();
   }
 }
-
-module.exports = AudioInBuffer;

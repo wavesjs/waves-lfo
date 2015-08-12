@@ -1,13 +1,13 @@
 'use strict';
 
-var Lfo = require('../core/lfo-base');
+const Lfo = require('../core/lfo-base');
 
 
 // @TODO create a single instance of ArrayBuffer of the last frame
 class BaseDraw extends Lfo {
   constructor(options = {}, extendDefaults = {}) {
 
-    var defaults = Object.assign({
+    const defaults = Object.assign({
       duration: 1,
       min: -1,
       max: 1,
@@ -50,15 +50,15 @@ class BaseDraw extends Lfo {
   }
 
   // http://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
-  //          (b-a)(x - min)
-  // f(x) = --------------  + a
-  //           max - min
+  //        (b-a)(x - min)
+  // f(x) = -------------- + a
+  //          max - min
   getYPosition(value) {
     // a = height
     // b = 0
-    var min = this.params.min;
-    var max = this.params.max;
-    var height = this.params.height;
+    const min = this.params.min;
+    const max = this.params.max;
+    const height = this.params.height;
 
     return (((0 - height) * (value - min)) / (max - min)) + height;
   }
@@ -86,17 +86,17 @@ class BaseDraw extends Lfo {
 
   // default draw mode
   scrollModeDraw(time, frame) {
-    var width = this.params.width;
-    var height = this.params.height;
-    var duration = this.params.duration;
-    var ctx = this.ctx;
+    const width = this.params.width;
+    const height = this.params.height;
+    const duration = this.params.duration;
+    const ctx = this.ctx;
 
-    var dt = time - this.previousTime;
-    var fShift = (dt / duration) * width - this.lastShiftError;
-    var iShift = Math.round(fShift);
+    const dt = time - this.previousTime;
+    const fShift = (dt / duration) * width - this.lastShiftError;
+    const iShift = Math.round(fShift);
     this.lastShiftError = iShift - fShift;
 
-    var partialShift = iShift - this.currentPartialShift;
+    const partialShift = iShift - this.currentPartialShift;
     this.shiftCanvas(partialShift);
 
     // shift all siblings if synchronized
@@ -117,13 +117,13 @@ class BaseDraw extends Lfo {
   }
 
   shiftCanvas(shift) {
-    var width = this.params.width;
-    var height = this.params.height;
-    var ctx = this.ctx;
+    const width = this.params.width;
+    const height = this.params.height;
+    const ctx = this.ctx;
 
     this.currentPartialShift += shift;
 
-    this.ctx.clearRect(0, 0, this.params.width, this.params.height);
+    ctx.clearRect(0, 0, width, height);
     ctx.save();
 
     ctx.drawImage(this.cachedCanvas,

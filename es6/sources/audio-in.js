@@ -1,27 +1,24 @@
+import BaseLfo from '../core/base-lfo';
 
-"use strict";
+let audioContext; // for lazy audioContext creation
 
-var Lfo = require('../core/lfo-base');
-var audioContext; // for lazy audioContext creation
-
-class AudioIn extends Lfo {
+export default class AudioIn extends BaseLfo {
 
   constructor(options = {}) {
-    // this.type = 'audio-in';
-
     // defaults
-    var defaults = {
+    const defaults = {
       frameSize: 512,
-      // blockSize: 2048,
-      // hopSize: 512,
-      channel: 0
+      channel: 0,
     };
 
     super(options, defaults);
 
     // private
     if (!this.params.ctx) {
-      audioContext = new AudioContext();
+      if (!audioContext) {
+        audioContext = new window.AudioContext();
+      }
+
       this.ctx = audioContext;
     } else {
       this.ctx = this.params.ctx;
@@ -31,10 +28,6 @@ class AudioIn extends Lfo {
     this.time = 0;
     this.metaData = {};
   }
-
-  // configureStream() {
-
-  // }
 
   start() {}
   stop() {}

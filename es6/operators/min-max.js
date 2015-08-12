@@ -1,11 +1,12 @@
-'use strict';
+import BaseLfo from '../core/base-lfo';
 
-var Lfo = require('../core/lfo-base');
-
-class MinMax extends Lfo {
+/**
+ *
+ *
+ */
+export default class MinMax extends BaseLfo {
   constructor(options) {
-    var defaults = {};
-
+    const defaults = {};
     super(options, defaults);
   }
 
@@ -14,11 +15,11 @@ class MinMax extends Lfo {
   }
 
   process(time, frame, metaData) {
-    var min = +Infinity;
-    var max = -Infinity;
+    let min = +Infinity;
+    let max = -Infinity;
 
-    for (var i = 0, l = frame.length; i < l; i++) {
-      var value = frame[i];
+    for (let i = 0, l = frame.length; i < l; i++) {
+      const value = frame[i];
       if (value < min) { min = value; }
       if (value > max) { max = value; }
     }
@@ -31,5 +32,3 @@ class MinMax extends Lfo {
     this.output();
   }
 }
-
-module.exports = MinMax;

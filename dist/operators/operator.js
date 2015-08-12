@@ -1,84 +1,80 @@
-"use strict";
+'use strict';
 
-var _classCallCheck = require("babel-runtime/helpers/class-call-check")["default"];
+var _get = require('babel-runtime/helpers/get')['default'];
 
-var _inherits = require("babel-runtime/helpers/inherits")["default"];
+var _inherits = require('babel-runtime/helpers/inherits')['default'];
 
-var _get = require("babel-runtime/helpers/get")["default"];
+var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
-var _createClass = require("babel-runtime/helpers/create-class")["default"];
+var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
-var _core = require("babel-runtime/core-js")["default"];
-
-var Lfo = require("../core/lfo-base");
+var Lfo = require('../core/lfo-base');
 
 // apply a given function on each frame
 
 var Operator = (function (_Lfo) {
+  _inherits(Operator, _Lfo);
+
   function Operator(options) {
     _classCallCheck(this, Operator);
 
-    _get(_core.Object.getPrototypeOf(Operator.prototype), "constructor", this).call(this, options, {});
+    _get(Object.getPrototypeOf(Operator.prototype), 'constructor', this).call(this, options, {});
 
-    this.params.type = this.params.type || "scalar";
+    this.params.type = this.params.type || 'scalar';
 
     if (this.params.onProcess) {
       this.onProcess(this.params.onProcess);
     }
   }
 
-  _inherits(Operator, _Lfo);
-
-  _createClass(Operator, {
-    configureStream: {
-      value: function configureStream() {
-        if (this.params.type === "vector" && this.params.frameSize) {
-          this.streamParams.frameSize = this.params.frameSize;
-        }
-      }
-    },
-    onProcess: {
-
-      // register the callback to be consumed in process
-
-      // @SIGNATURE scalar callback
-      // function(value, index, frame) {
-      //   return doSomething(value)
-      // }
-
-      // @SIGNATURE vector callback
-      // function(time, inFrame, outFrame) {
-      //   outFrame.set(inFrame, 0);
-      //   return time + 1;
-      // }
-
-      value: function onProcess(func) {
-        // bind current context
-        this.callback = func.bind(this);
-      }
-    },
-    process: {
-      value: function process(time, frame, metaData) {
-        // apply the callback to the frame
-        if (this.params.type === "vector") {
-          var outTime = this.callback(time, frame, this.outFrame);
-
-          if (outTime !== undefined) {
-            time = outTime;
-          }
-        } else {
-          for (var i = 0, l = frame.length; i < l; i++) {
-            this.outFrame[i] = this.callback(frame[i], i);
-          }
-        }
-
-        this.time = time;
-        this.metaData = metaData;
-
-        this.output();
+  _createClass(Operator, [{
+    key: 'configureStream',
+    value: function configureStream() {
+      if (this.params.type === 'vector' && this.params.frameSize) {
+        this.streamParams.frameSize = this.params.frameSize;
       }
     }
-  });
+
+    // register the callback to be consumed in process
+
+    // @SIGNATURE scalar callback
+    // function(value, index, frame) {
+    //   return doSomething(value)
+    // }
+
+    // @SIGNATURE vector callback
+    // function(time, inFrame, outFrame) {
+    //   outFrame.set(inFrame, 0);
+    //   return time + 1;
+    // }
+  }, {
+    key: 'onProcess',
+    value: function onProcess(func) {
+      // bind current context
+      this.callback = func.bind(this);
+    }
+  }, {
+    key: 'process',
+    value: function process(time, frame, metaData) {
+      // apply the callback to the frame
+      if (this.params.type === 'vector') {
+        var outTime = this.callback(time, frame, this.outFrame);
+
+        if (outTime !== undefined) {
+          time = outTime;
+        }
+      } else {
+        for (var i = 0, l = frame.length; i < l; i++) {
+          this.outFrame[i] = this.callback(frame[i], i);
+        }
+      }
+
+      this.time = time;
+      this.metaData = metaData;
+
+      this.output();
+    }
+  }]);
 
   return Operator;
 })(Lfo);
@@ -86,4 +82,4 @@ var Operator = (function (_Lfo) {
 ;
 
 module.exports = Operator;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImVzNi9vcGVyYXRvcnMvb3BlcmF0b3IuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBRUEsSUFBSSxHQUFHLEdBQUcsT0FBTyxDQUFDLGtCQUFrQixDQUFDLENBQUM7Ozs7SUFHaEMsUUFBUTtBQUVELFdBRlAsUUFBUSxDQUVBLE9BQU8sRUFBRTswQkFGakIsUUFBUTs7QUFHVixxQ0FIRSxRQUFRLDZDQUdKLE9BQU8sRUFBRSxFQUFFLEVBQUU7O0FBRW5CLFFBQUksQ0FBQyxNQUFNLENBQUMsSUFBSSxHQUFHLElBQUksQ0FBQyxNQUFNLENBQUMsSUFBSSxJQUFJLFFBQVEsQ0FBQzs7QUFFaEQsUUFBSSxJQUFJLENBQUMsTUFBTSxDQUFDLFNBQVMsRUFBRTtBQUN6QixVQUFJLENBQUMsU0FBUyxDQUFDLElBQUksQ0FBQyxNQUFNLENBQUMsU0FBUyxDQUFDLENBQUM7S0FDdkM7R0FDRjs7WUFWRyxRQUFROztlQUFSLFFBQVE7QUFZWixtQkFBZTthQUFBLDJCQUFHO0FBQ2hCLFlBQUksSUFBSSxDQUFDLE1BQU0sQ0FBQyxJQUFJLEtBQUssUUFBUSxJQUFJLElBQUksQ0FBQyxNQUFNLENBQUMsU0FBUyxFQUFFO0FBQzFELGNBQUksQ0FBQyxZQUFZLENBQUMsU0FBUyxHQUFHLElBQUksQ0FBQyxNQUFNLENBQUMsU0FBUyxDQUFDO1NBQ3JEO09BQ0Y7O0FBY0QsYUFBUzs7Ozs7Ozs7Ozs7Ozs7O2FBQUEsbUJBQUMsSUFBSSxFQUFFOztBQUVkLFlBQUksQ0FBQyxRQUFRLEdBQUcsSUFBSSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQztPQUNqQzs7QUFFRCxXQUFPO2FBQUEsaUJBQUMsSUFBSSxFQUFFLEtBQUssRUFBRSxRQUFRLEVBQUU7O0FBRTdCLFlBQUksSUFBSSxDQUFDLE1BQU0sQ0FBQyxJQUFJLEtBQUssUUFBUSxFQUFFO0FBQ2pDLGNBQUksT0FBTyxHQUFHLElBQUksQ0FBQyxRQUFRLENBQUMsSUFBSSxFQUFFLEtBQUssRUFBRSxJQUFJLENBQUMsUUFBUSxDQUFDLENBQUM7O0FBRXhELGNBQUksT0FBTyxLQUFLLFNBQVMsRUFBRTtBQUN6QixnQkFBSSxHQUFHLE9BQU8sQ0FBQztXQUNoQjtTQUNGLE1BQU07QUFDTCxlQUFLLElBQUksQ0FBQyxHQUFHLENBQUMsRUFBRSxDQUFDLEdBQUcsS0FBSyxDQUFDLE1BQU0sRUFBRSxDQUFDLEdBQUcsQ0FBQyxFQUFFLENBQUMsRUFBRSxFQUFFO0FBQzVDLGdCQUFJLENBQUMsUUFBUSxDQUFDLENBQUMsQ0FBQyxHQUFHLElBQUksQ0FBQyxRQUFRLENBQUMsS0FBSyxDQUFDLENBQUMsQ0FBQyxFQUFFLENBQUMsQ0FBQyxDQUFDO1dBQy9DO1NBQ0Y7O0FBRUQsWUFBSSxDQUFDLElBQUksR0FBRyxJQUFJLENBQUM7QUFDakIsWUFBSSxDQUFDLFFBQVEsR0FBRyxRQUFRLENBQUM7O0FBRXpCLFlBQUksQ0FBQyxNQUFNLEVBQUUsQ0FBQztPQUNmOzs7O1NBckRHLFFBQVE7R0FBUyxHQUFHOztBQXNEekIsQ0FBQzs7QUFFRixNQUFNLENBQUMsT0FBTyxHQUFHLFFBQVEsQ0FBQyIsImZpbGUiOiJlczYvb3BlcmF0b3JzL29wZXJhdG9yLmpzIiwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBzdHJpY3QnO1xuXG52YXIgTGZvID0gcmVxdWlyZSgnLi4vY29yZS9sZm8tYmFzZScpO1xuXG4vLyBhcHBseSBhIGdpdmVuIGZ1bmN0aW9uIG9uIGVhY2ggZnJhbWVcbmNsYXNzIE9wZXJhdG9yIGV4dGVuZHMgTGZvIHtcblxuICBjb25zdHJ1Y3RvcihvcHRpb25zKSB7XG4gICAgc3VwZXIob3B0aW9ucywge30pO1xuXG4gICAgdGhpcy5wYXJhbXMudHlwZSA9IHRoaXMucGFyYW1zLnR5cGUgfHzCoCdzY2FsYXInO1xuXG4gICAgaWYgKHRoaXMucGFyYW1zLm9uUHJvY2Vzcykge1xuICAgICAgdGhpcy5vblByb2Nlc3ModGhpcy5wYXJhbXMub25Qcm9jZXNzKTtcbiAgICB9XG4gIH1cblxuICBjb25maWd1cmVTdHJlYW0oKSB7XG4gICAgaWYgKHRoaXMucGFyYW1zLnR5cGUgPT09ICd2ZWN0b3InICYmIHRoaXMucGFyYW1zLmZyYW1lU2l6ZSkge1xuICAgICAgdGhpcy5zdHJlYW1QYXJhbXMuZnJhbWVTaXplID0gdGhpcy5wYXJhbXMuZnJhbWVTaXplO1xuICAgIH1cbiAgfVxuXG4gIC8vIHJlZ2lzdGVyIHRoZSBjYWxsYmFjayB0byBiZSBjb25zdW1lZCBpbiBwcm9jZXNzXG5cbiAgLy8gQFNJR05BVFVSRSBzY2FsYXIgY2FsbGJhY2tcbiAgLy8gZnVuY3Rpb24odmFsdWUsIGluZGV4LCBmcmFtZSkge1xuICAvLyAgIHJldHVybiBkb1NvbWV0aGluZyh2YWx1ZSlcbiAgLy8gfVxuXG4gIC8vIEBTSUdOQVRVUkUgdmVjdG9yIGNhbGxiYWNrXG4gIC8vIGZ1bmN0aW9uKHRpbWUsIGluRnJhbWUsIG91dEZyYW1lKSB7XG4gIC8vICAgb3V0RnJhbWUuc2V0KGluRnJhbWUsIDApO1xuICAvLyAgIHJldHVybiB0aW1lICsgMTtcbiAgLy8gfVxuICBvblByb2Nlc3MoZnVuYykge1xuICAgIC8vIGJpbmQgY3VycmVudCBjb250ZXh0XG4gICAgdGhpcy5jYWxsYmFjayA9IGZ1bmMuYmluZCh0aGlzKTtcbiAgfVxuXG4gIHByb2Nlc3ModGltZSwgZnJhbWUsIG1ldGFEYXRhKSB7XG4gICAgLy8gYXBwbHkgdGhlIGNhbGxiYWNrIHRvIHRoZSBmcmFtZVxuICAgIGlmICh0aGlzLnBhcmFtcy50eXBlID09PSAndmVjdG9yJykge1xuICAgICAgdmFyIG91dFRpbWUgPSB0aGlzLmNhbGxiYWNrKHRpbWUsIGZyYW1lLCB0aGlzLm91dEZyYW1lKTtcblxuICAgICAgaWYgKG91dFRpbWUgIT09IHVuZGVmaW5lZCkge1xuICAgICAgICB0aW1lID0gb3V0VGltZTtcbiAgICAgIH1cbiAgICB9IGVsc2Uge1xuICAgICAgZm9yICh2YXIgaSA9IDAsIGwgPSBmcmFtZS5sZW5ndGg7IGkgPCBsOyBpKyspIHtcbiAgICAgICAgdGhpcy5vdXRGcmFtZVtpXSA9IHRoaXMuY2FsbGJhY2soZnJhbWVbaV0sIGkpO1xuICAgICAgfVxuICAgIH1cblxuICAgIHRoaXMudGltZSA9IHRpbWU7XG4gICAgdGhpcy5tZXRhRGF0YSA9IG1ldGFEYXRhO1xuXG4gICAgdGhpcy5vdXRwdXQoKTtcbiAgfVxufTtcblxubW9kdWxlLmV4cG9ydHMgPSBPcGVyYXRvcjsiXX0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImVzNi9vcGVyYXRvcnMvb3BlcmF0b3IuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDOzs7Ozs7Ozs7O0FBRWIsSUFBSSxHQUFHLEdBQUcsT0FBTyxDQUFDLGtCQUFrQixDQUFDLENBQUM7Ozs7SUFHaEMsUUFBUTtZQUFSLFFBQVE7O0FBRUQsV0FGUCxRQUFRLENBRUEsT0FBTyxFQUFFOzBCQUZqQixRQUFROztBQUdWLCtCQUhFLFFBQVEsNkNBR0osT0FBTyxFQUFFLEVBQUUsRUFBRTs7QUFFbkIsUUFBSSxDQUFDLE1BQU0sQ0FBQyxJQUFJLEdBQUcsSUFBSSxDQUFDLE1BQU0sQ0FBQyxJQUFJLElBQUksUUFBUSxDQUFDOztBQUVoRCxRQUFJLElBQUksQ0FBQyxNQUFNLENBQUMsU0FBUyxFQUFFO0FBQ3pCLFVBQUksQ0FBQyxTQUFTLENBQUMsSUFBSSxDQUFDLE1BQU0sQ0FBQyxTQUFTLENBQUMsQ0FBQztLQUN2QztHQUNGOztlQVZHLFFBQVE7O1dBWUcsMkJBQUc7QUFDaEIsVUFBSSxJQUFJLENBQUMsTUFBTSxDQUFDLElBQUksS0FBSyxRQUFRLElBQUksSUFBSSxDQUFDLE1BQU0sQ0FBQyxTQUFTLEVBQUU7QUFDMUQsWUFBSSxDQUFDLFlBQVksQ0FBQyxTQUFTLEdBQUcsSUFBSSxDQUFDLE1BQU0sQ0FBQyxTQUFTLENBQUM7T0FDckQ7S0FDRjs7Ozs7Ozs7Ozs7Ozs7OztXQWNRLG1CQUFDLElBQUksRUFBRTs7QUFFZCxVQUFJLENBQUMsUUFBUSxHQUFHLElBQUksQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLENBQUM7S0FDakM7OztXQUVNLGlCQUFDLElBQUksRUFBRSxLQUFLLEVBQUUsUUFBUSxFQUFFOztBQUU3QixVQUFJLElBQUksQ0FBQyxNQUFNLENBQUMsSUFBSSxLQUFLLFFBQVEsRUFBRTtBQUNqQyxZQUFJLE9BQU8sR0FBRyxJQUFJLENBQUMsUUFBUSxDQUFDLElBQUksRUFBRSxLQUFLLEVBQUUsSUFBSSxDQUFDLFFBQVEsQ0FBQyxDQUFDOztBQUV4RCxZQUFJLE9BQU8sS0FBSyxTQUFTLEVBQUU7QUFDekIsY0FBSSxHQUFHLE9BQU8sQ0FBQztTQUNoQjtPQUNGLE1BQU07QUFDTCxhQUFLLElBQUksQ0FBQyxHQUFHLENBQUMsRUFBRSxDQUFDLEdBQUcsS0FBSyxDQUFDLE1BQU0sRUFBRSxDQUFDLEdBQUcsQ0FBQyxFQUFFLENBQUMsRUFBRSxFQUFFO0FBQzVDLGNBQUksQ0FBQyxRQUFRLENBQUMsQ0FBQyxDQUFDLEdBQUcsSUFBSSxDQUFDLFFBQVEsQ0FBQyxLQUFLLENBQUMsQ0FBQyxDQUFDLEVBQUUsQ0FBQyxDQUFDLENBQUM7U0FDL0M7T0FDRjs7QUFFRCxVQUFJLENBQUMsSUFBSSxHQUFHLElBQUksQ0FBQztBQUNqQixVQUFJLENBQUMsUUFBUSxHQUFHLFFBQVEsQ0FBQzs7QUFFekIsVUFBSSxDQUFDLE1BQU0sRUFBRSxDQUFDO0tBQ2Y7OztTQXJERyxRQUFRO0dBQVMsR0FBRzs7QUFzRHpCLENBQUM7O0FBRUYsTUFBTSxDQUFDLE9BQU8sR0FBRyxRQUFRLENBQUMiLCJmaWxlIjoiZXM2L29wZXJhdG9ycy9vcGVyYXRvci5qcyIsInNvdXJjZXNDb250ZW50IjpbIid1c2Ugc3RyaWN0JztcblxudmFyIExmbyA9IHJlcXVpcmUoJy4uL2NvcmUvbGZvLWJhc2UnKTtcblxuLy8gYXBwbHkgYSBnaXZlbiBmdW5jdGlvbiBvbiBlYWNoIGZyYW1lXG5jbGFzcyBPcGVyYXRvciBleHRlbmRzIExmbyB7XG5cbiAgY29uc3RydWN0b3Iob3B0aW9ucykge1xuICAgIHN1cGVyKG9wdGlvbnMsIHt9KTtcblxuICAgIHRoaXMucGFyYW1zLnR5cGUgPSB0aGlzLnBhcmFtcy50eXBlIHx8wqAnc2NhbGFyJztcblxuICAgIGlmICh0aGlzLnBhcmFtcy5vblByb2Nlc3MpIHtcbiAgICAgIHRoaXMub25Qcm9jZXNzKHRoaXMucGFyYW1zLm9uUHJvY2Vzcyk7XG4gICAgfVxuICB9XG5cbiAgY29uZmlndXJlU3RyZWFtKCkge1xuICAgIGlmICh0aGlzLnBhcmFtcy50eXBlID09PSAndmVjdG9yJyAmJiB0aGlzLnBhcmFtcy5mcmFtZVNpemUpIHtcbiAgICAgIHRoaXMuc3RyZWFtUGFyYW1zLmZyYW1lU2l6ZSA9IHRoaXMucGFyYW1zLmZyYW1lU2l6ZTtcbiAgICB9XG4gIH1cblxuICAvLyByZWdpc3RlciB0aGUgY2FsbGJhY2sgdG8gYmUgY29uc3VtZWQgaW4gcHJvY2Vzc1xuXG4gIC8vIEBTSUdOQVRVUkUgc2NhbGFyIGNhbGxiYWNrXG4gIC8vIGZ1bmN0aW9uKHZhbHVlLCBpbmRleCwgZnJhbWUpIHtcbiAgLy8gICByZXR1cm4gZG9Tb21ldGhpbmcodmFsdWUpXG4gIC8vIH1cblxuICAvLyBAU0lHTkFUVVJFIHZlY3RvciBjYWxsYmFja1xuICAvLyBmdW5jdGlvbih0aW1lLCBpbkZyYW1lLCBvdXRGcmFtZSkge1xuICAvLyAgIG91dEZyYW1lLnNldChpbkZyYW1lLCAwKTtcbiAgLy8gICByZXR1cm4gdGltZSArIDE7XG4gIC8vIH1cbiAgb25Qcm9jZXNzKGZ1bmMpIHtcbiAgICAvLyBiaW5kIGN1cnJlbnQgY29udGV4dFxuICAgIHRoaXMuY2FsbGJhY2sgPSBmdW5jLmJpbmQodGhpcyk7XG4gIH1cblxuICBwcm9jZXNzKHRpbWUsIGZyYW1lLCBtZXRhRGF0YSkge1xuICAgIC8vIGFwcGx5IHRoZSBjYWxsYmFjayB0byB0aGUgZnJhbWVcbiAgICBpZiAodGhpcy5wYXJhbXMudHlwZSA9PT0gJ3ZlY3RvcicpIHtcbiAgICAgIHZhciBvdXRUaW1lID0gdGhpcy5jYWxsYmFjayh0aW1lLCBmcmFtZSwgdGhpcy5vdXRGcmFtZSk7XG5cbiAgICAgIGlmIChvdXRUaW1lICE9PSB1bmRlZmluZWQpIHtcbiAgICAgICAgdGltZSA9IG91dFRpbWU7XG4gICAgICB9XG4gICAgfSBlbHNlIHtcbiAgICAgIGZvciAodmFyIGkgPSAwLCBsID0gZnJhbWUubGVuZ3RoOyBpIDwgbDsgaSsrKSB7XG4gICAgICAgIHRoaXMub3V0RnJhbWVbaV0gPSB0aGlzLmNhbGxiYWNrKGZyYW1lW2ldLCBpKTtcbiAgICAgIH1cbiAgICB9XG5cbiAgICB0aGlzLnRpbWUgPSB0aW1lO1xuICAgIHRoaXMubWV0YURhdGEgPSBtZXRhRGF0YTtcblxuICAgIHRoaXMub3V0cHV0KCk7XG4gIH1cbn07XG5cbm1vZHVsZS5leHBvcnRzID0gT3BlcmF0b3I7Il19

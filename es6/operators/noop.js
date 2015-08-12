@@ -1,13 +1,15 @@
 'use strict';
 
-var Lfo = require('../core/lfo-base');
+import BaseLfo from '../core/base-lfo';
 
-class Noop extends Lfo {
+/**
+ * a NoOp Lfo
+ */
+export default class Noop extends BaseLfo {
   constructor(previous, options = {}) {
     super(previous, options);
   }
 
-  // default noop - override if needed
   process(time, frame, metaData) {
     this.outFrame.set(frame, 0);
     this.time = time;
@@ -16,5 +18,3 @@ class Noop extends Lfo {
     this.output();
   }
 }
-
-module.exports = Noop;
