@@ -1,29 +1,37 @@
-// @TODO pass * uppercase as it is constructors
 module.exports = {
   // core
-  // Graph: require('./dist/core/graph'),
-  LfoBase: require('./dist/core/lfo-base'),
-  // sources
-  SourceAudioNode: require('./dist/sources/audio-in-node'),
-  SourceAudioBuffer: require('./dist/sources/audio-in-buffer'),
-  SourceEventIn: require('./dist/sources/event-in'),
+  // Graph: require('./dist/core/graph'), // still needed ?
+  core: {
+    LfoBase: require('./dist/core/lfo-base'),
+  },
 
-  SocketSourceServer: require('./dist/sources/socket-sources').SocketSourceServer,
-  SocketSourceClient: require('./dist/sources/socket-sources').SocketSourceClient,
-  // sink
-  SinkBpf: require('./dist/sink/bpf'),
-  SinkTrace: require('./dist/sink/trace'),
-  SinkWaveform: require('./dist/sink/waveform'),
-  SynchronizedDraw: require('./dist/sink/synchronized-draw'),
+  source: {
+    AudioInNode: require('./dist/sources/audio-in-node'),
+    AudioInBuffer: require('./dist/sources/audio-in-buffer'),
+    EventIn: require('./dist/sources/event-in'),
+    // retest
+    SocketServer: require('./dist/sources/socket-sources').SocketSourceServer,
+    SocketClient: require('./dist/sources/socket-sources').SocketSourceClient,
+  },
 
-  SocketSinkClient: require('./dist/sink/socket-sinks').SocketSinkClient,
-  SocketSinkServer: require('./dist/sink/socket-sinks').SocketSinkServer,
-  // operators
-  Magnitude: require('./dist/operators/magnitude'),
-  Framer: require('./dist/operators/framer'),
-  Biquad: require('./dist/operators/biquad'),
-  MinMax: require('./dist/operators/min-max'),
-  Operator: require('./dist/operators/operator'),
+  sink: {
+    Bpf: require('./dist/sink/bpf'),
+    Trace: require('./dist/sink/trace'),
+    Waveform: require('./dist/sink/waveform'),
+    SynchronizedDraw: require('./dist/sink/synchronized-draw'),
+    Recorder: require('./dist/sink/recorder'),
+    // retest
+    SocketClient: require('./dist/sink/socket-sinks').SocketSinkClient,
+    SocketServer: require('./dist/sink/socket-sinks').SocketSinkServer,
+  },
 
-  Noop: require('./dist/operators/noop')
+  operator: {
+    Magnitude: require('./dist/operators/magnitude'),
+    Framer: require('./dist/operators/framer'),
+    Biquad: require('./dist/operators/biquad'),
+    MinMax: require('./dist/operators/min-max'),
+    // MinMaxAsm: require('./dist/operators/_min-max-asm-test'),
+    Operator: require('./dist/operators/operator'),
+    Noop: require('./dist/operators/noop'),
+  },
 };
