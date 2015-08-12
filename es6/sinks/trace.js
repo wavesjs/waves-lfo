@@ -1,12 +1,10 @@
-'use strict';
+import BaseDraw from './base-draw';
+import { getRandomColor, getHue, hexToRGB } from '../utils/draw-utils';
 
-var BaseDraw = require('./base-draw');
-var { getRandomColor, getHue, hexToRGB } = require('../utils/draw-utils');
-
-class Trace extends BaseDraw {
+export default class Trace extends BaseDraw {
 
   constructor(options) {
-    var defaults = {
+    const defaults = {
       colorScheme: 'none' // color, opacity
     };
 
@@ -25,18 +23,22 @@ class Trace extends BaseDraw {
   }
 
   drawCurve(frame, prevFrame, iShift) {
-    var ctx = this.ctx;
-    var color;
+    const ctx = this.ctx;
+    let color, gradient;
 
-    var halfRange = frame[1] / 2;
-    var mean = this.getYPosition(frame[0]);
-    var min = this.getYPosition(frame[0] - halfRange);
-    var max = this.getYPosition(frame[0] + halfRange);
+    const halfRange = frame[1] / 2;
+    const mean = this.getYPosition(frame[0]);
+    const min = this.getYPosition(frame[0] - halfRange);
+    const max = this.getYPosition(frame[0] + halfRange);
+
+    let prevHalfRange;
+    let prevMin;
+    let prevMax;
 
     if (prevFrame) {
-      var prevHalfRange = prevFrame[1] / 2;
-      var prevMin = this.getYPosition(prevFrame[0] - prevHalfRange);
-      var prevMax = this.getYPosition(prevFrame[0] + prevHalfRange);
+      prevHalfRange = prevFrame[1] / 2;
+      prevMin = this.getYPosition(prevFrame[0] - prevHalfRange);
+      prevMax = this.getYPosition(prevFrame[0] + prevHalfRange);
     }
 
     switch (this.params.colorScheme) {
@@ -44,7 +46,7 @@ class Trace extends BaseDraw {
         ctx.fillStyle = this.params.color;
       break;
       case 'hue':
-        var gradient = ctx.createLinearGradient(-iShift, 0, 0, 0);
+        gradient = ctx.createLinearGradient(-iShift, 0, 0, 0);
 
         if (prevFrame) {
           gradient.addColorStop(0, 'hsl(' + getHue(prevFrame[2]) + ', 100%, 50%)');
@@ -56,8 +58,8 @@ class Trace extends BaseDraw {
         ctx.fillStyle = gradient;
       break;
       case 'opacity':
-        var rgb = hexToRGB(this.params.color);
-        var gradient = ctx.createLinearGradient(-iShift, 0, 0, 0);
+        const rgb = hexToRGB(this.params.color);
+        gradient = ctx.createLinearGradient(-iShift, 0, 0, 0);
 
         if (prevFrame) {
           gradient.addColorStop(0, 'rgba(' + rgb.join(',') + ',' + prevFrame[2] + ')');

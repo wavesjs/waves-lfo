@@ -27,20 +27,15 @@ export default class EventIn extends BaseLfo {
 
     this._isStarted = false;
     this._startTime = undefined;
-
-    // this.setupStream({
-    //   frameSize: this.params.frameSize,
-    //   frameRate: this.params.frameRate,
-    //   // @NOTE does it make sens ?
-    //   blockSampleRate: this.params.frameRate * this.params.frameSize
-    // });
   }
 
   configureStream() {
     // test if some values are not defined ?
     this.streamParams.frameSize = this.params.frameSize;
     this.streamParams.frameRate = this.params.frameRate;
-    this.streamParams.sourceSampleRate = this.params.frameSize * this.params.frameRate;
+    // @NOTE does it make sens ?
+    // this.streamParams.sourceSampleRate = this.params.frameSize * this.params.frameRate;
+    this.streamParams.sourceSampleRate = this.params.frameSize;
   }
 
   start() {
@@ -59,8 +54,7 @@ export default class EventIn extends BaseLfo {
   }
 
   process(time, frame, metaData = {}) {
-    if (!this.isStarted) { return; }
-
+    if (!this._isStarted) { return; }
     // à revoir
     // if no time provided, use audioContext.currentTime
     var frameTime = !isNaN(parseFloat(time)) && isFinite(time) ?

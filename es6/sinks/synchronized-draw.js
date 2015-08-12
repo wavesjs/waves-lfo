@@ -1,9 +1,9 @@
-'use strict';
-
-// is used to keep several draw in sync
-// when a view is installed in a synchronized draw
-// the meta view is installed as a member of all it's children
-class SynchronizedDraw {
+/**
+ * is used to keep several draw in sync
+ * when a view is installed in a synchronized draw
+ * the meta view is installed as a member of all it's children
+ */
+export default class SynchronizedDraw {
   constructor(...views) {
     this.views = [];
     this.add.apply(this, views);
@@ -26,5 +26,3 @@ class SynchronizedDraw {
     });
   }
 }
-
-module.exports = SynchronizedDraw;

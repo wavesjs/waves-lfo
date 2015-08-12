@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * @fileoverview WAVE LFO module: biquad filter.
  * @author Jean-Philippe.Lambert@ircam.fr, Norbert.Schnell@ircam.fr, victor.saiz@ircam.fr
@@ -26,256 +24,236 @@
 
 /* a1 is a[0] and a2 is a[1] */
 
-var Lfo = require('../core/lfo-base');
+var BaseLfo = require('../core/base-lfo');
 
 var sin = Math.sin;
 var cos = Math.cos;
 var M_PI = Math.PI;
 var sqrt = Math.sqrt;
 
-  // coefs calculations
-  // ------------------
+// coefs calculations
+// ------------------
 
-  /* LPF: H(s) = 1 / (s^2 + s/Q + 1) */
+/* LPF: H(s) = 1 / (s^2 + s/Q + 1) */
 function lowpass_coefs(f0, q, coefs) {
+  var w0 = M_PI * f0;
+  var alpha = sin(w0) / (2.0 * q);
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var alpha = sin(w0) / (2.0 * q);
-    var c = cos(w0);
+  var a0_inv = 1.0 / (1.0 + alpha);
 
-    var a0_inv = 1.0 / (1.0 + alpha);
+  coefs.a1 = (-2.0 * c) * a0_inv;
+  coefs.a2 = (1.0 - alpha) * a0_inv;
 
-    coefs.a1 = (-2.0 * c) * a0_inv;
-    coefs.a2 = (1.0 - alpha) * a0_inv;
-
-    coefs.b0 = ((1.0 - c) * 0.5) * a0_inv;
-    coefs.b1 = (1.0 - c) * a0_inv;
-    coefs.b2 = coefs.b0;
-
-  }
+  coefs.b0 = ((1.0 - c) * 0.5) * a0_inv;
+  coefs.b1 = (1.0 - c) * a0_inv;
+  coefs.b2 = coefs.b0;
+}
 
   /* HPF: H(s) = s^2 / (s^2 + s/Q + 1) */
 function highpass_coefs(f0, q, coefs) {
+  var w0 = M_PI * f0;
+  var alpha = sin(w0) / (2.0 * q);
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var alpha = sin(w0) / (2.0 * q);
-    var c = cos(w0);
+  var a0_inv = 1.0 / (1.0 + alpha);
 
-    var a0_inv = 1.0 / (1.0 + alpha);
+  coefs.a1 = (-2.0 * c) * a0_inv;
+  coefs.a2 = (1.0 - alpha) * a0_inv;
 
-    coefs.a1 = (-2.0 * c) * a0_inv;
-    coefs.a2 = (1.0 - alpha) * a0_inv;
+  coefs.b0 = ((1.0 + c) * 0.5) * a0_inv;
+  coefs.b1 = (-1.0 - c) * a0_inv;
+  coefs.b2 = coefs.b0;
+}
 
-    coefs.b0 = ((1.0 + c) * 0.5) * a0_inv;
-    coefs.b1 = (-1.0 - c) * a0_inv;
-    coefs.b2 = coefs.b0;
-
-  }
-
-  /* BPF: H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q) */
+/* BPF: H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q) */
 function bandpass_constant_skirt_coefs(f0, q, coefs) {
+  var w0 = M_PI * f0;
+  var s = sin(w0);
+  var alpha = s / (2.0 * q);
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var s = sin(w0);
-    var alpha = s / (2.0 * q);
-    var c = cos(w0);
+  var a0_inv = 1.0 / (1.0 + alpha);
 
-    var a0_inv = 1.0 / (1.0 + alpha);
+  coefs.a1 = (-2.0 * c) * a0_inv;
+  coefs.a2 = (1.0 - alpha) * a0_inv;
 
-    coefs.a1 = (-2.0 * c) * a0_inv;
-    coefs.a2 = (1.0 - alpha) * a0_inv;
+  coefs.b0 = (s * 0.5) * a0_inv;
+  coefs.b1 = 0.0;
+  coefs.b2 = -coefs.b0;
+}
 
-    coefs.b0 = (s * 0.5) * a0_inv;
-    coefs.b1 = 0.0;
-    coefs.b2 = -coefs.b0;
-
-  }
-
-  /* BPF: H(s) = (s/Q) / (s^2 + s/Q + 1)      (constant 0 dB peak gain) */
+/* BPF: H(s) = (s/Q) / (s^2 + s/Q + 1)      (constant 0 dB peak gain) */
 function bandpass_constant_peak_coefs(f0, q, coefs) {
+  var w0 = M_PI * f0;
+  var alpha = sin(w0) / (2.0 * q);
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var alpha = sin(w0) / (2.0 * q);
-    var c = cos(w0);
+  var a0_inv = 1.0 / (1.0 + alpha);
 
-    var a0_inv = 1.0 / (1.0 + alpha);
+  coefs.a1 = (-2.0 * c) * a0_inv;
+  coefs.a2 = (1.0 - alpha) * a0_inv;
 
-    coefs.a1 = (-2.0 * c) * a0_inv;
-    coefs.a2 = (1.0 - alpha) * a0_inv;
+  coefs.b0 = alpha * a0_inv;
+  coefs.b1 = 0.0;
+  coefs.b2 = -coefs.b0;
+}
 
-    coefs.b0 = alpha * a0_inv;
-    coefs.b1 = 0.0;
-    coefs.b2 = -coefs.b0;
-  }
-
-  /* notch: H(s) = (s^2 + 1) / (s^2 + s/Q + 1) */
+/* notch: H(s) = (s^2 + 1) / (s^2 + s/Q + 1) */
 function notch_coefs(f0, q, coefs) {
+  var w0 = M_PI * f0;
+  var alpha = sin(w0) / (2.0 * q);
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var alpha = sin(w0) / (2.0 * q);
-    var c = cos(w0);
+  var a0_inv = 1.0 / (1.0 + alpha);
 
-    var a0_inv = 1.0 / (1.0 + alpha);
+  coefs.a1 = (-2.0 * c) * a0_inv;
+  coefs.a2 = (1.0 - alpha) * a0_inv;
 
-    coefs.a1 = (-2.0 * c) * a0_inv;
-    coefs.a2 = (1.0 - alpha) * a0_inv;
+  coefs.b0 = a0_inv;
+  coefs.b1 = coefs.a1;
+  coefs.b2 = coefs.b0;
+}
 
-    coefs.b0 = a0_inv;
-    coefs.b1 = coefs.a1;
-    coefs.b2 = coefs.b0;
-
-  }
-
-  /* APF: H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1) */
+/* APF: H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1) */
 function allpass_coefs(f0, q, coefs) {
+  var w0 = M_PI * f0;
+  var alpha = sin(w0) / (2.0 * q);
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var alpha = sin(w0) / (2.0 * q);
-    var c = cos(w0);
+  var a0_inv = 1.0 / (1.0 + alpha);
 
-    var a0_inv = 1.0 / (1.0 + alpha);
+  coefs.a1 = (-2.0 * c) * a0_inv;
+  coefs.a2 = (1.0 - alpha) * a0_inv;
 
-    coefs.a1 = (-2.0 * c) * a0_inv;
-    coefs.a2 = (1.0 - alpha) * a0_inv;
+  coefs.b0 = coefs.a2;
+  coefs.b1 = coefs.a1;
+  coefs.b2 = 1.0;
+}
 
-    coefs.b0 = coefs.a2;
-    coefs.b1 = coefs.a1;
-    coefs.b2 = 1.0;
-
-  }
-
-  /* peakingEQ: H(s) = (s^2 + s*(A/Q) + 1) / (s^2 + s/(A*Q) + 1) */
-  /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
-  /* gain is linear here */
+/* peakingEQ: H(s) = (s^2 + s*(A/Q) + 1) / (s^2 + s/(A*Q) + 1) */
+/* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
+/* gain is linear here */
 function peaking_coefs(f0, q, gain, coefs) {
+  var g = sqrt(gain);
+  var g_inv = 1.0 / g;
 
-    var g = sqrt(gain);
-    var g_inv = 1.0 / g;
+  var w0 = M_PI * f0;
+  var alpha = sin(w0) / (2.0 * q);
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var alpha = sin(w0) / (2.0 * q);
-    var c = cos(w0);
+  var a0_inv = 1.0 / (1.0 + alpha * g_inv);
 
-    var a0_inv = 1.0 / (1.0 + alpha * g_inv);
+  coefs.a1 = (-2.0 * c) * a0_inv;
+  coefs.a2 = (1.0 - alpha * g_inv) * a0_inv;
 
-    coefs.a1 = (-2.0 * c) * a0_inv;
-    coefs.a2 = (1.0 - alpha * g_inv) * a0_inv;
+  coefs.b0 = (1.0 + alpha * g) * a0_inv;
+  coefs.b1 = coefs.a1;
+  coefs.b2 = (1.0 - alpha * g) * a0_inv;
+}
 
-    coefs.b0 = (1.0 + alpha * g) * a0_inv;
-    coefs.b1 = coefs.a1;
-    coefs.b2 = (1.0 - alpha * g) * a0_inv;
-
-  }
-
-  /* lowShelf: H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1) */
-  /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
-  /* gain is linear here */
+/* lowShelf: H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1) */
+/* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
+/* gain is linear here */
 function lowshelf_coefs(f0, q, gain, coefs) {
+  var g = sqrt(gain);
 
-    var g = sqrt(gain);
+  var w0 = M_PI * f0;
+  var alpha_2_sqrtg = sin(w0) * sqrt(g) / q ;
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var alpha_2_sqrtg = sin(w0) * sqrt(g) / q ;
-    var c = cos(w0);
+  var a0_inv = 1.0 / ( (g+1.0) + (g-1.0) * c + alpha_2_sqrtg);
 
-    var a0_inv = 1.0 / ( (g+1.0) + (g-1.0) * c + alpha_2_sqrtg);
+  coefs.a1 = (-2.0 *     ( (g-1.0) + (g+1.0) * c                ) ) * a0_inv;
+  coefs.a2 = (             (g+1.0) + (g-1.0) * c - alpha_2_sqrtg  ) * a0_inv;
 
-    coefs.a1 = (-2.0 *     ( (g-1.0) + (g+1.0) * c                ) ) * a0_inv;
-    coefs.a2 = (             (g+1.0) + (g-1.0) * c - alpha_2_sqrtg  ) * a0_inv;
+  coefs.b0 = (       g * ( (g+1.0) - (g-1.0) * c + alpha_2_sqrtg) ) * a0_inv;
+  coefs.b1 = ( 2.0 * g * ( (g-1.0) - (g+1.0) * c                ) ) * a0_inv;
+  coefs.b2 = (       g * ( (g+1.0) - (g-1.0) * c - alpha_2_sqrtg) ) * a0_inv;
+}
 
-    coefs.b0 = (       g * ( (g+1.0) - (g-1.0) * c + alpha_2_sqrtg) ) * a0_inv;
-    coefs.b1 = ( 2.0 * g * ( (g-1.0) - (g+1.0) * c                ) ) * a0_inv;
-    coefs.b2 = (       g * ( (g+1.0) - (g-1.0) * c - alpha_2_sqrtg) ) * a0_inv;
-
-  }
-
-  /* highShelf: H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A) */
-  /* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
-  /* gain is linear here */
+/* highShelf: H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A) */
+/* A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40) */
+/* gain is linear here */
 function highshelf_coefs(f0, q, gain, coefs) {
+  var g = sqrt(gain);
 
-    var g = sqrt(gain);
+  var w0 = M_PI * f0;
+  var alpha_2_sqrtg = sin(w0) * sqrt(g) / q ;
+  var c = cos(w0);
 
-    var w0 = M_PI * f0;
-    var alpha_2_sqrtg = sin(w0) * sqrt(g) / q ;
-    var c = cos(w0);
+  var a0_inv = 1.0 / ( (g+1.0) - (g-1.0) * c + alpha_2_sqrtg);
 
-    var a0_inv = 1.0 / ( (g+1.0) - (g-1.0) * c + alpha_2_sqrtg);
+  coefs.a1 = ( 2.0 *     ( (g-1.0) - (g+1.0) * c                ) ) * a0_inv;
+  coefs.a2 = (             (g+1.0) - (g-1.0) * c - alpha_2_sqrtg  ) * a0_inv;
 
-    coefs.a1 = ( 2.0 *     ( (g-1.0) - (g+1.0) * c                ) ) * a0_inv;
-    coefs.a2 = (             (g+1.0) - (g-1.0) * c - alpha_2_sqrtg  ) * a0_inv;
-
-    coefs.b0 = (      g * (  (g+1.0) + (g-1.0) * c + alpha_2_sqrtg) ) * a0_inv;
-    coefs.b1 = (-2.0 * g * ( (g-1.0) + (g+1.0) * c                ) ) * a0_inv;
-    coefs.b2 = (      g * (  (g+1.0) + (g-1.0) * c - alpha_2_sqrtg) ) * a0_inv;
-
-  }
+  coefs.b0 = (      g * (  (g+1.0) + (g-1.0) * c + alpha_2_sqrtg) ) * a0_inv;
+  coefs.b1 = (-2.0 * g * ( (g-1.0) + (g+1.0) * c                ) ) * a0_inv;
+  coefs.b2 = (      g * (  (g+1.0) + (g-1.0) * c - alpha_2_sqrtg) ) * a0_inv;
+}
 
   /* helper */
 function calculateCoefs(type, f0, q, gain, coefs) {
 
-    switch(type) {
-      case 'lowpass':
-        lowpass_coefs(f0, q, coefs);
-        break;
+  switch(type) {
+    case 'lowpass':
+      lowpass_coefs(f0, q, coefs);
+      break;
 
-      case 'highpass':
-        highpass_coefs(f0, q, coefs);
-        break;
+    case 'highpass':
+      highpass_coefs(f0, q, coefs);
+      break;
 
-      case 'bandpass_constant_skirt':
-        bandpass_constant_skirt_coefs(f0, q, coefs);
-        break;
+    case 'bandpass_constant_skirt':
+      bandpass_constant_skirt_coefs(f0, q, coefs);
+      break;
 
-      case 'bandpass_constant_peak':
-        bandpass_constant_peak_coefs(f0, q, coefs);
-        break;
+    case 'bandpass_constant_peak':
+      bandpass_constant_peak_coefs(f0, q, coefs);
+      break;
 
-      case 'notch':
-        notch_coefs(f0, q, coefs);
-        break;
+    case 'notch':
+      notch_coefs(f0, q, coefs);
+      break;
 
-      case 'allpass':
-        allpass_coefs(f0, q, coefs);
-        break;
+    case 'allpass':
+      allpass_coefs(f0, q, coefs);
+      break;
 
-      case 'peaking':
-        peaking_coefs(f0, q, gain, coefs);
-        break;
+    case 'peaking':
+      peaking_coefs(f0, q, gain, coefs);
+      break;
 
-      case 'lowshelf':
-        lowshelf_coefs(f0, q, gain, coefs);
-        break;
+    case 'lowshelf':
+      lowshelf_coefs(f0, q, gain, coefs);
+      break;
 
-      case 'highshelf':
-        highshelf_coefs(f0, q, gain, coefs);
-        break;
-    }
-
-    switch (type) {
-      case 'lowpass':
-      case 'highpass':
-      case 'bandpass_constant_skirt':
-      case 'bandpass_constant_peak':
-      case 'notch':
-      case 'allpass':
-
-       if (gain != 1.0) {
-         coefs.b0 *= gain;
-         coefs.b1 *= gain;
-         coefs.b2 *= gain;
-       }
-
-       break;
-
-      /* gain is already integrated for the following */
-      case 'peaking':
-      case 'lowshelf':
-      case 'highshelf':
-        break;
-    }
-
+    case 'highshelf':
+      highshelf_coefs(f0, q, gain, coefs);
+      break;
   }
+
+  // apply gain
+  switch (type) {
+    case 'lowpass':
+    case 'highpass':
+    case 'bandpass_constant_skirt':
+    case 'bandpass_constant_peak':
+    case 'notch':
+    case 'allpass':
+      if (gain != 1.0) {
+        coefs.b0 *= gain;
+        coefs.b1 *= gain;
+        coefs.b2 *= gain;
+      }
+      break;
+    /* gain is already integrated for the following */
+    case 'peaking':
+    case 'lowshelf':
+    case 'highshelf':
+      break;
+  }
+}
 
 /* direct form I */
 /* a0 = 1, a1 = a[0], a2 = a[1] */
@@ -308,9 +286,9 @@ function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
   }
 }
 
-class Biquad extends Lfo {
+export default class Biquad extends BaseLfo {
 
-  constructor(previous, options) {
+  constructor(options) {
     var defaults = {
       filterType:'lowpass',
       f0: 1.0,
@@ -318,8 +296,8 @@ class Biquad extends Lfo {
       q: 1.0
     };
 
-    super(previous, options, defaults);
-    this.type = 'biquad';
+    super(options, defaults);
+    // this.type = 'biquad';
 
     // from here on options is this.params
 
@@ -366,11 +344,3 @@ class Biquad extends Lfo {
     this.output(time);
   }
 }
-
-function factory(previous, options) {
-  return new Biquad(previous, options);
-}
-factory.Biquad = Biquad;
-
-module.exports = factory;
-

@@ -1,6 +1,4 @@
-'use strict';
-
-var Lfo = require('../core/lfo-base');
+import BaseLfo from '../core/base-lfo';
 
 // var isPowerOfTwo = function(number) {
 //   while ((number % 2 === 0) && number > 1) {
@@ -10,7 +8,7 @@ var Lfo = require('../core/lfo-base');
 //   return number === 1;
 // }
 
-class Framer extends Lfo {
+export default class Framer extends BaseLfo {
   constructor(options) {
     var defaults = {
       frameSize: 512,
@@ -129,5 +127,3 @@ class Framer extends Lfo {
     this.frameIndex = frameIndex;
   }
 }
-
-module.exports = Framer;

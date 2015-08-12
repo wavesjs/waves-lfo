@@ -1,11 +1,11 @@
 'use strict';
 
-var BaseDraw = require('./base-draw');
-var { getRandomColor } = require('../utils/draw-utils');
+import BaseDraw from './base-draw';
+import { getRandomColor } from '../utils/draw-utils';
 
-class Bpf extends BaseDraw {
+export default class Bpf extends BaseDraw {
   constructor(options) {
-    var defaults = {
+    const defaults = {
       trigger: false,
       radius: 0,
       line: true
@@ -40,7 +40,7 @@ class Bpf extends BaseDraw {
   }
 
   process(time, frame) {
-    // @TODO: compare dt - if dt < fps return;
+    // @TODO: compare dt - if dt < fps return; (?)
     if (this.params.trigger) {
       this.triggerModeDraw(time, frame);
     } else {
@@ -53,14 +53,14 @@ class Bpf extends BaseDraw {
   // add an alternative drawing mode
   // draw from left to right, go back to left when > width
   triggerModeDraw(time, frame) {
-    var width  = this.params.width;
-    var height = this.params.height;
-    var duration = this.params.duration;
-    var ctx = this.ctx;
+    const width  = this.params.width;
+    const height = this.params.height;
+    const duration = this.params.duration;
+    const ctx = this.ctx;
 
-    var dt = time - this.previousTime;
-    var fShift = (dt / duration) * width - this.lastShiftError; // px
-    var iShift = Math.round(fShift);
+    const dt = time - this.previousTime;
+    const fShift = (dt / duration) * width - this.lastShiftError; // px
+    const iShift = Math.round(fShift);
     this.lastShiftError = iShift - fShift;
 
     this.currentXPosition += iShift;
@@ -87,9 +87,9 @@ class Bpf extends BaseDraw {
 
   // implements drawCurve
   drawCurve(frame, prevFrame, iShift) {
-    var colors = this.params.colors;
-    var ctx = this.ctx;
-    var radius = this.params.radius;
+    const colors = this.params.colors;
+    const ctx = this.ctx;
+    const radius = this.params.radius;
     // @TODO this can and should be abstracted
     for (var i = 0, l = frame.length; i < l; i++) {
       ctx.save();
@@ -97,7 +97,7 @@ class Bpf extends BaseDraw {
       ctx.fillStyle = colors[i];
       ctx.strokeStyle = colors[i];
 
-      var posY = this.getYPosition(frame[i]);
+      const posY = this.getYPosition(frame[i]);
       // as an options ? radius ?
       if (radius > 0) {
         ctx.beginPath();
@@ -107,7 +107,7 @@ class Bpf extends BaseDraw {
       }
 
       if (prevFrame && this.params.line) {
-        var lastPosY = this.getYPosition(prevFrame[i]);
+        const lastPosY = this.getYPosition(prevFrame[i]);
         // draw line
         ctx.beginPath();
         ctx.moveTo(-iShift, lastPosY);
@@ -120,5 +120,3 @@ class Bpf extends BaseDraw {
     }
   }
 }
-
-module.exports = Bpf;

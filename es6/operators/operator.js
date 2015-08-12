@@ -1,9 +1,21 @@
-'use strict';
+import BaseLfo from '../core/base-lfo';
 
-var Lfo = require('../core/lfo-base');
-
-// apply a given function on each frame
-class Operator extends Lfo {
+/**
+ * apply a given function on each frame
+ *
+ * @SIGNATURE scalar callback
+ * function(value, index, frame) {
+ *   return doSomething(value)
+ * }
+ *
+ * @SIGNATURE vector callback
+ * function(time, inFrame, outFrame) {
+ *   outFrame.set(inFrame, 0);
+ *   return time + 1;
+ * }
+ *
+ */
+export default class Operator extends BaseLfo {
 
   constructor(options) {
     super(options, {});
@@ -11,7 +23,7 @@ class Operator extends Lfo {
     this.params.type = this.params.type || 'scalar';
 
     if (this.params.onProcess) {
-      this.onProcess(this.params.onProcess);
+      this.callback = this.params.onProcess.bind(this);
     }
   }
 
@@ -19,23 +31,6 @@ class Operator extends Lfo {
     if (this.params.type === 'vector' && this.params.frameSize) {
       this.streamParams.frameSize = this.params.frameSize;
     }
-  }
-
-  // register the callback to be consumed in process
-
-  // @SIGNATURE scalar callback
-  // function(value, index, frame) {
-  //   return doSomething(value)
-  // }
-
-  // @SIGNATURE vector callback
-  // function(time, inFrame, outFrame) {
-  //   outFrame.set(inFrame, 0);
-  //   return time + 1;
-  // }
-  onProcess(func) {
-    // bind current context
-    this.callback = func.bind(this);
   }
 
   process(time, frame, metaData) {
@@ -58,5 +53,3 @@ class Operator extends Lfo {
     this.output();
   }
 };
-
-module.exports = Operator;

@@ -1,12 +1,10 @@
 
-"use strict";
+import BaseLfo from '../core/base-lfo';
 
-var Lfo = require('../core/lfo-base');
-
-class Magnitude extends Lfo {
+export default class Magnitude extends BaseLfo {
 
   constructor(options = {}) {
-    var defaults = {
+    const defaults = {
       normalize: false
     };
 
@@ -18,11 +16,10 @@ class Magnitude extends Lfo {
   }
 
   process(time, frame, metaData) {
-    var frameSize = frame.length;
-    var sum = 0;
-    var i = 0;
+    const frameSize = frame.length;
+    let sum = 0;
 
-    for (i = 0; i < frameSize; i++) {
+    for (let i = 0; i < frameSize; i++) {
       sum += (frame[i] * frame[i]);
     }
 
@@ -38,5 +35,3 @@ class Magnitude extends Lfo {
     this.output();
   }
 }
-
-module.exports = Magnitude;
