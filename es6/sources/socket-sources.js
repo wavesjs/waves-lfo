@@ -1,12 +1,13 @@
 'use strict';
 
-var Lfo = require('../core/lfo-base');
-var WebSocketServer = require('ws').Server;
-var { bufferToArrayBuffer, encodeMessage, decodeMessage } = require('../utils/socket-utils');
+import BaseLfo from '../core/base-lfo';
+import { Server } from 'ws';
+import { bufferToArrayBuffer, encodeMessage, decodeMessage } from '../utils/socket-utils';
 
+const WebSocketServer = Server;
 // @TODO: handle `start` and `stop`
 
-class SocketSourceServer extends Lfo {
+class SocketSourceServer extends BaseLfo {
   constructor(options) {
     var defaults = {
       port: 3030
@@ -49,7 +50,7 @@ class SocketSourceServer extends Lfo {
   }
 }
 
-class SocketSourceClient extends Lfo {
+class SocketSourceClient extends BaseLfo {
   constructor(options) {
     var defaults = {
       port: 3031,
@@ -108,7 +109,7 @@ class SocketSourceClient extends Lfo {
   }
 }
 
-module.exports = {
+export default {
   SocketSourceServer: SocketSourceServer,
   SocketSourceClient: SocketSourceClient
 };

@@ -1,8 +1,7 @@
 import BaseLfo from '../core/base-lfo';
 
 /**
- *
- *
+ * Returns the min and max values from each frame
  */
 export default class MinMax extends BaseLfo {
   constructor(options) {

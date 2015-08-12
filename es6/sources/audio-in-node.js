@@ -1,9 +1,9 @@
-"use strict";
+import AudioIn from './audio-in';
 
-let AudioIn = require('./audio-in');
-
-// web audio API node as a source
-class AudioInNode extends AudioIn {
+/**
+ *  Use a WebAudio node as a source
+ */
+export default class AudioInNode extends AudioIn {
 
   constructor(options = {}) {
     super(options);
@@ -14,7 +14,7 @@ class AudioInNode extends AudioIn {
   configureStream() {
     this.streamParams.frameSize = this.params.frameSize;
     this.streamParams.frameRate = this.ctx.sampleRate / this.params.frameSize;
-    this.streamParams.blockSampleRate = this.ctx.sampleRate;
+    this.streamParams.sourceSampleRate = this.ctx.sampleRate;
   }
 
   initialize() {
@@ -42,12 +42,10 @@ class AudioInNode extends AudioIn {
 
   // is basically the `scriptProcessor.onaudioprocess` callback
   process(e) {
-    var block = e.inputBuffer.getChannelData(this.params.channel);
+    const block = e.inputBuffer.getChannelData(this.params.channel);
 
-    this.time += block.length / this.streamParams.blockSampleRate;
+    this.time += block.length / this.streamParams.sourceSampleRate;
     this.outFrame.set(block, 0);
     this.output();
   }
 }
-
-module.exports = AudioInNode;

@@ -1,10 +1,7 @@
-'use strict';
-
-const Lfo = require('../core/lfo-base');
+import BaseLfo from '../core/base-lfo';
 
 
-// @TODO create a single instance of ArrayBuffer of the last frame
-class BaseDraw extends Lfo {
+export default class BaseDraw extends BaseLfo {
   constructor(options = {}, extendDefaults = {}) {
 
     const defaults = Object.assign({
@@ -12,7 +9,7 @@ class BaseDraw extends Lfo {
       min: -1,
       max: 1,
       width: 300,
-      height: 100,
+      height: 150, // default canvas size in DOM too
       isSynchronized: false // is set to true if used in a synchronizedSink
     }, extendDefaults);
 
@@ -64,24 +61,23 @@ class BaseDraw extends Lfo {
   }
 
   // params modifiers
-    // params modifier
-  setDuration(duration) {
+  set duration(duration) {
     this.params.duration = duration;
   }
 
-  setMin(min) {
+  set min(min) {
     this.params.min = min;
   }
 
-  setMax(max) {
+  set max(max) {
     this.params.max = max;
   }
 
   // main process method
-  process(time, frame) {
+  process(time, frame, metaData) {
     this.previousFrame.set(frame, 0);
     this.previousTime = time;
-    super.process(time, frame);
+    super.process(time, frame, metaData);
   }
 
   // default draw mode

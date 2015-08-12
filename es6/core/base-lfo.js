@@ -92,7 +92,7 @@ export default class BaseLfo {
     }
   }
 
-  // fill the on-going buffer with 0
+  // fill the on-going buffer with 0 (is done)
   // output it, then call reset on all the children (sure ?)
   // @NOTE: `reset` is called in `sources.start`,
   //  if is called here, it will be called more than once in a child node

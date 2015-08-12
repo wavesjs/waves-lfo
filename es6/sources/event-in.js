@@ -1,6 +1,4 @@
-'use strict';
-
-var Lfo = require('../core/lfo-base');
+import BaseLfo from '../core/base-lfo';
 
 /*
   can forward
@@ -13,7 +11,7 @@ var Lfo = require('../core/lfo-base');
     - `stop()`  -> call `finalize()`
 */
 
-class EventIn extends Lfo {
+export default class EventIn extends BaseLfo {
   constructor(options) {
 
     var defaults = {
@@ -23,12 +21,12 @@ class EventIn extends Lfo {
     super(options, defaults);
 
     // test AudioContext for use in node environment
-    if (!this.params.audioContext && (typeof process === 'undefined')) {
-      this.params.audioContext = new AudioContext();
+    if (!this.params.ctx && (typeof process === 'undefined')) {
+      this.params.ctx = new AudioContext();
     }
 
-    this.startTime = undefined;
-    this.isStarted = false;
+    this._isStarted = false;
+    this._startTime = undefined;
 
     // this.setupStream({
     //   frameSize: this.params.frameSize,
@@ -42,21 +40,21 @@ class EventIn extends Lfo {
     // test if some values are not defined ?
     this.streamParams.frameSize = this.params.frameSize;
     this.streamParams.frameRate = this.params.frameRate;
-    this.streamParams.blockSampleRate = this.params.frameSize * this.params.frameRate;
+    this.streamParams.sourceSampleRate = this.params.frameSize * this.params.frameRate;
   }
 
   start() {
     // should be setted in the first process call
-    this.startTime = undefined;
-    this.isStarted = true;
+    this._isStarted = true;
+    this._startTime = undefined;
 
     this.initialize();
     this.reset();
   }
 
   stop() {
-    this.startTime = undefined;
-    this.isStarted = false;
+    this._isStarted = false;
+    this._startTime = undefined;
     this.finalize();
   }
 
@@ -66,14 +64,14 @@ class EventIn extends Lfo {
     // à revoir
     // if no time provided, use audioContext.currentTime
     var frameTime = !isNaN(parseFloat(time)) && isFinite(time) ?
-      time : this.params.audioContext.currentTime;
+      time : this.params.ctx.currentTime;
 
     // set `startTime` if first call after a `start`
-    if (!this.startTime) { this.startTime = frameTime; }
+    if (!this._startTime) { this._startTime = frameTime; }
 
     // handle time according to config
     if (this.params.timeType === 'relative') {
-      frameTime = time - this.startTime;
+      frameTime = time - this._startTime;
     }
 
     // if scalar, create a vector

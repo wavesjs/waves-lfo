@@ -1,9 +1,8 @@
-'use strict';
+import BaseDraw from './base-draw';
+import { getRandomColor } from '../utils/draw-utils';
 
-var BaseDraw = require('./base-draw');
-var { getRandomColor } = require('../utils/draw-utils');
 
-class Waveform extends BaseDraw {
+export default class Waveform extends BaseDraw {
   constructor(options) {
     var defaults = {};
 
@@ -16,15 +15,15 @@ class Waveform extends BaseDraw {
     if (!this.params.color) { this.params.color = getRandomColor(); }
   }
 
-  process(time, frame) {
+  process(time, frame, metaData) {
     this.scrollModeDraw(time, frame);
-    super.process(time, frame);
+    super.process(time, frame, metaData);
   }
 
   drawCurve(frame, previousFrame, iShift) {
-    var ctx = this.ctx;
-    var min = this.getYPosition(frame[0]);
-    var max = this.getYPosition(frame[1]);
+    const ctx = this.ctx;
+    const min = this.getYPosition(frame[0]);
+    const max = this.getYPosition(frame[1]);
 
     ctx.save();
 
@@ -35,8 +34,8 @@ class Waveform extends BaseDraw {
     ctx.lineTo(0, max);
 
     if (previousFrame) {
-      var prevMin = this.getYPosition(previousFrame[0]);
-      var prevMax = this.getYPosition(previousFrame[1]);
+      const prevMin = this.getYPosition(previousFrame[0]);
+      const prevMax = this.getYPosition(previousFrame[1]);
       ctx.lineTo(-iShift, prevMax);
       ctx.lineTo(-iShift, prevMin);
     }
@@ -48,5 +47,3 @@ class Waveform extends BaseDraw {
     ctx.restore();
   }
 }
-
-module.exports = Waveform;

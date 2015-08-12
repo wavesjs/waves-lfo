@@ -11,8 +11,6 @@ class Magnitude extends Lfo {
     };
 
     super(options, defaults);
-
-    // this.type = 'magnitude';
   }
 
   configureStream() {
