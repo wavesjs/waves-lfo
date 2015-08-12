@@ -1,6 +1,8 @@
 import BaseLfo from '../core/base-lfo';
 
 const worker = `
+var isInfiniteBuffer = false;
+var stack = [];
 var buffer;
 var bufferLength;
 var currentIndex;
@@ -9,6 +11,11 @@ function init() {
   if (!buffer) {
     buffer = new Float32Array(bufferLength);
   } else {
+    if (isInfiniteBuffer) {
+      buffer = stack[0];
+      stack.length = 0;
+    }
+
     for (var i = 0; i < bufferLength; i++) {
       buffer[i] = 0;
     }
@@ -19,22 +26,39 @@ function init() {
 
 function append(block) {
   var availableSpace = bufferLength - currentIndex;
-
+  var currentBlock;
   // return if already full
   if (availableSpace <= 0) { return; }
 
   if (availableSpace < block.length) {
-    block = block.subarray(0, availableSpace);
+    currentBlock = block.subarray(0, availableSpace);
+  } else {
+    currentBlock = block;
   }
 
-  buffer.set(block, currentIndex);
-  currentIndex += block.length;
+  buffer.set(currentBlock, currentIndex);
+  currentIndex += currentBlock.length;
+
+  if (isInfiniteBuffer && currentIndex === buffer.length) {
+    stack.push(buffer);
+
+    currentBlock = block.subarray(availableSpace);
+    buffer = new Float32Array(buffer.length);
+    buffer.set(currentBlock, 0);
+    currentIndex = currentBlock.length;
+  }
 }
 
 self.addEventListener('message', function(e) {
   switch (e.data.command) {
     case 'init':
-      bufferLength = e.data.sampleRate * e.data.duration;
+      if (isFinite(e.data.duration)) {
+        bufferLength = e.data.sampleRate * e.data.duration;
+      } else {
+        isInfiniteBuffer = true;
+        bufferLength = e.data.sampleRate * 10;
+      }
+
       init();
       break;
 
@@ -42,8 +66,8 @@ self.addEventListener('message', function(e) {
       var block = new Float32Array(e.data.buffer);
       append(block);
 
-      // if the buffer is full return it
-      if (currentIndex === bufferLength) {
+      // if the buffer is full return it, only works with finite buffers
+      if (!isInfiniteBuffer && currentIndex === bufferLength) {
         var buf = buffer.buffer.slice(0);
         self.postMessage({ buffer: buf }, [buf]);
         init();
@@ -51,10 +75,20 @@ self.addEventListener('message', function(e) {
       break;
 
     case 'finalize':
-      // @TODO add option to not clip the returned buffer
-      // values in FLoat32Array are 4 bytes long (32 / 8)
-      var copy = buffer.buffer.slice(0, currentIndex * (32 / 8));
-      self.postMessage({ buffer: copy }, [copy]);
+      if (!isInfiniteBuffer) {
+        // @TODO add option to not clip the returned buffer
+        // values in FLoat32Array are 4 bytes long (32 / 8)
+        var copy = buffer.buffer.slice(0, currentIndex * (32 / 8));
+        self.postMessage({ buffer: copy }, [copy]);
+      } else {
+        var copy = new Float32Array(stack.length * bufferLength + currentIndex);
+        stack.forEach(function(buffer, index) {
+          copy.set(buffer, bufferLength * index);
+        });
+
+        copy.set(buffer.subarray(0, currentIndex), stack.length * bufferLength);
+        self.postMessage({ buffer: copy.buffer }, [copy.buffer]);
+      }
       init();
       break;
   }
