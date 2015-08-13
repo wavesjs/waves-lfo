@@ -8,19 +8,8 @@ var bufferLength;
 var currentIndex;
 
 function init() {
-  if (!buffer) {
-    buffer = new Float32Array(bufferLength);
-  } else {
-    if (isInfiniteBuffer) {
-      buffer = stack[0];
-      stack.length = 0;
-    }
-
-    for (var i = 0; i < bufferLength; i++) {
-      buffer[i] = 0;
-    }
-  }
-
+  buffer = new Float32Array(bufferLength);
+  stack.length = 0;
   currentIndex = 0;
 }
 
@@ -100,9 +89,9 @@ let audioContext;
  * Record an audio stream
  */
 export default class AudioRecorder extends BaseLfo {
-  constructor(options = {}) {
+  constructor(options) {
     const defaults = {
-      duration: 60, // seconds
+      duration: 10, // seconds
     };
 
     super(options, defaults);
@@ -135,12 +124,13 @@ export default class AudioRecorder extends BaseLfo {
   }
 
   stop() {
-    this._isStarted = false;
     this.finalize();
+    this._isStarted = false;
   }
 
   // called when `stop` is triggered on the source
   finalize() {
+    if (!this._isStarted) { return; } // don't finalize if not started
     this.worker.postMessage({ command: 'finalize' });
   }
 
@@ -160,7 +150,7 @@ export default class AudioRecorder extends BaseLfo {
    */
   retrieve() {
     return new Promise((resolve, reject) => {
-      var callback = (e) => {
+      const callback = (e) => {
         // if called when buffer is full, stop the recorder too
         this._isStarted = false;
 

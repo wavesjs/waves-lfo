@@ -17,20 +17,21 @@ module.exports = {
   sinks: {
     AudioRecorder     : require('./dist/sinks/audio-recorder'),
     Bpf               : require('./dist/sinks/bpf'),
+    DataRecorder      : require('./dist/sinks/data-recorder'),
     Trace             : require('./dist/sinks/trace'),
     SynchronizedDraw  : require('./dist/sinks/synchronized-draw'),
     Waveform          : require('./dist/sinks/waveform'),
-    // // retest
+    // retest
     // SocketClient: require('./dist/sink/socket-sinks').SocketSinkClient,
     // SocketServer: require('./dist/sink/socket-sinks').SocketSinkServer,
   },
 
   operators: {
-    // Biquad: require('./dist/operators/biquad'),
+    Biquad            : require('./dist/operators/biquad'),
     Framer            : require('./dist/operators/framer'),
     Magnitude         : require('./dist/operators/magnitude'),
     MinMax            : require('./dist/operators/min-max'),
-    // // MinMaxAsm: require('./dist/operators/_min-max-asm-test'),
+    // MinMaxAsm: require('./dist/operators/_min-max-asm-test'),
     Noop              : require('./dist/operators/noop'),
     Operator          : require('./dist/operators/operator'),
   },

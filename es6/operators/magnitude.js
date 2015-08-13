@@ -3,7 +3,7 @@ import BaseLfo from '../core/base-lfo';
 
 export default class Magnitude extends BaseLfo {
 
-  constructor(options = {}) {
+  constructor(options) {
     const defaults = {
       normalize: false
     };
