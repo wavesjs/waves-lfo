@@ -227,7 +227,6 @@ export default class Fft extends BaseLfo {
 
     // power spectrum
     for (let i = 1, j = fftSize - 1; i < fftSize / 2; i++, j--) {
-      // (a + b)^2 !== a^2 + b^2, but (a + b) * (a - b) = a^2 + b^2
       const real = complexSpectrum.real[i] + complexSpectrum.real[j];
       const imag = complexSpectrum.imag[i] - complexSpectrum.imag[j];
 
