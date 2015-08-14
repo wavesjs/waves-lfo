@@ -28,6 +28,7 @@ module.exports = {
 
   operators: {
     Biquad            : require('./dist/operators/biquad'),
+    Fft               : require('./dist/operators/fft'),
     Framer            : require('./dist/operators/framer'),
     Magnitude         : require('./dist/operators/magnitude'),
     MinMax            : require('./dist/operators/min-max'),

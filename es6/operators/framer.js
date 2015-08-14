@@ -1,12 +1,5 @@
 import BaseLfo from '../core/base-lfo';
 
-// var isPowerOfTwo = function(number) {
-//   while ((number % 2 === 0) && number > 1) {
-//     number = number / 2;
-//   }
-
-//   return number === 1;
-// }
 
 export default class Framer extends BaseLfo {
   constructor(options) {
@@ -19,11 +12,6 @@ export default class Framer extends BaseLfo {
     super(options, defaults);
 
     this.frameIndex = 0;
-
-    // throw error if frameSize is not a power of 2 ?
-    // if (!isPowerOfTwo(this.streamParams.frameSize)) {
-    //   // throw Error() ?
-    // }
   }
 
   configureStream() {
