@@ -81,7 +81,6 @@ function initBlackmanHarrisWindow(buffer, size, normCoefs) {
   const a1 = 0.48829;
   const a2 = 0.14128;
   const a3 = 0.01168;
-
   const step = 2 * PI / size;
 
   for (let i = 0; i < size; i++) {
@@ -215,8 +214,7 @@ export default class Fft extends BaseLfo {
       value.imag = 0;
     });
 
-    const complexSpectrum = this.complexFrame.FFT(); // ~3ms
-
+    const complexSpectrum = this.complexFrame.FFT();
     const scale = 1 / fftSize;
     // DC index
     const realDc = complexSpectrum.real[0];
@@ -237,9 +235,10 @@ export default class Fft extends BaseLfo {
     }
 
     // magnitude spectrum
+    // @NOTE maybe see how to remove this loop properly
     if (this.params.outType === 'magnitude') {
       for (let i = 0; i < outFrameSize; i++) {
-        this.outFrame[i] = Math.sqrt(this.outFrame[i]);
+        this.outFrame[i] = sqrt(this.outFrame[i]);
       }
     }
 
