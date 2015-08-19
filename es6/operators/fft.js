@@ -1,11 +1,12 @@
 import BaseLfo from '../core/base-lfo';
 import jsfft from 'jsfft';
 import complexArray from 'jsfft/lib/complex_array';
+import initWindow from '../utils/fft-windows';
 
-// shortcuts / helpers
-const PI   = Math.PI;
-const cos  = Math.cos;
-const sin  = Math.sin;
+
+// const PI   = Math.PI;
+// const cos  = Math.cos;
+// const sin  = Math.sin;
 const sqrt = Math.sqrt;
 
 const isPowerOfTwo = function(number) {
@@ -16,139 +17,12 @@ const isPowerOfTwo = function(number) {
   return number === 1;
 }
 
-// window creation functions
-function initHannWindow(buffer, size, normCoefs) {
-  let linSum = 0;
-  let powSum = 0;
-  const step = 2 * PI / size;
-
-  for (let i = 0; i < size; i++) {
-    const phi = i * step;
-    const value = 0.5 - 0.5 * cos(phi);
-
-    buffer[i] = value;
-
-    linSum += value;
-    powSum += value * value;
-  }
-
-  normCoefs.linear = size / linSum;
-  normCoefs.power = sqrt(size / powSum);
-}
-
-function initHammingWindow(buffer, size, normCoefs) {
-  let linSum = 0;
-  let powSum = 0;
-  const step = 2 * PI / size;
-
-  for (let i = 0; i < size; i++) {
-    const phi = i * step;
-    const value = 0.54 - 0.46 * cos(phi);
-
-    buffer[i] = value;
-
-    linSum += value;
-    powSum += value * value;
-  }
-
-  normCoefs.linear = size / linSum;
-  normCoefs.power = sqrt(size / powSum);
-}
-
-function initBlackmanWindow(buffer, size, normCoefs) {
-  let linSum = 0;
-  let powSum = 0;
-  const step = 2 * PI / size;
-
-  for (let i = 0; i < size; i++) {
-    const phi = i * step;
-    const value = 0.42 - 0.5 * cos(phi) + 0.08 * cos(2 * phi);
-
-    buffer[i] = value;
-
-    linSum += value;
-    powSum += value * value;
-  }
-
-  normCoefs.linear = size / linSum;
-  normCoefs.power = sqrt(size / powSum);
-}
-
-function initBlackmanHarrisWindow(buffer, size, normCoefs) {
-  let linSum = 0;
-  let powSum = 0;
-  const a0 = 0.35875;
-  const a1 = 0.48829;
-  const a2 = 0.14128;
-  const a3 = 0.01168;
-  const step = 2 * PI / size;
-
-  for (let i = 0; i < size; i++) {
-    const phi = i * step;
-    const value = a0 - a1 * cos(phi) + a2 * cos(2 * phi); - a3 * cos(3 * phi);
-
-    buffer[i] = value;
-
-    linSum += value;
-    powSum += value * value;
-  }
-
-  normCoefs.linear = size / linSum;
-  normCoefs.power = sqrt(size / powSum);
-}
-
-function initSineWindow(buffer, size, normCoefs) {
-  let linSum = 0;
-  let powSum = 0;
-  const step = PI / size;
-
-  for (let i = 0; i < size; i++) {
-    const phi = i * step;
-    const value = sin(phi);
-
-    buffer[i] = value;
-
-    linSum += value;
-    powSum += value * value;
-  }
-
-  normCoefs.linear = size / linSum;
-  normCoefs.power = sqrt(size / powSum);
-}
-
-const initWindow = (function() {
-  // @NOTE implement some caching system (is this really usefull ?)
-  const cache = {};
-
-  return function(name, buffer, size, normCoefs) {
-    name = name.toLowerCase();
-
-    switch (name) {
-      case 'hann':
-      case 'hanning':
-        initHannWindow(buffer, size, normCoefs);
-        break;
-      case 'hamming':
-        initHammingWindow(buffer, size, normCoefs);
-        break;
-      case 'blackman':
-        initBlackmanWindow(buffer, size, normCoefs);
-        break;
-      case 'blackmanharris':
-        initBlackmanHarrisWindow(buffer, size, normCoefs);
-        break;
-      case 'sine':
-        initSineWindow(buffer, size, normCoefs);
-        break;
-    }
-  }
-}());
-
 export default class Fft extends BaseLfo {
   constructor(options) {
     const defaults = {
       fftSize: 1024,
       windowName: 'hann',
+      outType: 'magnitude'
     };
 
     super(options, defaults);
@@ -192,7 +66,7 @@ export default class Fft extends BaseLfo {
    */
   process(time, frame, metaData) {
     const inFrameSize = this.parent.streamParams.frameSize;
-    const outFrameSize = this.streamParams.frameSize; // this should be streamParams.frameSize;
+    const outFrameSize = this.streamParams.frameSize;
     const sampleRate = this.streamParams.sourceSampleRate;
     const fftSize = this.params.fftSize;
     // clip frame if bigger than fftSize
@@ -234,16 +108,14 @@ export default class Fft extends BaseLfo {
     }
 
     // magnitude spectrum
-    // @NOTE maybe see how to remove this loop properly
+    // @NOTE maybe check how to remove this loop properly
     if (this.params.outType === 'magnitude') {
       for (let i = 0; i < outFrameSize; i++) {
         this.outFrame[i] = sqrt(this.outFrame[i]);
       }
     }
 
-    // console.log(this.outFrame);
     // @NOTE what shall we do with `this.normalizeCoefs` ?
-
     // time is centered on the frame ?
     this.time = time + (inFrameSize / sampleRate / 2);
 

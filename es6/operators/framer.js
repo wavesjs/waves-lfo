@@ -5,7 +5,6 @@ export default class Framer extends BaseLfo {
   constructor(options) {
     var defaults = {
       frameSize: 512,
-      // define a good name cf. Nobert
       centeredTimeTag: false
     };
 
@@ -21,7 +20,7 @@ export default class Framer extends BaseLfo {
     }
 
     this.streamParams.frameSize = this.params.frameSize;
-    this.streamParams.frameRate = this.streamParams.blockSampleRate / this.params.hopSize;
+    this.streamParams.frameRate = this.streamParams.sourceSampleRate / this.params.hopSize;
   }
 
   // @NOTE must be tested

@@ -32,11 +32,35 @@ export default class BaseDraw extends BaseLfo {
     this.previousTime = 0;
     this.lastShiftError = 0;
     this.currentPartialShift = 0;
+
+    // this._cache = [];
+    // this._rafId;
+    // this.draw = this.draw.bind(this);
   }
+
+  // initialize() {
+  //   super.initialize();
+  //   // this._rafId = requestAnimationFrame(this.draw);
+  // }
+
+  // finalize() {
+  //   super.finalize();
+  //   // cancelAnimationFrame(this._rafId);
+  // }
+
+  // draw() {
+  //   console.log('draw', this._cache.length);
+  //   this._cache.forEach((infos) => {
+  //     console.log(infos);
+  //     this.scrollModeDraw(infos.time, infos.frame);
+  //   });
+
+  //   this._cache.length = 0;
+  //   this._rafId = requestAnimationFrame(this.draw);
+  // }
 
   reset() {
     super.reset();
-
     this.ctx.clearRect(0, 0, this.params.width, this.params.height);
     this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
   }
@@ -75,8 +99,6 @@ export default class BaseDraw extends BaseLfo {
 
   // main process method
   process(time, frame, metaData) {
-    this.previousFrame.set(frame, 0);
-    this.previousTime = time;
     super.process(time, frame, metaData);
   }
 
@@ -110,6 +132,9 @@ export default class BaseDraw extends BaseLfo {
     // save current state into buffer canvas
     this.cachedCtx.clearRect(0, 0, width, height);
     this.cachedCtx.drawImage(this.canvas, 0, 0, width, height);
+
+    this.previousFrame.set(frame, 0);
+    this.previousTime = time;
   }
 
   shiftCanvas(shift) {

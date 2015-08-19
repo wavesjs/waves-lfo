@@ -4,8 +4,7 @@ import { getRandomColor } from '../utils/draw-utils';
 
 export default class Waveform extends BaseDraw {
   constructor(options) {
-    var defaults = {};
-
+    const defaults = {};
     super(options, defaults);
   }
 
@@ -17,6 +16,7 @@ export default class Waveform extends BaseDraw {
 
   process(time, frame, metaData) {
     this.scrollModeDraw(time, frame);
+    // this._cache.push({ time, frame });
     super.process(time, frame, metaData);
   }
 

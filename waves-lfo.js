@@ -19,6 +19,7 @@ module.exports = {
     Bpf               : require('./dist/sinks/bpf'),
     DataRecorder      : require('./dist/sinks/data-recorder'),
     Trace             : require('./dist/sinks/trace'),
+    Spectrogram       : require('./dist/sinks/spectrogram'),
     SynchronizedDraw  : require('./dist/sinks/synchronized-draw'),
     Waveform          : require('./dist/sinks/waveform'),
     // retest
@@ -29,6 +30,7 @@ module.exports = {
   operators: {
     Biquad            : require('./dist/operators/biquad'),
     Fft               : require('./dist/operators/fft'),
+    Ifft               : require('./dist/operators/ifft'),
     Framer            : require('./dist/operators/framer'),
     Magnitude         : require('./dist/operators/magnitude'),
     MinMax            : require('./dist/operators/min-max'),
