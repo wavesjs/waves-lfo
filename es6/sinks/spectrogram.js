@@ -17,6 +17,10 @@ export default class Spectrogram extends BaseDraw {
     this.params.scale = value;
   }
 
+  get scale(value) {
+    return this.params.scale;
+  }
+
   initialize() {
     super.initialize();
 

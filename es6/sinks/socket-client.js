@@ -1,13 +1,10 @@
-'use strict';
-
-var Lfo = require('../core/lfo-base');
-var WebSocketServer = require('ws').Server;
-var { encodeMessage, decodeMessage, arrayBufferToBuffer } = require('../utils/socket-utils');
+import BaseLfo from '../core/base-lfo';
+import { encodeMessage } from '../utils/socket-utils';
 
 // send an Lfo stream from the browser over the network
 // through a WebSocket - should be paired with a SocketSourceServer
 // @NOTE: does it need to implement some ping process to maintain connection ?
-class SocketSinkClient extends Lfo {
+export default class SocketClient extends BaseLfo {
   constructor(options) {
     var defaults = {
       port: 3030,
@@ -39,52 +36,12 @@ class SocketSinkClient extends Lfo {
     };
 
     this.socket.onerror = (err) => {
-      console.log(err);
+      console.error(err);
     };
   }
 
   process(time, frame, metaData) {
     var buffer = encodeMessage(time, frame, metaData);
-
     this.socket.send(buffer);
   }
 }
-
-class SocketSinkServer extends Lfo {
-  constructor(options) {
-    var defaults = {
-      port: 3031
-    };
-
-    super(options, defaults);
-
-    this.server = null;
-    this.initServer();
-  }
-
-  initServer() {
-    this.server = new WebSocketServer({ port: this.params.port });
-  }
-
-  process(time, frame, metaData) {
-    var arrayBuffer = encodeMessage(time, frame, metaData);
-    var buffer = arrayBufferToBuffer(arrayBuffer);
-
-    this.server.clients.forEach(function(client) {
-      // console.timeEnd('ServerProcess');
-      client.send(buffer);
-    });
-  }
-}
-
-module.exports = {
-  SocketSinkClient: SocketSinkClient,
-  SocketSinkServer: SocketSinkServer
-};
-
-
-
-
-
-
-

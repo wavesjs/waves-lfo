@@ -1,36 +1,31 @@
 module.exports = {
-  // core
-  // Graph: require('./dist/core/graph'), // still needed ?
   core: {
     BaseLfo           : require('./dist/core/base-lfo'),
   },
-
   sources: {
     AudioInBuffer     : require('./dist/sources/audio-in-buffer'),
     AudioInNode       : require('./dist/sources/audio-in-node'),
     EventIn           : require('./dist/sources/event-in'),
     // retest
-    // SocketServer: require('./dist/sources/socket-sources').SocketSourceServer,
-    // SocketClient: require('./dist/sources/socket-sources').SocketSourceClient,
+    SocketClient      : require('./dist/sources/socket-client'),
+    SocketServer      : require('./dist/sources/socket-server'),
   },
-
   sinks: {
     AudioRecorder     : require('./dist/sinks/audio-recorder'),
     Bpf               : require('./dist/sinks/bpf'),
     DataRecorder      : require('./dist/sinks/data-recorder'),
     Trace             : require('./dist/sinks/trace'),
     Spectrogram       : require('./dist/sinks/spectrogram'),
+    SocketClient      : require('./dist/sinks/socket-client'),
+    SocketServer      : require('./dist/sinks/socket-server'),
+    Sonogram          : require('./dist/sinks/sonogram'),
     SynchronizedDraw  : require('./dist/sinks/synchronized-draw'),
     Waveform          : require('./dist/sinks/waveform'),
-    // retest
-    // SocketClient: require('./dist/sink/socket-sinks').SocketSinkClient,
-    // SocketServer: require('./dist/sink/socket-sinks').SocketSinkServer,
   },
-
   operators: {
     Biquad            : require('./dist/operators/biquad'),
     Fft               : require('./dist/operators/fft'),
-    Ifft               : require('./dist/operators/ifft'),
+    // Ifft           : require('./dist/operators/ifft'),
     Framer            : require('./dist/operators/framer'),
     Magnitude         : require('./dist/operators/magnitude'),
     MinMax            : require('./dist/operators/min-max'),

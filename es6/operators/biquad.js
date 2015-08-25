@@ -260,7 +260,9 @@ function calculateCoefs(type, f0, q, gain, coefs) {
 /* 4 states (in that order): x(n-1), x(n-2), y(n-1), y(n-2)  */
 function biquadArrayDf1(coefs, state, inFrame, outFrame, size) {
   for(let i = 0; i < size; i++) {
-    var y = coefs.b0 * inFrame[i] + coefs.b1 * state.xn_1[i] + coefs.b2 * state.xn_2[i] - coefs.a1 * state.yn_1[i] - coefs.a2 * state.yn_2[i];
+    var y = coefs.b0 * inFrame[i]
+          + coefs.b1 * state.xn_1[i] + coefs.b2 * state.xn_2[i]
+          - coefs.a1 * state.yn_1[i] - coefs.a2 * state.yn_2[i];
 
     outFrame[i] = y;
 

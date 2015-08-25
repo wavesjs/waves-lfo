@@ -42,7 +42,7 @@ export default class Framer extends BaseLfo {
   }
 
   process(time, block, metaData) {
-    var sampleRate = this.streamParams.blockSampleRate;
+    var sampleRate = this.streamParams.sourceSampleRate;
     var samplePeriod = 1 / sampleRate;
 
     var frameIndex = this.frameIndex;
