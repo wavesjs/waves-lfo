@@ -7,14 +7,14 @@ import BaseLfo from '../core/base-lfo';
 export default class MovingAverage extends BaseLfo {
   constructor(options) {
     const defaults = {
-      order: 10
+      order: 100
     };
 
     super(options, defaults);
 
     this.sum = 0;
     this.counter = 0;
-    this.stack = new Float32Array(this.params.order);
+    this.queue = new Float32Array(this.params.order);
   }
 
   // streamParams should not change from parent
@@ -22,8 +22,8 @@ export default class MovingAverage extends BaseLfo {
   reset() {
     super.reset();
 
-    for (let i = 0, l = this.stack.length; i < l; i++) {
-      this.stack[i] = 0;
+    for (let i = 0, l = this.queue.length; i < l; i++) {
+      this.queue[i] = 0;
     }
 
     this.sum = 0;
@@ -48,14 +48,14 @@ export default class MovingAverage extends BaseLfo {
         divisor = order;
       }
 
-      this.sum -= this.stack[0];
+      this.sum -= this.queue[0];
       this.sum += current;
       outFrame[i] = this.sum / divisor;
       // outFrame[i] = this.sum / order;
 
       // maintain stack
-      this.stack.set(this.stack.subarray(1), 0);
-      this.stack[pushIndex] = current;
+      this.queue.set(this.queue.subarray(1), 0);
+      this.queue[pushIndex] = current;
     }
 
     this.output(time, outFrame, metaData);
