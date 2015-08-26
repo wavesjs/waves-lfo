@@ -1,6 +1,9 @@
 import BaseLfo from '../core/base-lfo';
 
 
+// NOTES:
+// - add 'symetrical' option (how to deal with values between frames ?) ?
+// - can we improve algorithm implementation ?
 export default class MovingAverage extends BaseLfo {
   constructor(options) {
     const defaults = {
