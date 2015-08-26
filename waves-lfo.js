@@ -29,7 +29,7 @@ module.exports = {
     Framer            : require('./dist/operators/framer'),
     Magnitude         : require('./dist/operators/magnitude'),
     MinMax            : require('./dist/operators/min-max'),
-    // MinMaxAsm: require('./dist/operators/_min-max-asm-test'),
+    MovingAverage     : require('./dist/operators/moving-average'),
     Noop              : require('./dist/operators/noop'),
     Operator          : require('./dist/operators/operator'),
   },

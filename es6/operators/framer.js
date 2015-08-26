@@ -3,7 +3,7 @@ import BaseLfo from '../core/base-lfo';
 
 export default class Framer extends BaseLfo {
   constructor(options) {
-    var defaults = {
+    const defaults = {
       frameSize: 512,
       centeredTimeTag: false
     };
@@ -42,19 +42,19 @@ export default class Framer extends BaseLfo {
   }
 
   process(time, block, metaData) {
-    var sampleRate = this.streamParams.sourceSampleRate;
-    var samplePeriod = 1 / sampleRate;
+    const sampleRate = this.streamParams.sourceSampleRate;
+    const samplePeriod = 1 / sampleRate;
 
-    var frameIndex = this.frameIndex;
-    var frameSize = this.streamParams.frameSize;
-    var blockSize = block.length;
-    var blockIndex = 0;
-    var hopSize = this.params.hopSize;
+    const frameIndex = this.frameIndex;
+    const frameSize = this.streamParams.frameSize;
+    const blockSize = block.length;
+    const blockIndex = 0;
+    const hopSize = this.params.hopSize;
 
-    var outFrame = this.outFrame;
+    const outFrame = this.outFrame;
 
     while (blockIndex < blockSize) {
-      var numSkip = 0;
+      const numSkip = 0;
 
       // skip block samples for negative frameIndex
       if (frameIndex < 0) {
@@ -64,16 +64,16 @@ export default class Framer extends BaseLfo {
       if (numSkip < blockSize) {
         blockIndex += numSkip; // skip block segment
         // can copy all the rest of the incoming block
-        var numCopy = blockSize - blockIndex;
+        const numCopy = blockSize - blockIndex;
         // connot copy more than what fits into the frame
-        var maxCopy = frameSize - frameIndex;
+        const maxCopy = frameSize - frameIndex;
 
         if (numCopy >= maxCopy) {
           numCopy = maxCopy;
         }
 
         // copy block segment into frame
-        var copy = block.subarray(blockIndex, blockIndex + numCopy);
+        const copy = block.subarray(blockIndex, blockIndex + numCopy);
         // console.log(blockIndex, frameIndex, numCopy);
         outFrame.set(copy, frameIndex);
 
@@ -105,7 +105,7 @@ export default class Framer extends BaseLfo {
         }
       } else {
         // skip entire block
-        var blockRest = blockSize - blockIndex;
+        const blockRest = blockSize - blockIndex;
         frameIndex += blockRest;
         blockIndex += blockRest;
       }

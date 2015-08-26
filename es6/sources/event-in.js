@@ -30,12 +30,12 @@ export default class EventIn extends BaseLfo {
   }
 
   configureStream() {
-    // test if some values are not defined ?
+    // throw error if some values are undefined ?
     this.streamParams.frameSize = this.params.frameSize;
     this.streamParams.frameRate = this.params.frameRate;
-    // @NOTE does it make sens ?
+    // @NOTE what does make sens in this case ?
     // this.streamParams.sourceSampleRate = this.params.frameSize * this.params.frameRate;
-    this.streamParams.sourceSampleRate = this.params.frameSize;
+    this.streamParams.sourceSampleRate = (this.params.sourceSampleRate || this.params.frameRate);
   }
 
   start() {
