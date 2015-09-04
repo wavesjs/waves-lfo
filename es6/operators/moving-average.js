@@ -7,7 +7,7 @@ import BaseLfo from '../core/base-lfo';
 export default class MovingAverage extends BaseLfo {
   constructor(options) {
     const defaults = {
-      order: 100
+      order: 10
     };
 
     super(options, defaults);
@@ -17,7 +17,7 @@ export default class MovingAverage extends BaseLfo {
     this.queue = new Float32Array(this.params.order);
   }
 
-  // streamParams should not change from parent
+  // streamParams should stay the same ?
 
   reset() {
     super.reset();
@@ -40,7 +40,7 @@ export default class MovingAverage extends BaseLfo {
     for (let i = 0; i < frameSize; i++) {
       const current = frame[i];
 
-      // is this necessary, or is it overhead ?
+      // is it necessary, or is it overhead ?
       if (this.counter < order) {
         this.counter += 1;
         divisor = this.counter;

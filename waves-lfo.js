@@ -13,6 +13,7 @@ module.exports = {
   sinks: {
     AudioRecorder     : require('./dist/sinks/audio-recorder'),
     Bpf               : require('./dist/sinks/bpf'),
+    Bridge            : require('./dist/sinks/bridge'),
     DataRecorder      : require('./dist/sinks/data-recorder'),
     Trace             : require('./dist/sinks/trace'),
     Spectrogram       : require('./dist/sinks/spectrogram'),
@@ -30,6 +31,7 @@ module.exports = {
     Magnitude         : require('./dist/operators/magnitude'),
     MinMax            : require('./dist/operators/min-max'),
     MovingAverage     : require('./dist/operators/moving-average'),
+    MovingMedian      : require('./dist/operators/moving-median'),
     Noop              : require('./dist/operators/noop'),
     Operator          : require('./dist/operators/operator'),
   },

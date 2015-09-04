@@ -6,7 +6,12 @@ import AudioIn from './audio-in';
 export default class AudioInNode extends AudioIn {
 
   constructor(options = {}) {
+    const defaults = {
+      timeType: 'absolute',
+    };
+
     super(options);
+
     this.metaData = {};
   }
 
@@ -28,6 +33,8 @@ export default class AudioInNode extends AudioIn {
 
   // connect the audio nodes to start streaming
   start() {
+    if (this.params.timeType === 'relative') { this.time = 0; }
+
     this.initialize();
     this.reset();
     // start "the patch" ;)

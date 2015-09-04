@@ -308,6 +308,42 @@ export default class Biquad extends BaseLfo {
     // if(opts.decay) …
     // if(opts.over) …
 
+    // var frameRate = this.streamParams.frameRate;
+    // // if no frameRate or framerate is 0 we shall halt!
+    // if (!frameRate || frameRate <= 0) {
+    //   throw new Error('This Operator requires a frameRate higher than 0.');
+    // }
+
+    // var normF0 = this.params.f0 / frameRate,
+    //     gain = this.params.gain,
+    //     q;
+
+    // if (this.params.q)  { q = this.params.q; }
+    // if (this.params.bw) { q = this.params.f0 / this.params.bw; }
+
+    // this.coefs = {
+    //   b0: 0,
+    //   b1: 0,
+    //   b2: 0,
+    //   a1: 0,
+    //   a2: 0
+    // };
+
+    // var frameSize = this.streamParams.frameSize;
+    // this.state = {
+    //   xn_1: new Float32Array(frameSize),
+    //   xn_2: new Float32Array(frameSize),
+    //   yn_1: new Float32Array(frameSize),
+    //   yn_2: new Float32Array(frameSize)
+    // };
+
+    // calculateCoefs(this.params.filterType, normF0, q, gain, this.coefs);
+    // this.setupStream();
+  }
+
+  initialize() {
+    super.initialize();
+
     var frameRate = this.streamParams.frameRate;
     // if no frameRate or framerate is 0 we shall halt!
     if (!frameRate || frameRate <= 0) {
@@ -338,11 +374,11 @@ export default class Biquad extends BaseLfo {
     };
 
     calculateCoefs(this.params.filterType, normF0, q, gain, this.coefs);
-    this.setupStream();
   }
 
-  process(time, frame) {
+  process(time, frame, metaData) {
     biquadArrayDf1(this.coefs, this.state, frame, this.outFrame, frame.length);
-    this.output(time);
+    // console.log(this.outFrame);
+    this.output(time, this.outFrame, metaData);
   }
 }

@@ -47,9 +47,10 @@ export default class Sonogram extends BaseDraw {
       const slope = (nextBin - prevBin);
       const intercept = prevBin;
       const weightedBin = slope * position + intercept;
+      const sqrtWeightedBin = weightedBin * weightedBin;
 
       const y = this.params.height - i;
-      const c = Math.round(weightedBin * scale * 255);
+      const c = Math.round(sqrtWeightedBin * scale * 255);
 
       ctx.fillStyle = `rgba(${c}, ${c}, ${c}, 1)`;
       ctx.fillRect(-iShift, y, iShift, -1);
