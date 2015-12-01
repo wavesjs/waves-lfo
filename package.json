@@ -31,10 +31,13 @@
     "devel": true
   },
   "dependencies": {
-    "babel-runtime": "^5.8.12",
+    "babel-runtime": "^5.8.34",
+    "jsfft": "dntj/jsfft",
     "ws": "^0.7.1"
   },
   "devDependencies": {
+    "babel": "^5.8.34",
+    "browserify": "^12.0.1",
     "fs-extra": "^0.16.3",
     "jshint": "^2.6.0",
     "node-watch": "^0.3.4",
