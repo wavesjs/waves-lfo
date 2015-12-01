@@ -7,7 +7,8 @@ import BaseLfo from '../core/base-lfo';
 export default class MovingAverage extends BaseLfo {
   constructor(options) {
     const defaults = {
-      order: 10
+      order: 10,
+      zeroFill: true,
     };
 
     super(options, defaults);
@@ -35,23 +36,27 @@ export default class MovingAverage extends BaseLfo {
     const frameSize = this.streamParams.frameSize;
     const order = this.params.order;
     const pushIndex = this.params.order - 1;
+    const zeroFill = this.params.zeroFill;
     let divisor;
 
     for (let i = 0; i < frameSize; i++) {
       const current = frame[i];
 
-      // is it necessary, or is it overhead ?
-      if (this.counter < order) {
-        this.counter += 1;
-        divisor = this.counter;
-      } else {
-        divisor = order;
-      }
-
       this.sum -= this.queue[0];
       this.sum += current;
-      outFrame[i] = this.sum / divisor;
-      // outFrame[i] = this.sum / order;
+
+      if (!zeroFill) {
+        if (this.counter < order) {
+          this.counter += 1;
+          divisor = this.counter;
+        } else {
+          divisor = order;
+        }
+
+        outFrame[i] = this.sum / divisor;
+      } else {
+        outFrame[i] = this.sum / order;
+      }
 
       // maintain stack
       this.queue.set(this.queue.subarray(1), 0);
