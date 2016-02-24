@@ -23,9 +23,8 @@ export default class MovingAverage extends BaseLfo {
   reset() {
     super.reset();
 
-    for (let i = 0, l = this.queue.length; i < l; i++) {
+    for (let i = 0, l = this.queue.length; i < l; i++)
       this.queue[i] = 0;
-    }
 
     this.sum = 0;
     this.counter = 0;

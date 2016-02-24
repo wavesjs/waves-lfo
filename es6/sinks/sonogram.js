@@ -19,11 +19,6 @@ export default class Sonogram extends BaseDraw {
     return this.params.scale;
   }
 
-  process(time, frame, metaData) {
-    this.scrollModeDraw(time, frame);
-    super.process(time, frame, metaData);
-  }
-
   drawCurve(frame, previousFrame, iShift) {
     const ctx = this.ctx;
     const height = this.params.height;

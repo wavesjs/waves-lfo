@@ -2,8 +2,8 @@ import BaseLfo from '../core/base-lfo';
 
 
 /**
- *  accumulate intput and expose it - allow view (see waves-ui) to pull data for rendering
- *  bridge between `push` to `pull` paradigm
+ * Create a bridge between `push` to `pull` paradigms.
+ * Alias `outFrame` to `data` and accumulate incomming frames into it.
  */
 export default class Bridge extends BaseLfo {
   constructor(options, process) {

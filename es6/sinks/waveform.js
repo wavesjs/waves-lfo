@@ -4,20 +4,10 @@ import { getRandomColor } from '../utils/draw-utils';
 
 export default class Waveform extends BaseDraw {
   constructor(options) {
-    const defaults = {};
+    const defaults = {
+      color: getRandomColor(),
+    };
     super(options, defaults);
-  }
-
-  initialize() {
-    super.initialize();
-
-    if (!this.params.color) { this.params.color = getRandomColor(); }
-  }
-
-  process(time, frame, metaData) {
-    this.scrollModeDraw(time, frame);
-    // this._cache.push({ time, frame });
-    super.process(time, frame, metaData);
   }
 
   drawCurve(frame, previousFrame, iShift) {
