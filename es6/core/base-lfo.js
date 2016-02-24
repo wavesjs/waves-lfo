@@ -25,6 +25,15 @@ export default class BaseLfo {
     child.parent = this;
   }
 
+  // define if suffiscient
+  disconnect() {
+    // remove itself from parent children
+    const index = this.parent.children.indexOf(this);
+    this.parent.children.splice(index, 1);
+    // this.parent = null;
+    // this.children = null;
+  }
+
   // initialize the current node stream and propagate to it's children
   initialize() {
     if (this.parent) {

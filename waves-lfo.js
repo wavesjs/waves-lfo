@@ -29,6 +29,7 @@ module.exports = {
     // Ifft           : require('./dist/operators/ifft'),
     Framer            : require('./dist/operators/framer'),
     Magnitude         : require('./dist/operators/magnitude'),
+    Max               : require('./dist/operators/max'),
     MinMax            : require('./dist/operators/min-max'),
     MovingAverage     : require('./dist/operators/moving-average'),
     MovingMedian      : require('./dist/operators/moving-median'),

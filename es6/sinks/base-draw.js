@@ -26,13 +26,11 @@ export default class BaseDraw extends BaseLfo {
     this.cachedCanvas = document.createElement('canvas');
     this.cachedCtx = this.cachedCanvas.getContext('2d');
 
-    this.ctx.canvas.width  = this.cachedCtx.canvas.width  = this.params.width;
-    this.ctx.canvas.height = this.cachedCtx.canvas.height = this.params.height;
-
     this.previousTime = 0;
     this.lastShiftError = 0;
     this.currentPartialShift = 0;
 
+    this.resize(this.params.width, this.params.height);
     // this._cache = [];
     // this._rafId;
     // this.draw = this.draw.bind(this);
@@ -70,18 +68,24 @@ export default class BaseDraw extends BaseLfo {
     this.previousFrame = new Float32Array(this.streamParams.frameSize);
   }
 
-  // http://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
-  //        (b-a)(x - min)
-  // f(x) = -------------- + a
-  //          max - min
-  getYPosition(value) {
-    // a = height
-    // b = 0
+  resize(width, height) {
+    this.ctx.canvas.width  = this.cachedCtx.canvas.width  = this.params.width = width;
+    this.ctx.canvas.height = this.cachedCtx.canvas.height = this.params.height = height;
+    // clear cache canvas
+    this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
+    // update scale
+    this.setYScale();
+  }
+
+  setYScale() {
     const min = this.params.min;
     const max = this.params.max;
     const height = this.params.height;
 
-    return (((0 - height) * (value - min)) / (max - min)) + height;
+    const a = (0 - height) / (max - min);
+    const b = height - (a * min);
+
+    this.getYPosition = (x) => a * x + b;
   }
 
   // params modifiers
@@ -91,10 +95,12 @@ export default class BaseDraw extends BaseLfo {
 
   set min(min) {
     this.params.min = min;
+    this.setYScale();
   }
 
   set max(max) {
     this.params.max = max;
+    this.setYScale();
   }
 
   // main process method
