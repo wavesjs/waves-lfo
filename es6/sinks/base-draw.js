@@ -10,17 +10,25 @@ export default class BaseDraw extends BaseLfo {
       max: 1,
       width: 300,
       height: 150, // default canvas size in DOM too
-      isSynchronized: false // is set to true if used in a synchronizedSink
+      isSynchronized: false, // is set to true if used in a synchronizedSink
+      canvas: null, // an existing canvas element be used for drawing
+      container: null, // a selector inside which create an element
     }, extendDefaults);
 
     super(options, defaults);
 
-    if (!this.params.canvas) {
-      throw new Error('params.canvas is mandatory and must be canvas DOM element');
-    }
+    if (!this.params.canvas && !this.params.container)
+      throw new Error('parameter `canvas` or `container` are mandatory');
 
     // prepare canvas
-    this.canvas = this.params.canvas;
+    if (this.params.canvas) {
+      this.canvas = this.params.canvas;
+    } else if (this.params.container) {
+      const container = document.querySelector(this.params.container);
+      this.canvas = document.createElement('canvas');
+      container.appendChild(this.canvas);
+    }
+
     this.ctx = this.canvas.getContext('2d');
 
     this.cachedCanvas = document.createElement('canvas');

@@ -1,6 +1,9 @@
 let id = 0;
 
 export default class BaseLfo {
+  /**
+   * @todo - reverse arguments order, is weird
+   */
   constructor(options = {}, defaults = {}) {
     this.cid = id++;
     this.params = {};
