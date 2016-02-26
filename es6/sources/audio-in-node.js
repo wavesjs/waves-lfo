@@ -1,4 +1,4 @@
-import AudioIn from './audio-in';
+import BaseLfo from '../core/base-lfo';
 
 /**
  *  Use a WebAudio node as a source
@@ -6,33 +6,46 @@ import AudioIn from './audio-in';
 export default class AudioInNode extends AudioIn {
 
   constructor(options = {}) {
-    super(options, {
+    super({
+      frameSize: 512,
+      channel: 0,
+      ctx: null,
+      src: null,
       timeType: 'absolute',
-    });
-  }
+    }, options);
 
-  configureStream() {
-    this.streamParams.frameSize = this.params.frameSize;
-    this.streamParams.frameRate = this.ctx.sampleRate / this.params.frameSize;
-    this.streamParams.sourceSampleRate = this.ctx.sampleRate;
+    if (!this.params.ctx || !(this.params.ctx instanceof AudioContext)) {
+      throw new Error('Missing audio context parameter (ctx)');
+    }
+
+    if (!this.params.src || !(this.params.src instanceof AudioNode)) {
+      throw new Error('Missing audio source node parameter (src)');
+    }
   }
 
   initialize() {
-    super.initialize();
+    super.initialize({
+      frameSize: this.params.frameSize,
+      frameRate: this.ctx.sampleRate / this.params.frameSize,
+      sourceSampleRate: this.ctx.sampleRate,
+    });
 
     var blockSize = this.streamParams.frameSize;
     this.scriptProcessor = this.ctx.createScriptProcessor(blockSize, 1, 1);
+
     // prepare audio graph
     this.scriptProcessor.onaudioprocess = this.process.bind(this);
-    this.src.connect(this.scriptProcessor);
+    this.params.src.connect(this.scriptProcessor);
   }
 
   // connect the audio nodes to start streaming
   start() {
-    if (this.params.timeType === 'relative') { this.time = 0; }
-
     this.initialize();
     this.reset();
+
+    if (this.params.timeType === 'relative')
+      this.time = 0;
+
     // start "the patch" ;)
     this.scriptProcessor.connect(this.ctx.destination);
   }

@@ -3,22 +3,22 @@ import BaseLfo from '../core/base-lfo';
 
 export default class Framer extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       frameSize: 512,
       centeredTimeTag: false
-    });
+    }, options);
 
     this.frameIndex = 0;
   }
 
-  configureStream() {
-    // defaults to `hopSize` === `frameSize`
-    if (!this.params.hopSize) {
-      this.params.hopSize = this.params.frameSize;
-    }
+  initialize(inStreamParams) {
+    if (!this.params.hopSize)
+      this.params.hopSize = this.params.frameSize; // hopSize defaults to frameSize
 
-    this.streamParams.frameSize = this.params.frameSize;
-    this.streamParams.frameRate = this.streamParams.sourceSampleRate / this.params.hopSize;
+    super.initialize(inStreamParams, {
+      framesize: this.params.frameSize,
+      frameRate: inStreamParams.sourceSampleRate / this.params.hopSize,
+    });
   }
 
   // @NOTE must be tested

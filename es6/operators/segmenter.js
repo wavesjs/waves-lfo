@@ -2,14 +2,14 @@ import lfo from 'waves-lfo';
 
 export default class Segmenter extends lfo.core.BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       logInput: false,
       filterOrder: 5,
       threshold: 0.08,
       offThreshold: -Infinity,
       minInter: 0.050,
       maxDuration: Infinity,
-    });
+    }, options);
 
     this.movingAverage = new lfo.operators.MovingAverage({ order: this.params.filterOrder });
     this.initSegment();

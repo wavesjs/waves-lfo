@@ -6,9 +6,9 @@ import { bufferToArrayBuffer, decodeMessage } from '../utils/socket-utils';
 // @TODO: handle `start` and `stop`
 export default class SocketServer extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       port: 3030
-    });
+    }, options);
 
     // @TODO handle disconnect and so on...
     this.clients = [];

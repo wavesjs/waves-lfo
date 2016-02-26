@@ -3,16 +3,16 @@ import BaseLfo from '../core/base-lfo';
 export default class Magnitude extends BaseLfo {
 
   constructor(options) {
-    const defaults = {
+    super({
       normalize: true,
       power: false,
-    };
-
-    super(options, defaults);
+    }, options);
   }
 
-  configureStream() {
-    this.streamParams.frameSize = 1;
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams, {
+      frameSize: 1,
+    });
   }
 
   inputArray(frame) {

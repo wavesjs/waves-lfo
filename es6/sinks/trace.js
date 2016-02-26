@@ -4,12 +4,10 @@ import { getRandomColor, getHue, hexToRGB } from '../utils/draw-utils';
 export default class Trace extends BaseDraw {
 
   constructor(options) {
-    const defaults = {
+    super({
       colorScheme: 'none', // color, opacity
       color: getRandomColor(),
-    };
-
-    super(options, defaults);
+    }, options);
   }
 
   drawCurve(frame, prevFrame, iShift) {

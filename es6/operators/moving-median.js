@@ -2,9 +2,9 @@ import BaseLfo from '../core/base-lfo';
 
 export default class MovingMedian extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       order: 9,
-    });
+    }, options);
 
     if (this.params.order % 2 === 0) {
       throw new Error('order must be an odd number');

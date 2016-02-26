@@ -5,9 +5,9 @@ import { encodeMessage, arrayBufferToBuffer } from '../utils/socket-utils';
 
 export default class SocketServer extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       port: 3031
-    });
+    }, options);
 
     this.server = null;
     this.initServer();

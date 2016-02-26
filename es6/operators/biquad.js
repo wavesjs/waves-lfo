@@ -291,66 +291,27 @@ function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
 export default class Biquad extends BaseLfo {
 
   constructor(options) {
-    super(options, {
+    super({
       filterType:'lowpass',
       f0: 1.0,
       gain: 1.0,
       q: 1.0
-    });
-    // this.type = 'biquad';
-
-    // from here on options is this.params
-
-    // to implement
-    // if(opts.damp) …
-    // if(opts.decay) …
-    // if(opts.over) …
-
-    // var frameRate = this.streamParams.frameRate;
-    // // if no frameRate or framerate is 0 we shall halt!
-    // if (!frameRate || frameRate <= 0) {
-    //   throw new Error('This Operator requires a frameRate higher than 0.');
-    // }
-
-    // var normF0 = this.params.f0 / frameRate,
-    //     gain = this.params.gain,
-    //     q;
-
-    // if (this.params.q)  { q = this.params.q; }
-    // if (this.params.bw) { q = this.params.f0 / this.params.bw; }
-
-    // this.coefs = {
-    //   b0: 0,
-    //   b1: 0,
-    //   b2: 0,
-    //   a1: 0,
-    //   a2: 0
-    // };
-
-    // var frameSize = this.streamParams.frameSize;
-    // this.state = {
-    //   xn_1: new Float32Array(frameSize),
-    //   xn_2: new Float32Array(frameSize),
-    //   yn_1: new Float32Array(frameSize),
-    //   yn_2: new Float32Array(frameSize)
-    // };
-
-    // calculateCoefs(this.params.filterType, normF0, q, gain, this.coefs);
-    // this.setupStream();
+    }, options);
   }
 
-  initialize() {
-    super.initialize();
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams);
 
-    var frameRate = this.streamParams.frameRate;
+    const frameRate = this.streamParams.frameRate;
+
     // if no frameRate or framerate is 0 we shall halt!
     if (!frameRate || frameRate <= 0) {
       throw new Error('This Operator requires a frameRate higher than 0.');
     }
 
-    var normF0 = this.params.f0 / frameRate,
-        gain = this.params.gain,
-        q;
+    const normF0 = this.params.f0 / frameRate;
+    const gain = this.params.gain;
+    let q;
 
     if (this.params.q)  { q = this.params.q; }
     if (this.params.bw) { q = this.params.f0 / this.params.bw; }
@@ -363,7 +324,8 @@ export default class Biquad extends BaseLfo {
       a2: 0
     };
 
-    var frameSize = this.streamParams.frameSize;
+    const frameSize = this.streamParams.frameSize;
+
     this.state = {
       xn_1: new Float32Array(frameSize),
       xn_2: new Float32Array(frameSize),

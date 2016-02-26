@@ -5,10 +5,10 @@ import { decodeMessage } from '../utils/socket-utils';
 // @TODO: handle `start` and `stop`
 export default class SocketClient extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       port: 3031,
       address: window.location.hostname
-    });
+    }, options);
 
     this.socket = null;
     this.initConnection();
@@ -19,9 +19,11 @@ export default class SocketClient extends BaseLfo {
     this.reset();
   }
 
-  configureStream() {
-    this.streamParams.frameSize = this.params.frameSize;
-    this.streamParams.frameRate = this.params.frameRate;
+  initialize() {
+    super.initialize(undefined, {
+      frameSize: this.params.frameSize,
+      frameRate: this.params.frameRate,
+    }
   }
 
   initConnection() {

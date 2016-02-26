@@ -3,19 +3,18 @@ import { getRandomColor } from '../utils/draw-utils';
 
 export default class Bpf extends BaseDraw {
   constructor(options) {
-    const defaults = {
+    super({
       trigger: false,
       radius: 0,
       line: true
-    };
+    }, options);
 
-    super(options, defaults);
     // for loop mode
     this.currentXPosition = 0;
   }
 
-  initialize() {
-    super.initialize();
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams);
 
     // create an array of colors according to the `outFrame` size
     if (!this.params.colors) {

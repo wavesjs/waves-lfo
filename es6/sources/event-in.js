@@ -13,7 +13,7 @@ import BaseLfo from '../core/base-lfo';
 
 export default class EventIn extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       timeType: 'absolute'
     });
 
@@ -26,22 +26,21 @@ export default class EventIn extends BaseLfo {
     this._startTime = undefined;
   }
 
-  configureStream() {
-    // throw error if some values are undefined ?
-    this.streamParams.frameSize = this.params.frameSize;
-    this.streamParams.frameRate = this.params.frameRate;
-    // @NOTE what does make sens in this case ?
-    // this.streamParams.sourceSampleRate = this.params.frameSize * this.params.frameRate;
-    this.streamParams.sourceSampleRate = (this.params.sourceSampleRate || this.params.frameRate);
+  initialize() {
+    super.initialize({
+      frameSize: this.params.frameSize,
+      frameRate: this.params.frameRate,
+      sourceSampleRate: this.params.frameRate,
+    }
   }
 
   start() {
+    this.initialize();
+    this.reset();
+
     // should be setted in the first process call
     this._isStarted = true;
     this._startTime = undefined;
-
-    this.initialize();
-    this.reset();
   }
 
   stop() {

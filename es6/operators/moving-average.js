@@ -5,10 +5,10 @@ import BaseLfo from '../core/base-lfo';
 // - can we improve algorithm implementation ?
 export default class MovingAverage extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       order: 10,
       zeroFill: true,
-    });
+    }, options);
 
     this.sum = null;
     this.ringBuffer = null;
@@ -16,8 +16,8 @@ export default class MovingAverage extends BaseLfo {
     this.ringCount = 0;
   }
 
-  initialize() {
-    super.initialize();
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams);
 
     this.ringBuffer = new Float32Array(this.params.order * this.frameSize);
 

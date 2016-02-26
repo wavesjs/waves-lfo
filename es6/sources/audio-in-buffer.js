@@ -1,4 +1,4 @@
-import AudioIn from './audio-in';
+import BaseLfo from '../core/base-lfo';
 
 const workerCode = `
 self.addEventListener('message', function process(e) {
@@ -30,26 +30,37 @@ self.addEventListener('message', function process(e) {
 /**
  * AudioBuffer as source, sliced it in blocks through a worker
  */
-export default class AudioInBuffer extends AudioIn {
+export default class AudioInBuffer extends BaseLfo {
   constructor(options = {}) {
-    super(options, {});
+    super({
+      frameSize: 512,
+      channel: 0,
+      ctx: null,
+      buffer: null,
+    }, options);
 
-    if (!this.params.src || !(this.params.src instanceof AudioBuffer)) {
-      throw new Error('An AudioBuffer source must be given');
+    if (!this.params.ctx || !(this.params.ctx instanceof AudioContext)) {
+      throw new Error('Missing audio context parameter (ctx)');
+    }
+
+    if (!this.params.buffer || !(this.params.buffer instanceof AudioBuffer)) {
+      throw new Error('Missing audio buffer parameter (buffer)');
     }
 
     this.blob = new Blob([workerCode], { type: "text/javascript" });
     this.worker = null;
   }
 
-  configureStream() {
-    this.streamParams.frameSize = this.params.frameSize;
-    this.streamParams.frameRate = this.params.src.sampleRate / this.params.frameSize;
-    this.streamParams.sourceSampleRate = this.params.src.sampleRate;
-  }
-
   setupStream() {
     this.outFrame = null;
+  }
+
+  initialize() {
+    super.initialize({
+      frameSize: this.params.frameSize,
+      frameRate: this.params.buffer.sampleRate / this.params.frameSize,
+      sourceSampleRate: this.params.buffer.sampleRate,
+    });
   }
 
   start() {
@@ -59,7 +70,7 @@ export default class AudioInBuffer extends AudioIn {
     this.worker = new Worker(window.URL.createObjectURL(this.blob));
     this.worker.addEventListener('message', this.process.bind(this), false);
 
-    const buffer = this.src.getChannelData(this.channel).buffer
+    const buffer = this.params.buffer.getChannelData(this.params.channel).buffer
 
     this.worker.postMessage({
       sampleRate: this.streamParams.sourceSampleRate,

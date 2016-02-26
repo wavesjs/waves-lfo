@@ -3,14 +3,12 @@ import { getRandomColor } from '../utils/draw-utils';
 
 export default class Spectrogram extends BaseDraw {
   constructor(options) {
-    super(options, {
+    super({
       min: 0,
       max: 1,
       scale: 1,
       color: getRandomColor(),
-    });
-
-    super(options, defaults);
+    }, options);
   }
 
   set scale(value) {

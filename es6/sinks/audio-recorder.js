@@ -90,9 +90,9 @@ let audioContext;
  */
 export default class AudioRecorder extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       duration: 10, // seconds
-    });
+    }, options);
 
     // needed to retrive an AudioBuffer
     if (!this.params.ctx) {
@@ -106,8 +106,9 @@ export default class AudioRecorder extends BaseLfo {
     this.worker = new Worker(window.URL.createObjectURL(blob));
   }
 
-  initialize() {
-    super.initialize();
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams);
+
     // propagate `streamParams` to the worker
     this.worker.postMessage({
       command: 'init',

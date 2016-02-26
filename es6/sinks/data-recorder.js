@@ -43,11 +43,11 @@ self.addEventListener('message', function(e) {
 
 export default class DataRecorder extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       // default format is [{time, data}, {time, data}]
       // if set to `true` format is { time: [...], data: [...] }
       separateArrays: false,
-    });
+    }, options);
 
     this._isStarted = false;
 
@@ -56,8 +56,8 @@ export default class DataRecorder extends BaseLfo {
     this.worker = new Worker(window.URL.createObjectURL(blob));
   }
 
-  initialize() {
-    super.initialize();
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams);
 
     this.worker.postMessage({
       command: 'init',
