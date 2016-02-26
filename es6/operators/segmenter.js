@@ -73,11 +73,8 @@ export default class Segmenter extends lfo.core.BaseLfo {
   }
 
   process(time, frame, metaData) {
-    let value = frame[0];
-
-    if(this.params.logInput)
-      value = Math.log(value);
-
+    const rawValue = frame[0];
+    const value = this.params.logInput ? Math.log(value) : rawValue;
     const mvavrg = this.movingAverage.inputScalar(value);
     const diff = value - mvavrg;
 
@@ -93,14 +90,14 @@ export default class Segmenter extends lfo.core.BaseLfo {
       this.max = -Infinity;
     }
 
-    if(this.insideSegment) {
-      this.min = Math.min(this.min, value);
-      this.max = Math.max(this.max, value);
-      this.sum += value;
-      this.sumOfSquares += value * value;
+    if (this.insideSegment) {
+      this.min = Math.min(this.min, rawValue);
+      this.max = Math.max(this.max, rawValue);
+      this.sum += rawValue;
+      this.sumOfSquares += rawValue * rawValue;
       this.count++;
 
-      if(time - this.onsetTime >= this.params.maxDuration || value < this.params.offThreshold) {
+      if (time - this.onsetTime >= this.params.maxDuration || value <= this.params.offThreshold) {
         this.outputSegment(time);
         this.insideSegment = false;
       }
