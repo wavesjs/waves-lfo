@@ -3,12 +3,10 @@ import BaseLfo from '../core/base-lfo';
 
 export default class Framer extends BaseLfo {
   constructor(options) {
-    const defaults = {
+    super(options, {
       frameSize: 512,
       centeredTimeTag: false
-    };
-
-    super(options, defaults);
+    });
 
     this.frameIndex = 0;
   }
@@ -42,19 +40,17 @@ export default class Framer extends BaseLfo {
   }
 
   process(time, block, metaData) {
+    const outFrame = this.outFrame;
     const sampleRate = this.streamParams.sourceSampleRate;
     const samplePeriod = 1 / sampleRate;
-
-    const frameIndex = this.frameIndex;
     const frameSize = this.streamParams.frameSize;
     const blockSize = block.length;
-    const blockIndex = 0;
     const hopSize = this.params.hopSize;
-
-    const outFrame = this.outFrame;
+    let frameIndex = this.frameIndex;
+    let blockIndex = 0;
 
     while (blockIndex < blockSize) {
-      const numSkip = 0;
+      let numSkip = 0;
 
       // skip block samples for negative frameIndex
       if (frameIndex < 0) {
@@ -63,8 +59,10 @@ export default class Framer extends BaseLfo {
 
       if (numSkip < blockSize) {
         blockIndex += numSkip; // skip block segment
+
         // can copy all the rest of the incoming block
-        const numCopy = blockSize - blockIndex;
+        let numCopy = blockSize - blockIndex;
+
         // connot copy more than what fits into the frame
         const maxCopy = frameSize - frameIndex;
 
@@ -74,6 +72,7 @@ export default class Framer extends BaseLfo {
 
         // copy block segment into frame
         const copy = block.subarray(blockIndex, blockIndex + numCopy);
+
         // console.log(blockIndex, frameIndex, numCopy);
         outFrame.set(copy, frameIndex);
 
