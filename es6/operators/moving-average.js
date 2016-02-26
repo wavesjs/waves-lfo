@@ -1,67 +1,112 @@
 import BaseLfo from '../core/base-lfo';
 
-
 // NOTES:
 // - add 'symetrical' option (how to deal with values between frames ?) ?
 // - can we improve algorithm implementation ?
 export default class MovingAverage extends BaseLfo {
   constructor(options) {
-    const defaults = {
+    super(options, {
       order: 10,
       zeroFill: true,
-    };
+    });
 
-    super(options, defaults);
-
-    this.sum = 0;
-    this.counter = 0;
-    this.queue = new Float32Array(this.params.order);
+    this.sum = null;
+    this.ringBuffer = null;
+    this.ringIndex = 0;
+    this.ringCount = 0;
   }
 
-  // streamParams should stay the same ?
+  initialize() {
+    super.initialize();
+
+    this.ringBuffer = new Float32Array(this.params.order * this.streamParams.frameSize);
+
+    if (this.streamParams.frameSize > 1)
+      this.sum = new Float32Array(this.streamParams.frameSize);
+    else
+      this.sum = 0;
+  }
 
   reset() {
     super.reset();
 
-    for (let i = 0, l = this.queue.length; i < l; i++)
-      this.queue[i] = 0;
+    this.ringBuffer.fill(0)
 
-    this.sum = 0;
-    this.counter = 0;
+    if (this.streamParams.frameSize > 1)
+      this.sum.fill(0);
+    else
+      this.sum = 0;
+
+    this.ringIndex = 0;
+    this.ringCount = 0;
+  }
+
+  inputScalar(value) {
+    const ringIndex = this.ringIndex;
+    const nextRingIndex = (ringIndex + 1) % order;
+    const ringOffset = ringIndex;
+    const nextRingOffset = nextRingIndex;
+    const ringBuffer = this.ringBuffer;
+    let order = this.params.order;
+    let sum = this.sum;
+
+    if (!this.params.zeroFill && this.ringCount < order) {
+      this.ringCount++;
+      order = this.ringCount;
+    }
+
+    sum -= ringBuffer[nextRingOffset];
+    sum += value;
+
+    this.sum = sum;
+    this.ringBuffer[ringOffset] = value;
+    this.ringIndex = nextRingIndex;
+
+    return sum / order;
+  }
+
+  inputArray(frame) {
+    const outFrame = this.outFrame;
+    const frameSize = this.streamParams.frameSize;
+    const ringIndex = this.ringIndex;
+    const nextRingIndex = (ringIndex + 1) % order;
+    const ringOffset = ringIndex * frameSize;
+    const nextRingOffset = nextRingIndex * frameSize;
+    const ring = this.ringBuffer;
+    const sum = this.sum;
+    let order = this.params.order;
+
+    if (!this.params.zeroFill && this.ringCount < order) {
+      this.ringCount++;
+      order = this.ringCount;
+    }
+
+    const scale = 1 / order;
+
+    for (let i = 0; i < frameSize; i++) {
+      const value = frame[i];
+      let sum = sum[i];
+
+      sum -= ringBuffer[nextRingOffset + i];
+      sum += value;
+
+      outFrame[i] = sum * scale;
+
+      this.sum[i] = sum;
+      this.ringBuffer[ringOffset + i] = value;
+    }
+
+    this.ringIndex = nextRingIndex;
+
+    return outFrame;
   }
 
   process(time, frame, metaData) {
-    const outFrame = this.outFrame;
-    const frameSize = this.streamParams.frameSize;
-    const order = this.params.order;
-    const pushIndex = this.params.order - 1;
-    const zeroFill = this.params.zeroFill;
-    let divisor;
+    if(this.frameSize > 1)
+      this.inputArray(frame);
+    else
+      this.outFrame[0] = this.inputScalar(frame[0]);
 
-    for (let i = 0; i < frameSize; i++) {
-      const current = frame[i];
-
-      this.sum -= this.queue[0];
-      this.sum += current;
-
-      if (!zeroFill) {
-        if (this.counter < order) {
-          this.counter += 1;
-          divisor = this.counter;
-        } else {
-          divisor = order;
-        }
-
-        outFrame[i] = this.sum / divisor;
-      } else {
-        outFrame[i] = this.sum / order;
-      }
-
-      // maintain stack
-      this.queue.set(this.queue.subarray(1), 0);
-      this.queue[pushIndex] = current;
-    }
-
-    this.output(time, outFrame, metaData);
+    this.output(time, this.outFrame, metaData);
   }
 }

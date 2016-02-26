@@ -16,11 +16,11 @@ Object.defineProperty(exports, '__esModule', {
 
 var _coreBaseLfo = require('../core/base-lfo');
 
+var _coreBaseLfo2 = _interopRequireDefault(_coreBaseLfo);
+
 /**
  * a NoOp Lfo
  */
-
-var _coreBaseLfo2 = _interopRequireDefault(_coreBaseLfo);
 
 var Noop = (function (_BaseLfo) {
   _inherits(Noop, _BaseLfo);

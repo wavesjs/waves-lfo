@@ -36,5 +36,6 @@ module.exports = {
     MovingMedian      : require('./dist/operators/moving-median'),
     Noop              : require('./dist/operators/noop'),
     Operator          : require('./dist/operators/operator'),
+    Segmenter         : require('./dist/operators/segmenter'),
   },
 };

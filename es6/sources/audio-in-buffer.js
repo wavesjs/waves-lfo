@@ -1,22 +1,29 @@
 import AudioIn from './audio-in';
 
-const worker = `
+const workerCode = `
 self.addEventListener('message', function process(e) {
-  var blockSize = e.data.options.blockSize;
-  var sampleRate = e.data.options.sampleRate;
+  var blockSize = e.data.blockSize;
+  var sampleRate = e.data.sampleRate;
   var buffer = new Float32Array(e.data.buffer);
-
   var length = buffer.length;
-  // var block = new Float32Array(blockSize);
+  var index = 0;
 
-  for (var index = 0; index < length; index += blockSize) {
-    var copySize = length - index;
-    if (copySize > blockSize) { copySize = blockSize; }
-
+  while (index + blockSize < length) {
+    var copySize = Math.min(length - index, blockSize);
     var block = buffer.subarray(index, index + copySize);
-    block = new Float32Array(block);
+    var sendBlock = new Float32Array(block);
 
-    postMessage({ buffer: block.buffer, time: index / sampleRate }, [block.buffer]);
+    postMessage({ msg: 'process', buffer: sendBlock.buffer, time: index / sampleRate }, [sendBlock.buffer]);
+
+    index += blockSize;
+  }
+
+  copySize = length - index;
+
+  if (copySize > 0) {
+    block = buffer.subarray(index, index + copySize);
+    sendBlock = new Float32Array(block);
+    postMessage({ msg: 'finalize', buffer: block.buffer, time: index / sampleRate }, [block.buffer]);
   }
 }, false)`;
 
@@ -26,11 +33,12 @@ self.addEventListener('message', function process(e) {
 export default class AudioInBuffer extends AudioIn {
   constructor(options = {}) {
     super(options, {});
-    this.metaData = {};
 
-    if (!this.params.src || !(this.params.src instanceof AudioBuffer)) {
+    if (!this.params.src || !(this.params.src instanceof AudioBuffer))
       throw new Error('An AudioBuffer source must be given');
-    }
+
+    this.blob = new Blob([workerCode], { type: "text/javascript" });
+    this.worker = null;
   }
 
   configureStream() {
@@ -39,42 +47,45 @@ export default class AudioInBuffer extends AudioIn {
     this.streamParams.sourceSampleRate = this.params.src.sampleRate;
   }
 
-  initialize() {
-    super.initialize();
-    // init worker
-    // @NOTE: could be done once in constructor ?
-    const blob = new Blob([worker], { type: "text/javascript" });
-    this.worker = new Worker(window.URL.createObjectURL(blob));
-    this.worker.addEventListener('message', this.process.bind(this), false);
+  setupStream() {
+    this.outFrame = null;
   }
 
   start() {
-    // propagate to the whole chain
     this.initialize();
     this.reset();
+
+    this.worker = new Worker(window.URL.createObjectURL(this.blob));
+    this.worker.addEventListener('message', this.process.bind(this), false);
 
     const buffer = this.src.getChannelData(this.channel).buffer
 
     this.worker.postMessage({
-      options: {
-        sampleRate: this.streamParams.sourceSampleRate,
-        blockSize: this.streamParams.frameSize
-      },
-      buffer: buffer
+      sampleRate: this.streamParams.sourceSampleRate,
+      blockSize: this.streamParams.frameSize,
+      buffer: buffer,
     }, [buffer]);
   }
 
   stop() {
-    // propagate to the whole chain
+    this.worker.terminate();
+    this.worker = null;
+
     this.finalize();
   }
 
-  // callback of the worker
+  // worker callback
   process(e) {
-    const block = new Float32Array(e.data.buffer);
-    this.outFrame.set(block, 0);
-    this.time = e.data.time;
+    const msg = e.data.msg;
+    const buffer = e.data.buffer;
 
-    this.output();
+    if (buffer) {
+      this.outFrame = new Float32Array(buffer);
+      this.time = e.data.time;
+      this.output();
+    }
+
+    if (msg === 'finalize')
+      this.finalize();
   }
 }

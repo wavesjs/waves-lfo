@@ -6,13 +6,9 @@ import AudioIn from './audio-in';
 export default class AudioInNode extends AudioIn {
 
   constructor(options = {}) {
-    const defaults = {
+    super(options, {
       timeType: 'absolute',
-    };
-
-    super(options);
-
-    this.metaData = {};
+    });
   }
 
   configureStream() {
@@ -53,8 +49,7 @@ export default class AudioInNode extends AudioIn {
     if (!this.blockDuration)
       this.blockDuration = block.length / this.streamParams.sourceSampleRate;
 
-    this.time += ;
-    // console.log(this.ctx.currentTime, this.time);
+    this.time += this.blockDuration;
     this.outFrame = block;
     this.output();
   }

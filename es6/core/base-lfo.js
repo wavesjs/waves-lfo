@@ -16,6 +16,11 @@ export default class BaseLfo {
 
     this.params = Object.assign({}, defaults, options);
     this.children = [];
+
+    // stream data
+    this.time = 0;
+    this.outFrame = null;
+    this.metaData = {};
   }
 
   // WebAudioAPI `connect` like method
@@ -40,12 +45,13 @@ export default class BaseLfo {
   // initialize the current node stream and propagate to it's children
   initialize() {
     if (this.parent) {
-      // defaults to inherit parent's stream parameters
+      // inherits parent's stream parameters by default
       this.streamParams = Object.assign(this.streamParams, this.parent.streamParams);
     }
 
     // entry point for stream params configuration in derived class
     this.configureStream();
+
     // create the `outFrame` arrayBuffer
     this.setupStream();
 
@@ -64,19 +70,7 @@ export default class BaseLfo {
   /**
    * override inherited streamParams, only if specified in `params`
    */
-  configureStream() {
-    if (this.params.frameSize) {
-      this.streamParams.frameSize = this.params.frameSize;
-    }
-
-    if (this.params.frameRate) {
-      this.streamParams.frameRate = this.params.frameRate;
-    }
-
-    if (this.params.sourceSampleRate) {
-      this.streamParams.sourceSampleRate = this.params.sourceSampleRate;
-    }
-  }
+  configureStream() { }
 
   /**
    * create the outputFrame according to the `streamParams`

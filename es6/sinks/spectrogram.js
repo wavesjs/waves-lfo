@@ -1,15 +1,14 @@
 import BaseDraw from './base-draw';
 import { getRandomColor } from '../utils/draw-utils';
 
-
 export default class Spectrogram extends BaseDraw {
   constructor(options) {
-    const defaults = {
+    super(options, {
       min: 0,
       max: 1,
       scale: 1,
       color: getRandomColor(),
-    };
+    });
 
     super(options, defaults);
   }
@@ -18,7 +17,7 @@ export default class Spectrogram extends BaseDraw {
     this.params.scale = value;
   }
 
-  get scale(value) {
+  get scale() {
     return this.params.scale;
   }
 

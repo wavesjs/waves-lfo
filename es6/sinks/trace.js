@@ -5,8 +5,8 @@ export default class Trace extends BaseDraw {
 
   constructor(options) {
     const defaults = {
-      colorScheme: 'none' // color, opacity
-      color: color: getRandomColor(),
+      colorScheme: 'none', // color, opacity
+      color: getRandomColor(),
     };
 
     super(options, defaults);
