@@ -7,7 +7,7 @@ import BaseLfo from '../core/base-lfo';
  */
 export default class Bridge extends BaseLfo {
   constructor(options, process) {
-    super(options, {});
+    super(options);
 
     this.process = process.bind(this);
     this.data = this.outFrame = [];

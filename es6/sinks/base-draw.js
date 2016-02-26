@@ -3,7 +3,6 @@ import BaseLfo from '../core/base-lfo';
 
 export default class BaseDraw extends BaseLfo {
   constructor(options = {}, extendDefaults = {}) {
-
     const defaults = Object.assign({
       duration: 1,
       min: -1,
@@ -15,7 +14,7 @@ export default class BaseDraw extends BaseLfo {
       container: null, // a selector inside which create an element
     }, extendDefaults);
 
-    super(options, defaults);
+    super(defaults, options);
 
     if (!this.params.canvas && !this.params.container)
       throw new Error('parameter `canvas` or `container` are mandatory');
@@ -82,8 +81,9 @@ export default class BaseDraw extends BaseLfo {
     this.previousFrame = new Float32Array(this.streamParams.frameSize);
   }
 
-  initialize() {
-    super.initialize();
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams);
+
     this._stack = [];
     this._rafId = requestAnimationFrame(this.draw);
   }
@@ -94,8 +94,8 @@ export default class BaseDraw extends BaseLfo {
     this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
   }
 
-  finalize() {
-    super.finalize();
+  finalize(endTime) {
+    super.finalize(endTime);
     cancelAnimationFrame(this._rafId);
   }
 
@@ -234,6 +234,3 @@ export default class BaseDraw extends BaseLfo {
     console.error('must be implemented');
   }
 }
-
-
-

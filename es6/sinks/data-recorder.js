@@ -32,7 +32,7 @@ self.addEventListener('message', function(e) {
       var data = new Float32Array(e.data.buffer);
       process(time, data);
       break;
-    case 'finalize':
+    case 'stop':
       var data = _separateArrays ? _separateArraysData : _data;
       self.postMessage({ data: data });
       init();
@@ -43,12 +43,13 @@ self.addEventListener('message', function(e) {
 
 export default class DataRecorder extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       // default format is [{time, data}, {time, data}]
       // if set to `true` format is { time: [...], data: [...] }
       separateArrays: false,
-    });
+    }, options);
 
+    // @todo - rename `isRecording`
     this._isStarted = false;
 
     // init worker
@@ -56,8 +57,8 @@ export default class DataRecorder extends BaseLfo {
     this.worker = new Worker(window.URL.createObjectURL(blob));
   }
 
-  initialize() {
-    super.initialize();
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams);
 
     this.worker.postMessage({
       command: 'init',
@@ -70,13 +71,14 @@ export default class DataRecorder extends BaseLfo {
   }
 
   stop() {
-    this.finalize();
-    this._isStarted = false;
+    if (this._isStarted) {
+      this.worker.postMessage({ command: 'stop' });
+      this._isStarted = false;
+    }
   }
 
   finalize() {
-    if (!this._isStarted) { return; }
-    this.worker.postMessage({ command: 'finalize' });
+    this.stop();
   }
 
   process(time, frame, metaData) {

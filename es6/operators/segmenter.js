@@ -4,14 +4,15 @@ import MovingAverage from './moving-average';
 
 export default class Segmenter extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       logInput: false,
+      minInput: 0.000001,
       filterOrder: 5,
-      threshold: 0.08,
+      threshold: 0.5,
       offThreshold: -Infinity,
       minInter: 0.050,
       maxDuration: Infinity,
-    });
+    }, options);
 
     this.movingAverage = new MovingAverage({ order: this.params.filterOrder });
   }
@@ -36,7 +37,7 @@ export default class Segmenter extends BaseLfo {
     this.count = 0;
   }
 
-  outputSegment(time) {
+  outputSegment(endTime) {
     this.outFrame[0] = this.max;
     this.outFrame[1] = this.min;
 
@@ -48,21 +49,20 @@ export default class Segmenter extends BaseLfo {
     this.outFrame[2] = mean;
     this.outFrame[3] = 0;
 
-    if(meanOfSquare > squareOfmean)
-      this.outFrame[3] = sqrt(meanOfSquare - squareOfmean);
+    if (meanOfSquare > squareOfmean)
+      this.outFrame[3] = Math.sqrt(meanOfSquare - squareOfmean);
 
-    this.metaData.duration = time - this.onsetTime;
+    this.metaData.duration = endTime - this.onsetTime;
 
     this.output(this.onsetTime);
   }
 
-  configureStream() {
-    this.streamParams.frameSize = 4; // min, max, mean, stddev
-  }
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams, {
+      frameSize: 4,
+    });
 
-  initialize(streamParams) {
-    super.initialize(streamParams);
-    this.movingAverage.initialize(streamParams);
+    this.movingAverage.initialize(inStreamParams);
   }
 
   reset() {
@@ -71,16 +71,21 @@ export default class Segmenter extends BaseLfo {
     this.resetSegment();
   }
 
-  finalize(time) {
-    super.finalize(time);
+  finalize(endTime) {
+    super.finalize(endTime);
 
     if (this.insideSegment)
-      this.outputSegment(time);
+      this.outputSegment(endTime);
   }
 
   process(time, frame, metaData) {
     const rawValue = frame[0];
-    const value = this.params.logInput ? Math.log(value) : rawValue;
+    const minInput = this.params.minInput;
+    let value = Math.max(rawValue, minInput);
+
+    if (this.params.logInput)
+      value = Math.log(value);
+
     const mvavrg = this.movingAverage.inputScalar(value);
     const diff = value - mvavrg;
 

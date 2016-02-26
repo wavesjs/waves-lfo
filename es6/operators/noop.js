@@ -5,7 +5,7 @@ import BaseLfo from '../core/base-lfo';
  */
 export default class Noop extends BaseLfo {
   constructor(options) {
-    super(options, {});
+    super(options);
   }
 
   process(time, frame, metaData) {

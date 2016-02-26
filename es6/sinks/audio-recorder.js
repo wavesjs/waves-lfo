@@ -63,7 +63,7 @@ self.addEventListener('message', function(e) {
       }
       break;
 
-    case 'finalize':
+    case 'stop':
       if (!isInfiniteBuffer) {
         // @TODO add option to not clip the returned buffer
         // values in FLoat32Array are 4 bytes long (32 / 8)
@@ -90,9 +90,9 @@ let audioContext;
  */
 export default class AudioRecorder extends BaseLfo {
   constructor(options) {
-    super(options, {
+    super({
       duration: 10, // seconds
-    });
+    }, options);
 
     // needed to retrive an AudioBuffer
     if (!this.params.ctx) {
@@ -106,8 +106,9 @@ export default class AudioRecorder extends BaseLfo {
     this.worker = new Worker(window.URL.createObjectURL(blob));
   }
 
-  initialize() {
-    super.initialize();
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams);
+
     // propagate `streamParams` to the worker
     this.worker.postMessage({
       command: 'init',
@@ -121,14 +122,16 @@ export default class AudioRecorder extends BaseLfo {
   }
 
   stop() {
-    this.finalize();
-    this._isStarted = false;
+    if (this._isStarted) {
+      this.worker.postMessage({ command: 'stop' });
+      this._isStarted = false;
+    }
   }
 
   // called when `stop` is triggered on the source
-  finalize() {
-    if (!this._isStarted) { return; } // don't finalize if not started
-    this.worker.postMessage({ command: 'finalize' });
+  // @todo - optionnaly truncate retrieved buffer to end time
+  finalize(endTime) {
+    this.stop();
   }
 
   process(time, frame, metaData) {
@@ -138,7 +141,10 @@ export default class AudioRecorder extends BaseLfo {
     this.outFrame = new Float32Array(frame);
 
     const buffer = this.outFrame.buffer;
-    this.worker.postMessage({ command: 'process', buffer: buffer }, [buffer]);
+    this.worker.postMessage({
+      command: 'process',
+      buffer: buffer
+    }, [buffer]);
   }
 
   /**

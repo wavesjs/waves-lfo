@@ -1,44 +1,54 @@
-import AudioIn from './audio-in';
+import BaseLfo from '../core/base-lfo';
 
 /**
  *  Use a WebAudio node as a source
  */
-export default class AudioInNode extends AudioIn {
+export default class AudioInNode extends BaseLfo {
 
   constructor(options = {}) {
-    super(options, {
-      timeType: 'absolute',
-    });
-  }
+    super({
+      frameSize: 512,
+      channel: 0,
+      ctx: null,
+      src: null,
+    }, options);
 
-  configureStream() {
-    this.streamParams.frameSize = this.params.frameSize;
-    this.streamParams.frameRate = this.ctx.sampleRate / this.params.frameSize;
-    this.streamParams.sourceSampleRate = this.ctx.sampleRate;
+    if (!this.params.ctx || !(this.params.ctx instanceof AudioContext)) {
+      throw new Error('Missing audio context parameter (ctx)');
+    }
+
+    if (!this.params.src || !(this.params.src instanceof AudioNode)) {
+      throw new Error('Missing audio source node parameter (src)');
+    }
   }
 
   initialize() {
-    super.initialize();
+    const ctx = this.params.ctx;
+
+    super.initialize({
+      frameSize: this.params.frameSize,
+      frameRate: ctx.sampleRate / this.params.frameSize,
+      sourceSampleRate: ctx.sampleRate,
+    });
 
     var blockSize = this.streamParams.frameSize;
-    this.scriptProcessor = this.ctx.createScriptProcessor(blockSize, 1, 1);
+    this.scriptProcessor = ctx.createScriptProcessor(blockSize, 1, 1);
+
     // prepare audio graph
     this.scriptProcessor.onaudioprocess = this.process.bind(this);
-    this.src.connect(this.scriptProcessor);
+    this.params.src.connect(this.scriptProcessor);
   }
 
   // connect the audio nodes to start streaming
   start() {
-    if (this.params.timeType === 'relative') { this.time = 0; }
-
     this.initialize();
     this.reset();
-    // start "the patch" ;)
-    this.scriptProcessor.connect(this.ctx.destination);
+    this.time = 0;
+    this.scriptProcessor.connect(this.params.ctx.destination);
   }
 
   stop() {
-    this.finalize();
+    this.finalize(this.time);
     this.scriptProcessor.disconnect();
   }
 
@@ -49,8 +59,9 @@ export default class AudioInNode extends AudioIn {
     if (!this.blockDuration)
       this.blockDuration = block.length / this.streamParams.sourceSampleRate;
 
-    this.time += this.blockDuration;
     this.outFrame = block;
     this.output();
+
+    this.time += this.blockDuration;
   }
 }

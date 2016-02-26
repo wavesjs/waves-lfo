@@ -5,11 +5,13 @@ import BaseLfo from '../core/base-lfo';
  */
 export default class MinMax extends BaseLfo {
   constructor(options) {
-    super(options, {});
+    super(options);
   }
 
-  configureStream() {
-    this.streamParams.frameSize = 2;
+  initialize(inStreamParams) {
+    super.initialize(inStreamParams, {
+      frameSize: 2,
+    });
   }
 
   process(time, frame, metaData) {

@@ -4,7 +4,7 @@ export default class BaseLfo {
   /**
    * @todo - reverse arguments order, is weird
    */
-  constructor(options = {}, defaults = {}) {
+  constructor(defaults = {}, options = {}) {
     this.cid = id++;
     this.params = {};
 
@@ -43,44 +43,26 @@ export default class BaseLfo {
   }
 
   // initialize the current node stream and propagate to it's children
-  initialize() {
-    if (this.parent) {
-      // inherits parent's stream parameters by default
-      this.streamParams = Object.assign(this.streamParams, this.parent.streamParams);
-    }
-
-    // entry point for stream params configuration in derived class
-    this.configureStream();
+  initialize(inStreamParams = {}, outStreamParams = {}) {
+    Object.assign(this.streamParams, inStreamParams, outStreamParams);
 
     // create the `outFrame` arrayBuffer
     this.setupStream();
 
     // propagate initialization in lfo chain
     for (let i = 0, l = this.children.length; i < l; i++) {
-      this.children[i].initialize();
+      this.children[i].initialize(this.streamParams);
     }
   }
 
-  // sources only
-  // start() {
-  //   this.initialize();
-  //   this.reset();
-  // }
-
-  /**
-   * override inherited streamParams, only if specified in `params`
-   */
-  configureStream() { }
-
   /**
    * create the outputFrame according to the `streamParams`
-   * @NOTE remove commented code ?
    */
-  setupStream(/* opts = {} */) {
-    // if (opts.frameRate) { this.streamParams.frameRate = opts.frameRate; }
-    // if (opts.frameSize) { this.streamParams.frameSize = opts.frameSize; }
-    // if (opts.sourceSampleRate) { this.streamParams.sourceSampleRate = opts.sourceSampleRate; }
-    this.outFrame = new Float32Array(this.streamParams.frameSize);
+  setupStream() {
+    const frameSize = this.streamParams.frameSize;
+
+    if(frameSize > 0)
+      this.outFrame = new Float32Array(frameSize);
   }
 
   // reset `outFrame` and call reset on children
@@ -98,14 +80,10 @@ export default class BaseLfo {
     }
   }
 
-  // fill the on-going buffer with 0 (is done)
-  // output it, then call reset on all the children (sure ?)
-  // @NOTE: `reset` is called in `sources.start`,
-  //  if is called here, it will be called more than once in a child node
-  //  is this a problem ?
-  finalize() {
+  // finalize stream
+  finalize(endTime) {
     for (let i = 0, l = this.children.length; i < l; i++) {
-      this.children[i].finalize();
+      this.children[i].finalize(endTime);
     }
   }
 

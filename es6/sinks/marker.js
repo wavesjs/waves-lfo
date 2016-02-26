@@ -4,13 +4,11 @@ import { getRandomColor } from '../utils/draw-utils';
 
 export default class Marker extends BaseDraw {
   constructor(options) {
-    const defaults = {
+    super({
       frameSize: 1,
       color: getRandomColor(),
       threshold: 0,
-    };
-
-    super(options, defaults);
+    }, options);
   }
 
   drawCurve(frame, prevFrame, iShift) {
