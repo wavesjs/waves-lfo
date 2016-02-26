@@ -31,7 +31,7 @@ export default class EventIn extends BaseLfo {
       frameSize: this.params.frameSize,
       frameRate: this.params.frameRate,
       sourceSampleRate: this.params.frameRate,
-    }
+    });
   }
 
   start() {

@@ -23,7 +23,7 @@ export default class SocketClient extends BaseLfo {
     super.initialize(undefined, {
       frameSize: this.params.frameSize,
       frameRate: this.params.frameRate,
-    }
+    });
   }
 
   initConnection() {
