@@ -1,5 +1,3 @@
-'use strict';
-
 import BaseDraw from './base-draw';
 import { getRandomColor } from '../utils/draw-utils';
 
@@ -22,9 +20,9 @@ export default class Bpf extends BaseDraw {
     // create an array of colors according to the `outFrame` size
     if (!this.params.colors) {
       this.params.colors = [];
-      for (var i = 0, l = this.streamParams.frameSize; i < l; i++) {
+
+      for (let i = 0, l = this.streamParams.frameSize; i < l; i++)
         this.params.colors.push(getRandomColor());
-      }
     }
   }
 
@@ -39,19 +37,19 @@ export default class Bpf extends BaseDraw {
     this.lastShiftError = 0;
   }
 
-  process(time, frame) {
-    // @TODO: compare dt - if dt < fps return; (?)
-    if (this.params.trigger) {
+  executeDraw(time, frame) {
+    if (this.params.trigger)
       this.triggerModeDraw(time, frame);
-    } else {
+    else
       this.scrollModeDraw(time, frame);
-    }
 
     super.process(time, frame);
   }
 
-  // add an alternative drawing mode
-  // draw from left to right, go back to left when > width
+  /**
+   * Alternative drawing mode.
+   * Draw from left to right, go back to left when > width
+   */
   triggerModeDraw(time, frame) {
     const width  = this.params.width;
     const height = this.params.height;
@@ -85,12 +83,11 @@ export default class Bpf extends BaseDraw {
     }
   }
 
-  // implements drawCurve
   drawCurve(frame, prevFrame, iShift) {
     const colors = this.params.colors;
     const ctx = this.ctx;
     const radius = this.params.radius;
-    // @TODO this can and should be abstracted
+
     for (var i = 0, l = frame.length; i < l; i++) {
       ctx.save();
       // color should bechosen according to index

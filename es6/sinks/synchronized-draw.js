@@ -6,7 +6,7 @@
 export default class SynchronizedDraw {
   constructor(...views) {
     this.views = [];
-    this.add.apply(this, views);
+    this.add(...views);
   }
 
   add(...views) {

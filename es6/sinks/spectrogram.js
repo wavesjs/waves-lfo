@@ -1,14 +1,16 @@
 import BaseDraw from './base-draw';
 import { getRandomColor } from '../utils/draw-utils';
 
-
 export default class Spectrogram extends BaseDraw {
   constructor(options) {
     super(options, {
       min: 0,
       max: 1,
-      scale: 1
+      scale: 1,
+      color: getRandomColor(),
     });
+
+    super(options, defaults);
   }
 
   set scale(value) {
@@ -17,27 +19,6 @@ export default class Spectrogram extends BaseDraw {
 
   get scale() {
     return this.params.scale;
-  }
-
-  initialize() {
-    super.initialize();
-
-    this._rafFlag = true;
-    if (!this.params.color) { this.params.color = getRandomColor(); }
-  }
-
-  finalize() {
-    super.finalize();
-    this._rafFlag = false;
-  }
-
-  process(time, frame, metaData) {
-    if (this._rafFlag) {
-      this._rafFlag = false;
-      requestAnimationFrame(() => this.drawCurve(frame));
-    }
-
-    super.process(time, frame, metaData);
   }
 
   drawCurve(frame) {
@@ -52,12 +33,10 @@ export default class Spectrogram extends BaseDraw {
     ctx.clearRect(0, 0, width, height);
 
     for (let i = 0; i < nbrBins; i++) {
-      const x = i / nbrBins * width;
+      const x = Math.round(i / nbrBins * width);
       const y = this.getYPosition(frame[i] * scale);
 
       ctx.fillRect(x, y, binWidth, height - y);
     }
-
-    this._rafFlag = true;
   }
 }

@@ -5,21 +5,11 @@ export default class Trace extends BaseDraw {
 
   constructor(options) {
     const defaults = {
-      colorScheme: 'none' // color, opacity
+      colorScheme: 'none', // color, opacity
+      color: getRandomColor(),
     };
 
     super(options, defaults);
-  }
-
-  initialize() {
-    super.initialize();
-
-    if (!this.params.color) { this.params.color = getRandomColor(); }
-  }
-
-  process(time, frame) {
-    this.scrollModeDraw(time, frame);
-    super.process(time, frame);
   }
 
   drawCurve(frame, prevFrame, iShift) {
@@ -48,11 +38,10 @@ export default class Trace extends BaseDraw {
       case 'hue':
         gradient = ctx.createLinearGradient(-iShift, 0, 0, 0);
 
-        if (prevFrame) {
+        if (prevFrame)
           gradient.addColorStop(0, 'hsl(' + getHue(prevFrame[2]) + ', 100%, 50%)');
-        } else {
+        else
           gradient.addColorStop(0, 'hsl(' + getHue(frame[2]) + ', 100%, 50%)');
-        }
 
         gradient.addColorStop(1, 'hsl(' + getHue(frame[2]) + ', 100%, 50%)');
         ctx.fillStyle = gradient;
@@ -61,11 +50,10 @@ export default class Trace extends BaseDraw {
         const rgb = hexToRGB(this.params.color);
         gradient = ctx.createLinearGradient(-iShift, 0, 0, 0);
 
-        if (prevFrame) {
+        if (prevFrame)
           gradient.addColorStop(0, 'rgba(' + rgb.join(',') + ',' + prevFrame[2] + ')');
-        } else {
+        else
           gradient.addColorStop(0, 'rgba(' + rgb.join(',') + ',' + frame[2] + ')');
-        }
 
         gradient.addColorStop(1, 'rgba(' + rgb.join(',') + ',' + frame[2] + ')');
         ctx.fillStyle = gradient;

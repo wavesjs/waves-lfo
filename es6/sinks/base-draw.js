@@ -39,53 +39,33 @@ export default class BaseDraw extends BaseLfo {
     this.currentPartialShift = 0;
 
     this.resize(this.params.width, this.params.height);
-    // this._cache = [];
-    // this._rafId;
-    // this.draw = this.draw.bind(this);
+
+    //
+    this._stack;
+    this._rafId;
+    this.draw = this.draw.bind(this);
   }
 
-  // initialize() {
-  //   super.initialize();
-  //   // this._rafId = requestAnimationFrame(this.draw);
-  // }
-
-  // finalize() {
-  //   super.finalize();
-  //   // cancelAnimationFrame(this._rafId);
-  // }
-
-  // draw() {
-  //   console.log('draw', this._cache.length);
-  //   this._cache.forEach((infos) => {
-  //     console.log(infos);
-  //     this.scrollModeDraw(infos.time, infos.frame);
-  //   });
-
-  //   this._cache.length = 0;
-  //   this._rafId = requestAnimationFrame(this.draw);
-  // }
-
-  reset() {
-    super.reset();
-    this.ctx.clearRect(0, 0, this.params.width, this.params.height);
-    this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
+  // params modifiers
+  set duration(duration) {
+    this.params.duration = duration;
   }
 
-  setupStream() {
-    super.setupStream();
-    this.previousFrame = new Float32Array(this.streamParams.frameSize);
+  set min(min) {
+    this.params.min = min;
+    this._setYScale();
   }
 
-  resize(width, height) {
-    this.ctx.canvas.width  = this.cachedCtx.canvas.width  = this.params.width = width;
-    this.ctx.canvas.height = this.cachedCtx.canvas.height = this.params.height = height;
-    // clear cache canvas
-    this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
-    // update scale
-    this.setYScale();
+  set max(max) {
+    this.params.max = max;
+    this._setYScale();
   }
 
-  setYScale() {
+  /**
+   * Create the transfert function used to map values to pixel in the y axis
+   * @private
+   */
+  _setYScale() {
     const min = this.params.min;
     const max = this.params.max;
     const height = this.params.height;
@@ -96,24 +76,60 @@ export default class BaseDraw extends BaseLfo {
     this.getYPosition = (x) => a * x + b;
   }
 
-  // params modifiers
-  set duration(duration) {
-    this.params.duration = duration;
+  setupStream() {
+    super.setupStream();
+    // keep track of the previous frame
+    this.previousFrame = new Float32Array(this.streamParams.frameSize);
   }
 
-  set min(min) {
-    this.params.min = min;
-    this.setYScale();
+  initialize() {
+    super.initialize();
+    this._stack = [];
+    this._rafId = requestAnimationFrame(this.draw);
   }
 
-  set max(max) {
-    this.params.max = max;
-    this.setYScale();
+  reset() {
+    super.reset();
+    this.ctx.clearRect(0, 0, this.params.width, this.params.height);
+    this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
   }
 
-  // main process method
+  finalize() {
+    super.finalize();
+    cancelAnimationFrame(this._rafId);
+  }
+
+  /**
+   * Add the current frame to the frames to draw. Should not be overriden.
+   * @inheritdoc
+   * @final
+   */
   process(time, frame, metaData) {
-    super.process(time, frame, metaData);
+    this._stack.push({ time, frame, metaData });
+  }
+
+  draw() {
+    for (let i = 0, length = this._stack.length; i < length; i++) {
+      const event = this._stack[i];
+      this.executeDraw(event.time, event.frame);
+    }
+
+    // reinit stack for next call
+    this._stack.length = 0;
+    this._rafId = requestAnimationFrame(this.draw);
+  }
+
+  executeDraw(time, frame) {
+    this.scrollModeDraw(time, frame);
+  }
+
+  resize(width, height) {
+    this.ctx.canvas.width  = this.cachedCtx.canvas.width  = this.params.width = width;
+    this.ctx.canvas.height = this.cachedCtx.canvas.height = this.params.height = height;
+    // clear cache canvas
+    this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
+    // update scale
+    this._setYScale();
   }
 
   // default draw mode
@@ -132,9 +148,8 @@ export default class BaseDraw extends BaseLfo {
     this.shiftCanvas(partialShift);
 
     // shift all siblings if synchronized
-    if (this.params.isSynchronized && this.synchronizer) {
+    if (this.params.isSynchronized && this.synchronizer)
       this.synchronizer.shiftSiblings(partialShift, this);
-    }
 
     // translate to the current frame and draw a new polygon
     ctx.save();
@@ -169,14 +184,18 @@ export default class BaseDraw extends BaseLfo {
     ctx.restore();
   }
 
-  // Must implement the logic to draw the shape between
-  // the previous and the current frame.
-  // Assuming the context is centered on the current frame
+  /**
+   * Interface method to implement in order to define how to draw the shape
+   * between the previous and the current frame, assuming the canvas context
+   * is centered on the current frame.
+   * @param {Float32Array} frame - The current frame to draw.
+   * @param {Float32Array} prevFrame - The last frame.
+   * @param {Number} iShift - the number of pixels between the last and the current frame.
+   */
   drawCurve(frame, prevFrame, iShift) {
     console.error('must be implemented');
   }
 }
 
-module.exports = BaseDraw;
 
 

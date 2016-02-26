@@ -1,22 +1,16 @@
 import BaseDraw from './base-draw';
+import { getRandomColor } from '../utils/draw-utils';
 
 
 export default class Marker extends BaseDraw {
   constructor(options) {
     const defaults = {
       frameSize: 1,
-      color: '#ffffff',
+      color: getRandomColor(),
       threshold: 0,
     };
 
     super(options, defaults);
-
-    console.log(this.params.color, options);
-  }
-
-  process(time, frame, metaData) {
-    this.scrollModeDraw(time, frame);
-    super.process(time, frame, metaData);
   }
 
   drawCurve(frame, prevFrame, iShift) {
