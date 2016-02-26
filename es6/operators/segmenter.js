@@ -73,7 +73,7 @@ export default class Segmenter extends lfo.core.BaseLfo {
   }
 
   process(time, frame, metaData) {
-    const value = frame[0];
+    let value = frame[0];
 
     if(this.params.logInput)
       value = Math.log(value);

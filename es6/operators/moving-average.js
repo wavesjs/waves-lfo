@@ -42,12 +42,12 @@ export default class MovingAverage extends BaseLfo {
   }
 
   inputScalar(value) {
-    const order = this.params.order;
     const ringIndex = this.ringIndex;
     const nextRingIndex = (ringIndex + 1) % order;
     const ringOffset = ringIndex;
     const nextRingOffset = nextRingIndex;
     const ringBuffer = this.ringBuffer;
+    let order = this.params.order;
     let sum = this.sum;
 
     if (!this.params.zeroFill && this.ringCount < order) {
@@ -68,13 +68,13 @@ export default class MovingAverage extends BaseLfo {
   inputArray(frame) {
     const outFrame = this.outFrame;
     const frameSize = this.streamParams.frameSize;
-    const order = this.params.order;
     const ringIndex = this.ringIndex;
     const nextRingIndex = (ringIndex + 1) % order;
     const ringOffset = ringIndex * frameSize;
     const nextRingOffset = nextRingIndex * frameSize;
     const ring = this.ringBuffer;
     const sum = this.sum;
+    let order = this.params.order;
 
     if (!this.params.zeroFill && this.ringCount < order) {
       this.ringCount++;
