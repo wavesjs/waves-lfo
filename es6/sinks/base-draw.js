@@ -105,7 +105,11 @@ export default class BaseDraw extends BaseLfo {
    * @final
    */
   process(time, frame, metaData) {
-    this._stack.push({ time, frame, metaData });
+    const buffer = frame.buffer.slice(0); // copy values instead of reference
+    const copy = new Float32Array(buffer);
+    // console.log(copy);
+    // frame = frame.slice(0);
+    this._stack.push({ time, frame: copy, metaData });
   }
 
   draw() {
@@ -124,20 +128,52 @@ export default class BaseDraw extends BaseLfo {
   }
 
   resize(width, height) {
-    this.ctx.canvas.width  = this.cachedCtx.canvas.width  = this.params.width = width;
-    this.ctx.canvas.height = this.cachedCtx.canvas.height = this.params.height = height;
+    const ctx = this.ctx;
+    const cachedCtx = this.cachedCtx;
+
+    // @todo - fix this, problem with the cached canvas...
+    // http://www.html5rocks.com/en/tutorials/canvas/hidpi/
+    // const auto = true;
+    // const devicePixelRatio = window.devicePixelRatio || 1;
+    // const backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
+    //                     ctx.mozBackingStorePixelRatio ||
+    //                     ctx.msBackingStorePixelRatio ||
+    //                     ctx.oBackingStorePixelRatio ||
+    //                     ctx.backingStorePixelRatio || 1;
+
+    // if (auto && devicePixelRatio !== backingStoreRatio) {
+    //   const ratio = devicePixelRatio / backingStoreRatio;
+
+    //   this.params.width = width * ratio;
+    //   this.params.height = height * ratio;
+
+    //   ctx.canvas.width = cachedCtx.canvas.width = this.params.width;
+    //   ctx.canvas.height = cachedCtx.canvas.height = this.params.height;
+
+    //   ctx.canvas.style.width = `${width}px`;
+    //   ctx.canvas.style.height = `${height}px`;
+
+    //   ctx.scale(ratio, ratio);
+    // } else {
+      this.params.width = width;
+      this.params.height = height;
+
+      ctx.canvas.width = cachedCtx.canvas.width = width;
+      ctx.canvas.height = cachedCtx.canvas.height = height;
+    // }
+
     // clear cache canvas
-    this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
+    cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
     // update scale
     this._setYScale();
   }
 
   // default draw mode
   scrollModeDraw(time, frame) {
+    const ctx = this.ctx;
     const width = this.params.width;
     const height = this.params.height;
     const duration = this.params.duration;
-    const ctx = this.ctx;
 
     const dt = time - this.previousTime;
     const fShift = (dt / duration) * width - this.lastShiftError;
@@ -167,18 +203,20 @@ export default class BaseDraw extends BaseLfo {
   }
 
   shiftCanvas(shift) {
+    const ctx = this.ctx;
     const width = this.params.width;
     const height = this.params.height;
-    const ctx = this.ctx;
 
     this.currentPartialShift += shift;
 
     ctx.clearRect(0, 0, width, height);
     ctx.save();
 
+    const croppedWidth = width - this.currentPartialShift;
+
     ctx.drawImage(this.cachedCanvas,
-      this.currentPartialShift, 0, width - this.currentPartialShift, height,
-      0, 0, width - this.currentPartialShift, height
+      this.currentPartialShift, 0, croppedWidth, height,
+      0, 0, croppedWidth, height
     );
 
     ctx.restore();

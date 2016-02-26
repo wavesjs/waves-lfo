@@ -50,8 +50,12 @@ export default class AudioInNode extends AudioIn {
   process(e) {
     const block = e.inputBuffer.getChannelData(this.params.channel);
 
-    this.time += block.length / this.streamParams.sourceSampleRate;
-    this.outFrame.set(block, 0);
+    if (!this.blockDuration)
+      this.blockDuration = block.length / this.streamParams.sourceSampleRate;
+
+    this.time += ;
+    // console.log(this.ctx.currentTime, this.time);
+    this.outFrame = block;
     this.output();
   }
 }

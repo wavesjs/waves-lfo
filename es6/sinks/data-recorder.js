@@ -43,13 +43,12 @@ self.addEventListener('message', function(e) {
 
 export default class DataRecorder extends BaseLfo {
   constructor(options) {
-    const defaults = {
+    super(options, {
       // default format is [{time, data}, {time, data}]
       // if set to `true` format is { time: [...], data: [...] }
       separateArrays: false,
-    };
+    });
 
-    super(options, defaults);
     this._isStarted = false;
 
     // init worker
