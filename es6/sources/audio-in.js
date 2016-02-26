@@ -4,13 +4,10 @@ let audioContext; // for lazy audioContext creation
 
 export default class AudioIn extends BaseLfo {
 
-  constructor(options = {}) {
-    // defaults
-    const defaults = {
-      frameSize: 512,
-      channel: 0,
-    };
-
+  constructor(options = {}, defaults = {}) {
+    defaults.frameSize = 512;
+    defaults.channel = 0;
+    
     super(options, defaults);
 
     // private

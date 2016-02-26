@@ -5,12 +5,10 @@ import { decodeMessage } from '../utils/socket-utils';
 // @TODO: handle `start` and `stop`
 export default class SocketClient extends BaseLfo {
   constructor(options) {
-    var defaults = {
+    super(options, {
       port: 3031,
       address: window.location.hostname
-    };
-
-    super(options, defaults);
+    });
 
     this.socket = null;
     this.initConnection();

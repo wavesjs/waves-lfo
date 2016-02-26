@@ -90,12 +90,9 @@ let audioContext;
  */
 export default class AudioRecorder extends BaseLfo {
   constructor(options) {
-    const defaults = {
+    super(options, {
       duration: 10, // seconds
-    };
-
-    super(options, defaults);
-    this.metaData = {};
+    });
 
     // needed to retrive an AudioBuffer
     if (!this.params.ctx) {

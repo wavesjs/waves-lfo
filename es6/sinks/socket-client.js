@@ -6,12 +6,10 @@ import { encodeMessage } from '../utils/socket-utils';
 // @NOTE: does it need to implement some ping process to maintain connection ?
 export default class SocketClient extends BaseLfo {
   constructor(options) {
-    var defaults = {
+    super(options, {
       port: 3030,
       address: window.location.hostname
-    };
-
-    super(options, defaults);
+    });
 
     this.socket = null;
     this.initConnection();

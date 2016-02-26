@@ -13,12 +13,9 @@ import BaseLfo from '../core/base-lfo';
 
 export default class EventIn extends BaseLfo {
   constructor(options) {
-
-    var defaults = {
+    super(options, {
       timeType: 'absolute'
-    };
-    // cannot have previous
-    super(options, defaults);
+    });
 
     // test AudioContext for use in node environment
     if (!this.params.ctx && (typeof process === 'undefined')) {

@@ -4,11 +4,9 @@ import { getRandomColor } from '../utils/draw-utils';
 let counter = 0;
 export default class Sonogram extends BaseDraw {
   constructor(options) {
-    const defaults = {
+    super(options, {
       scale: 1
-    };
-
-    super(options, defaults);
+    });
   }
 
   set scale(value) {

@@ -16,7 +16,6 @@ import BaseLfo from '../core/base-lfo';
  *
  */
 export default class Operator extends BaseLfo {
-
   constructor(options) {
     super(options, {});
 

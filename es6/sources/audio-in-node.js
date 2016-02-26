@@ -6,13 +6,9 @@ import AudioIn from './audio-in';
 export default class AudioInNode extends AudioIn {
 
   constructor(options = {}) {
-    const defaults = {
+    super(options, {
       timeType: 'absolute',
-    };
-
-    super(options);
-
-    this.metaData = {};
+    });
   }
 
   configureStream() {
