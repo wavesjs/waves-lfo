@@ -2,8 +2,7 @@ import BaseLfo from '../core/base-lfo';
 
 export default class Max extends BaseLfo {
   constructor(options) {
-    const defaults = {};
-    super(options, defaults);
+    super(options, {});
   }
 
   configureStream() {
@@ -11,19 +10,8 @@ export default class Max extends BaseLfo {
   }
 
   process(time, frame, metaData) {
-    let max = -Infinity;
-    let value;
-    const length = frame.length;
-
-    for (let i = 0; i < length; i++) {
-      value = frame[i];
-
-      if (value > max)
-        max = value;
-    }
-
     this.time = time;
-    this.outFrame[0] = max;
+    this.outFrame[0] = Math.max.apply(null, frame);
     this.metaData = metaData;
 
     this.output();
