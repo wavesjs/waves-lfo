@@ -1,11 +1,11 @@
-
 import BaseLfo from '../core/base-lfo';
 
 export default class Magnitude extends BaseLfo {
 
   constructor(options) {
     const defaults = {
-      normalize: false
+      normalize: true,
+      power: false,
     };
 
     super(options, defaults);
@@ -15,7 +15,8 @@ export default class Magnitude extends BaseLfo {
     this.streamParams.frameSize = 1;
   }
 
-  process(time, frame, metaData) {
+  inputArray(frame) {
+    const outFrame = this.outFrame;
     const frameSize = frame.length;
     let sum = 0;
 
@@ -23,15 +24,23 @@ export default class Magnitude extends BaseLfo {
       sum += (frame[i] * frame[i]);
     }
 
+    let mag = sum;
+
     if (this.params.normalize) {
-      // sum is a mean here (for rms)
-      sum /= frameSize;
+      mag /= frameSize;
     }
 
-    this.time = time;
-    this.outFrame[0] = Math.sqrt(sum);
-    this.metaData = metaData;
+    if (!this.params.power) {
+      mag = Math.sqrt(mag);
+    }
 
-    this.output();
+    outFrame[0] = mag;
+
+    return outFrame;
+  }
+
+  process(time, frame, metaData) {
+    this.inputArray(frame);
+    this.output(time, this.outFrame, metaData);
   }
 }
