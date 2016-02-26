@@ -291,14 +291,12 @@ function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
 export default class Biquad extends BaseLfo {
 
   constructor(options) {
-    var defaults = {
+    super(options, {
       filterType:'lowpass',
       f0: 1.0,
       gain: 1.0,
       q: 1.0
-    };
-
-    super(options, defaults);
+    });
     // this.type = 'biquad';
 
     // from here on options is this.params

@@ -5,8 +5,7 @@ import BaseLfo from '../core/base-lfo';
  */
 export default class MinMax extends BaseLfo {
   constructor(options) {
-    const defaults = {};
-    super(options, defaults);
+    super(options, {});
   }
 
   configureStream() {

@@ -3,7 +3,6 @@ import jsfft from 'jsfft';
 import complexArray from 'jsfft/lib/complex_array';
 import initWindow from '../utils/fft-windows';
 
-
 // const PI   = Math.PI;
 // const cos  = Math.cos;
 // const sin  = Math.sin;
@@ -19,13 +18,11 @@ const isPowerOfTwo = function(number) {
 
 export default class Fft extends BaseLfo {
   constructor(options) {
-    const defaults = {
+    super(options, {
       fftSize: 1024,
       windowName: 'hann',
       outType: 'magnitude'
-    };
-
-    super(options, defaults);
+    });
 
     if (!isPowerOfTwo(this.params.fftSize)) {
       throw new Error('fftSize must be a power of two');
@@ -122,8 +119,3 @@ export default class Fft extends BaseLfo {
     this.output();
   }
 }
-
-
-
-
-
