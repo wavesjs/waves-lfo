@@ -55,6 +55,7 @@ self.addEventListener('message', function(e) {
       var block = new Float32Array(e.data.buffer);
       append(block);
 
+
       // if the buffer is full return it, only works with finite buffers
       if (!isInfiniteBuffer && currentIndex === bufferLength) {
         var buf = buffer.buffer.slice(0);
@@ -92,6 +93,7 @@ export default class AudioRecorder extends BaseLfo {
   constructor(options) {
     super({
       duration: 10, // seconds
+      ignoreLeadingZeros: true, // ignore zeros at the beginning of the recoarding
     }, options);
 
     // needed to retrive an AudioBuffer
@@ -101,6 +103,9 @@ export default class AudioRecorder extends BaseLfo {
     } else {
       this.ctx = this.params.ctx;
     }
+
+    this._isStarted = false;
+    this._ignoreZeros = false;
 
     const blob = new Blob([worker], { type: 'text/javascript' });
     this.worker = new Worker(window.URL.createObjectURL(blob));
@@ -119,6 +124,9 @@ export default class AudioRecorder extends BaseLfo {
 
   start() {
     this._isStarted = true;
+    this._ignoreZeros = this.params.ignoreLeadingZeros;
+
+    this.count = 0;
   }
 
   stop() {
@@ -138,13 +146,31 @@ export default class AudioRecorder extends BaseLfo {
     if (!this._isStarted) { return; }
     // `this.outFrame` must be recreated each time because
     // it is copied in the worker and lost for this context
-    this.outFrame = new Float32Array(frame);
+    let sendFrame = null;
 
-    const buffer = this.outFrame.buffer;
-    this.worker.postMessage({
-      command: 'process',
-      buffer: buffer
-    }, [buffer]);
+    if (!this._ignoreZeros) {
+      sendFrame = new Float32Array(frame);
+    } else if (frame[frame.length - 1] !== 0) {
+      const len = frame.length;
+      let i;
+
+      for (i = 0; i < len; i++) {
+        if (frame[i] !== 0)
+          break;
+      }
+
+      // copy non zero segment
+      sendFrame = new Float32Array(frame.subarray(i));
+      this._ignoreZeros = false;
+    }
+
+    if (sendFrame) {
+      const buffer = sendFrame.buffer;
+      this.worker.postMessage({
+        command: 'process',
+        buffer: buffer
+      }, [buffer]);
+    }
   }
 
   /**

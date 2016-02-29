@@ -72,6 +72,7 @@ export default class DataRecorder extends BaseLfo {
 
   stop() {
     if (this._isStarted) {
+      console.log('worker:stop');
       this.worker.postMessage({ command: 'stop' });
       this._isStarted = false;
     }
@@ -92,7 +93,6 @@ export default class DataRecorder extends BaseLfo {
       time: time,
       buffer: buffer,
     }, [buffer]);
-
   }
 
   retrieve() {

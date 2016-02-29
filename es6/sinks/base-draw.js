@@ -2,7 +2,7 @@ import BaseLfo from '../core/base-lfo';
 
 
 export default class BaseDraw extends BaseLfo {
-  constructor(options = {}, extendDefaults = {}) {
+  constructor(extendDefaults = {}, options = {}) {
     const defaults = Object.assign({
       duration: 1,
       min: -1,
@@ -94,8 +94,8 @@ export default class BaseDraw extends BaseLfo {
     this.cachedCtx.clearRect(0, 0, this.params.width, this.params.height);
   }
 
-  finalize(endTime) {
-    super.finalize(endTime);
+  finalize(endTime  ) {
+    super.finalize(endTime  );
     cancelAnimationFrame(this._rafId);
   }
 

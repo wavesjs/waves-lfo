@@ -6,15 +6,36 @@ export default class Segmenter extends BaseLfo {
   constructor(options) {
     super({
       logInput: false,
-      minInput: 0.000001,
+      minInput: 0.000000000001,
       filterOrder: 5,
-      threshold: 0.5,
+      threshold: 3,
       offThreshold: -Infinity,
       minInter: 0.050,
       maxDuration: Infinity,
     }, options);
 
-    this.movingAverage = new MovingAverage({ order: this.params.filterOrder });
+    this.insideSegment = false;
+    this.onsetTime = -Infinity;
+
+    // stats
+    this.min = Infinity;
+    this.max = -Infinity;
+    this.sum = 0;
+    this.sumOfSquares = 0;
+    this.count = 0;
+
+    const minInput = this.params.minInput;
+    let fill = minInput;
+
+    if(this.params.logInput && minInput > 0)
+      fill = Math.log(minInput);
+
+    this.movingAverage = new MovingAverage({
+      order: this.params.filterOrder,
+      fill: fill,
+    });
+
+    this.lastMvavrg = fill;
   }
 
   set threshold(value) {
@@ -38,28 +59,34 @@ export default class Segmenter extends BaseLfo {
   }
 
   outputSegment(endTime) {
-    this.outFrame[0] = this.max;
+    this.outFrame[0] = endTime - this.onsetTime;
     this.outFrame[1] = this.min;
+    this.outFrame[2] = this.max;
 
     const norm = 1 / this.count;
     const mean = this.sum * norm;
     const meanOfSquare = this.sumOfSquares * norm;
     const squareOfmean = mean * mean;
 
-    this.outFrame[2] = mean;
-    this.outFrame[3] = 0;
+    this.outFrame[3] = mean;
+    this.outFrame[4] = 0;
 
     if (meanOfSquare > squareOfmean)
-      this.outFrame[3] = Math.sqrt(meanOfSquare - squareOfmean);
-
-    this.metaData.duration = endTime - this.onsetTime;
+      this.outFrame[4] = Math.sqrt(meanOfSquare - squareOfmean);
 
     this.output(this.onsetTime);
   }
 
   initialize(inStreamParams) {
     super.initialize(inStreamParams, {
-      frameSize: 4,
+      frameSize: 5,
+      description: [
+        'duration',
+        'min',
+        'max',
+        'mean',
+        'std dev',
+      ],
     });
 
     this.movingAverage.initialize(inStreamParams);
@@ -72,10 +99,10 @@ export default class Segmenter extends BaseLfo {
   }
 
   finalize(endTime) {
-    super.finalize(endTime);
-
     if (this.insideSegment)
       this.outputSegment(endTime);
+
+    super.finalize(endTime);
   }
 
   process(time, frame, metaData) {
@@ -86,8 +113,8 @@ export default class Segmenter extends BaseLfo {
     if (this.params.logInput)
       value = Math.log(value);
 
-    const mvavrg = this.movingAverage.inputScalar(value);
-    const diff = value - mvavrg;
+    const diff = value - this.lastMvavrg;
+    this.lastMvavrg = this.movingAverage.inputScalar(value);
 
     this.metaData = metaData;
 
