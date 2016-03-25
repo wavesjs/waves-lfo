@@ -36,12 +36,24 @@ export default class Spectrogram extends BaseDraw {
     ctx.fillStyle = this.params.color;
     ctx.clearRect(0, 0, width, height);
 
+    // error handling needs review...
     let error = 0;
 
     for (let i = 0; i < nbrBins; i++) {
-      const x = Math.round(i * binWidth);
-      const y = this.getYPosition(frame[i] * scale);
-      ctx.fillRect(x, y, binWidth, height - y);
+      const x1Float = i * binWidth + error;
+      const x1Int = Math.round(x1Float);
+      const x2Float = x1Float + (binWidth - error);
+      const x2Int = Math.round(x2Float);
+
+      error = x2Int - x2Float;
+
+      if (x1Int !== x2Int) {
+        const width = x2Int - x1Int;
+        const y = this.getYPosition(frame[i] * scale);
+        ctx.fillRect(x1Int, y, width, height - y);
+      } else {
+        error -= binWidth;
+      }
     }
   }
 }
