@@ -61,7 +61,7 @@ export default class BaseLfo {
   setupStream() {
     const frameSize = this.streamParams.frameSize;
 
-    if(frameSize > 0)
+    if (frameSize > 0)
       this.outFrame = new Float32Array(frameSize);
   }
 

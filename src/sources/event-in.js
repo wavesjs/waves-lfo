@@ -50,16 +50,16 @@ export default class EventIn extends BaseLfo {
 
     const currentTime = this.params.ctx.currentTime;
     // if no time provided, use audioContext.currentTime
-    var frameTime = !isNaN(parseFloat(time)) && isFinite(time) ?
+    time = !isNaN(parseFloat(time)) && isFinite(time) ?
       time : currentTime;
 
     // set `startTime` if first call after a `start`
     if (!this._startTime)
-      this._startTime = frameTime;
+      this._startTime = time;
 
     // handle time according to config
     if (this.params.absoluteTime === false)
-      frameTime = time - this._startTime;
+      time = time - this._startTime;
 
     // if scalar, create a vector
     if (frame.length === undefined)
@@ -67,9 +67,8 @@ export default class EventIn extends BaseLfo {
 
     // works if frame is an array
     this.outFrame.set(frame, 0);
-    this.time = frameTime;
+    this.time = time;
     this.metaData = metaData;
-
     this._lastTime = currentTime;
 
     this.output();
