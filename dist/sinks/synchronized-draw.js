@@ -1,27 +1,34 @@
-/**
- * is used to keep several draw in sync
- * when a view is installed in a synchronized draw
- * the meta view is installed as a member of all it's children
- */
 "use strict";
-
-var _createClass = require("babel-runtime/helpers/create-class")["default"];
-
-var _classCallCheck = require("babel-runtime/helpers/class-call-check")["default"];
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var SynchronizedDraw = (function () {
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require("babel-runtime/helpers/createClass");
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * is used to keep several draw in sync
+ * when a view is installed in a synchronized draw
+ * the meta view is installed as a member of all it's children
+ */
+
+var SynchronizedDraw = function () {
   function SynchronizedDraw() {
-    _classCallCheck(this, SynchronizedDraw);
+    (0, _classCallCheck3.default)(this, SynchronizedDraw);
 
     this.views = [];
     this.add.apply(this, arguments);
   }
 
-  _createClass(SynchronizedDraw, [{
+  (0, _createClass3.default)(SynchronizedDraw, [{
     key: "add",
     value: function add() {
       var _this = this;
@@ -52,10 +59,8 @@ var SynchronizedDraw = (function () {
       });
     }
   }]);
-
   return SynchronizedDraw;
-})();
+}();
 
-exports["default"] = SynchronizedDraw;
-module.exports = exports["default"];
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImVzNi9zaW5rcy9zeW5jaHJvbml6ZWQtZHJhdy5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7SUFLcUIsZ0JBQWdCO0FBQ3hCLFdBRFEsZ0JBQWdCLEdBQ2I7MEJBREgsZ0JBQWdCOztBQUVqQyxRQUFJLENBQUMsS0FBSyxHQUFHLEVBQUUsQ0FBQztBQUNoQixRQUFJLENBQUMsR0FBRyxNQUFBLENBQVIsSUFBSSxZQUFjLENBQUM7R0FDcEI7O2VBSmtCLGdCQUFnQjs7V0FNaEMsZUFBVzs7O3dDQUFQLEtBQUs7QUFBTCxhQUFLOzs7QUFDVixXQUFLLENBQUMsT0FBTyxDQUFDLFVBQUEsSUFBSSxFQUFJO0FBQUUsY0FBSyxPQUFPLENBQUMsSUFBSSxDQUFDLENBQUM7T0FBRSxDQUFDLENBQUM7S0FDaEQ7OztXQUVNLGlCQUFDLElBQUksRUFBRTtBQUNaLFVBQUksQ0FBQyxLQUFLLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO0FBQ3RCLFVBQUksQ0FBQyxNQUFNLENBQUMsY0FBYyxHQUFHLElBQUksQ0FBQztBQUNsQyxVQUFJLENBQUMsWUFBWSxHQUFHLElBQUksQ0FBQztLQUMxQjs7O1dBRVksdUJBQUMsTUFBTSxFQUFFLElBQUksRUFBRTtBQUMxQixVQUFJLENBQUMsS0FBSyxDQUFDLE9BQU8sQ0FBQyxVQUFDLEtBQUssRUFBSztBQUM1QixZQUFJLEtBQUssS0FBSyxJQUFJLEVBQUU7QUFBRSxpQkFBTztTQUFFO0FBQy9CLGFBQUssQ0FBQyxXQUFXLENBQUMsTUFBTSxDQUFDLENBQUM7T0FDM0IsQ0FBQyxDQUFDO0tBQ0o7OztTQXJCa0IsZ0JBQWdCOzs7cUJBQWhCLGdCQUFnQiIsImZpbGUiOiJlczYvc2lua3Mvc3luY2hyb25pemVkLWRyYXcuanMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIGlzIHVzZWQgdG8ga2VlcCBzZXZlcmFsIGRyYXcgaW4gc3luY1xuICogd2hlbiBhIHZpZXcgaXMgaW5zdGFsbGVkIGluIGEgc3luY2hyb25pemVkIGRyYXdcbiAqIHRoZSBtZXRhIHZpZXcgaXMgaW5zdGFsbGVkIGFzIGEgbWVtYmVyIG9mIGFsbCBpdCdzIGNoaWxkcmVuXG4gKi9cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIFN5bmNocm9uaXplZERyYXcge1xuICBjb25zdHJ1Y3RvciguLi52aWV3cykge1xuICAgIHRoaXMudmlld3MgPSBbXTtcbiAgICB0aGlzLmFkZCguLi52aWV3cyk7XG4gIH1cblxuICBhZGQoLi4udmlld3MpIHtcbiAgICB2aWV3cy5mb3JFYWNoKHZpZXcgPT4geyB0aGlzLmluc3RhbGwodmlldyk7IH0pO1xuICB9XG5cbiAgaW5zdGFsbCh2aWV3KSB7XG4gICAgdGhpcy52aWV3cy5wdXNoKHZpZXcpO1xuICAgIHZpZXcucGFyYW1zLmlzU3luY2hyb25pemVkID0gdHJ1ZTtcbiAgICB2aWV3LnN5bmNocm9uaXplciA9IHRoaXM7XG4gIH1cblxuICBzaGlmdFNpYmxpbmdzKGlTaGlmdCwgdmlldykge1xuICAgIHRoaXMudmlld3MuZm9yRWFjaCgoY2hpbGQpID0+IHtcbiAgICAgIGlmIChjaGlsZCA9PT0gdmlldykgeyByZXR1cm47IH1cbiAgICAgIGNoaWxkLnNoaWZ0Q2FudmFzKGlTaGlmdCk7XG4gICAgfSk7XG4gIH1cbn1cbiJdfQ==
+exports.default = SynchronizedDraw;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInN5bmNocm9uaXplZC1kcmF3LmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7SUFLcUI7QUFDbkIsV0FEbUIsZ0JBQ25CLEdBQXNCO3dDQURILGtCQUNHOztBQUNwQixTQUFLLEtBQUwsR0FBYSxFQUFiLENBRG9CO0FBRXBCLFNBQUssR0FBTCx3QkFGb0I7R0FBdEI7OzZCQURtQjs7MEJBTUw7Ozt3Q0FBUDs7T0FBTzs7QUFDWixZQUFNLE9BQU4sQ0FBYyxnQkFBUTtBQUFFLGNBQUssT0FBTCxDQUFhLElBQWIsRUFBRjtPQUFSLENBQWQsQ0FEWTs7Ozs0QkFJTixNQUFNO0FBQ1osV0FBSyxLQUFMLENBQVcsSUFBWCxDQUFnQixJQUFoQixFQURZO0FBRVosV0FBSyxNQUFMLENBQVksY0FBWixHQUE2QixJQUE3QixDQUZZO0FBR1osV0FBSyxZQUFMLEdBQW9CLElBQXBCLENBSFk7Ozs7a0NBTUEsUUFBUSxNQUFNO0FBQzFCLFdBQUssS0FBTCxDQUFXLE9BQVgsQ0FBbUIsVUFBQyxLQUFELEVBQVc7QUFDNUIsWUFBSSxVQUFVLElBQVYsRUFBZ0I7QUFBRSxpQkFBRjtTQUFwQjtBQUNBLGNBQU0sV0FBTixDQUFrQixNQUFsQixFQUY0QjtPQUFYLENBQW5CLENBRDBCOzs7U0FoQlQiLCJmaWxlIjoic3luY2hyb25pemVkLWRyYXcuanMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIGlzIHVzZWQgdG8ga2VlcCBzZXZlcmFsIGRyYXcgaW4gc3luY1xuICogd2hlbiBhIHZpZXcgaXMgaW5zdGFsbGVkIGluIGEgc3luY2hyb25pemVkIGRyYXdcbiAqIHRoZSBtZXRhIHZpZXcgaXMgaW5zdGFsbGVkIGFzIGEgbWVtYmVyIG9mIGFsbCBpdCdzIGNoaWxkcmVuXG4gKi9cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIFN5bmNocm9uaXplZERyYXcge1xuICBjb25zdHJ1Y3RvciguLi52aWV3cykge1xuICAgIHRoaXMudmlld3MgPSBbXTtcbiAgICB0aGlzLmFkZCguLi52aWV3cyk7XG4gIH1cblxuICBhZGQoLi4udmlld3MpIHtcbiAgICB2aWV3cy5mb3JFYWNoKHZpZXcgPT4geyB0aGlzLmluc3RhbGwodmlldyk7IH0pO1xuICB9XG5cbiAgaW5zdGFsbCh2aWV3KSB7XG4gICAgdGhpcy52aWV3cy5wdXNoKHZpZXcpO1xuICAgIHZpZXcucGFyYW1zLmlzU3luY2hyb25pemVkID0gdHJ1ZTtcbiAgICB2aWV3LnN5bmNocm9uaXplciA9IHRoaXM7XG4gIH1cblxuICBzaGlmdFNpYmxpbmdzKGlTaGlmdCwgdmlldykge1xuICAgIHRoaXMudmlld3MuZm9yRWFjaCgoY2hpbGQpID0+IHtcbiAgICAgIGlmIChjaGlsZCA9PT0gdmlldykgeyByZXR1cm47IH1cbiAgICAgIGNoaWxkLnNoaWZ0Q2FudmFzKGlTaGlmdCk7XG4gICAgfSk7XG4gIH1cbn1cbiJdfQ==

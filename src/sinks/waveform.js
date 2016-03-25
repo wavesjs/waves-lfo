@@ -19,7 +19,6 @@ export default class Waveform extends BaseDraw {
     ctx.fillStyle = this.params.color;
     ctx.beginPath();
 
-    // console.log(this.getYPosition(0));
     ctx.moveTo(0, this.getYPosition(0));
     ctx.lineTo(0, max);
 

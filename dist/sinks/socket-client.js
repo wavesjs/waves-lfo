@@ -1,48 +1,61 @@
 'use strict';
 
-var _get = require('babel-runtime/helpers/get')['default'];
-
-var _inherits = require('babel-runtime/helpers/inherits')['default'];
-
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
-
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _coreBaseLfo = require('../core/base-lfo');
+var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
-var _coreBaseLfo2 = _interopRequireDefault(_coreBaseLfo);
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
 
-var _utilsSocketUtils = require('../utils/socket-utils');
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+var _baseLfo = require('../core/base-lfo');
+
+var _baseLfo2 = _interopRequireDefault(_baseLfo);
+
+var _socketUtils = require('../utils/socket-utils');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // send an Lfo stream from the browser over the network
 // through a WebSocket - should be paired with a SocketSourceServer
 // @NOTE: does it need to implement some ping process to maintain connection ?
 
-var SocketClient = (function (_BaseLfo) {
-  _inherits(SocketClient, _BaseLfo);
+var SocketClient = function (_BaseLfo) {
+  (0, _inherits3.default)(SocketClient, _BaseLfo);
 
   function SocketClient(options) {
-    _classCallCheck(this, SocketClient);
+    (0, _classCallCheck3.default)(this, SocketClient);
 
-    _get(Object.getPrototypeOf(SocketClient.prototype), 'constructor', this).call(this, {
+    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(SocketClient).call(this, {
       port: 3030,
       address: window.location.hostname
-    }, options);
+    }, options));
 
-    this.socket = null;
-    this.initConnection();
+    _this.socket = null;
+    _this.initConnection();
+    return _this;
   }
 
-  _createClass(SocketClient, [{
+  (0, _createClass3.default)(SocketClient, [{
     key: 'initConnection',
     value: function initConnection() {
-      var _this = this;
+      var _this2 = this;
 
       var socketAddr = 'ws://' + this.params.address + ':' + this.params.port;
       this.socket = new WebSocket(socketAddr);
@@ -50,7 +63,7 @@ var SocketClient = (function (_BaseLfo) {
 
       // callback to start to when WebSocket is connected
       this.socket.onopen = function () {
-        _this.params.onopen();
+        _this2.params.onopen();
       };
 
       this.socket.onclose = function () {};
@@ -64,14 +77,12 @@ var SocketClient = (function (_BaseLfo) {
   }, {
     key: 'process',
     value: function process(time, frame, metaData) {
-      var buffer = (0, _utilsSocketUtils.encodeMessage)(time, frame, metaData);
+      var buffer = (0, _socketUtils.encodeMessage)(time, frame, metaData);
       this.socket.send(buffer);
     }
   }]);
-
   return SocketClient;
-})(_coreBaseLfo2['default']);
+}(_baseLfo2.default);
 
-exports['default'] = SocketClient;
-module.exports = exports['default'];
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImVzNi9zaW5rcy9zb2NrZXQtY2xpZW50LmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7MkJBQW9CLGtCQUFrQjs7OztnQ0FDUix1QkFBdUI7Ozs7OztJQUtoQyxZQUFZO1lBQVosWUFBWTs7QUFDcEIsV0FEUSxZQUFZLENBQ25CLE9BQU8sRUFBRTswQkFERixZQUFZOztBQUU3QiwrQkFGaUIsWUFBWSw2Q0FFdkI7QUFDSixVQUFJLEVBQUUsSUFBSTtBQUNWLGFBQU8sRUFBRSxNQUFNLENBQUMsUUFBUSxDQUFDLFFBQVE7S0FDbEMsRUFBRSxPQUFPLEVBQUU7O0FBRVosUUFBSSxDQUFDLE1BQU0sR0FBRyxJQUFJLENBQUM7QUFDbkIsUUFBSSxDQUFDLGNBQWMsRUFBRSxDQUFDO0dBQ3ZCOztlQVRrQixZQUFZOztXQVdqQiwwQkFBRzs7O0FBQ2YsVUFBSSxVQUFVLEdBQUcsT0FBTyxHQUFHLElBQUksQ0FBQyxNQUFNLENBQUMsT0FBTyxHQUFHLEdBQUcsR0FBRyxJQUFJLENBQUMsTUFBTSxDQUFDLElBQUksQ0FBQztBQUN4RSxVQUFJLENBQUMsTUFBTSxHQUFHLElBQUksU0FBUyxDQUFDLFVBQVUsQ0FBQyxDQUFDO0FBQ3hDLFVBQUksQ0FBQyxNQUFNLENBQUMsVUFBVSxHQUFHLGFBQWEsQ0FBQzs7O0FBR3ZDLFVBQUksQ0FBQyxNQUFNLENBQUMsTUFBTSxHQUFHLFlBQU07QUFDekIsY0FBSyxNQUFNLENBQUMsTUFBTSxFQUFFLENBQUM7T0FDdEIsQ0FBQzs7QUFFRixVQUFJLENBQUMsTUFBTSxDQUFDLE9BQU8sR0FBRyxZQUFNLEVBRTNCLENBQUM7O0FBRUYsVUFBSSxDQUFDLE1BQU0sQ0FBQyxTQUFTLEdBQUcsWUFBTSxFQUU3QixDQUFDOztBQUVGLFVBQUksQ0FBQyxNQUFNLENBQUMsT0FBTyxHQUFHLFVBQUMsR0FBRyxFQUFLO0FBQzdCLGVBQU8sQ0FBQyxLQUFLLENBQUMsR0FBRyxDQUFDLENBQUM7T0FDcEIsQ0FBQztLQUNIOzs7V0FFTSxpQkFBQyxJQUFJLEVBQUUsS0FBSyxFQUFFLFFBQVEsRUFBRTtBQUM3QixVQUFJLE1BQU0sR0FBRyxxQ0FBYyxJQUFJLEVBQUUsS0FBSyxFQUFFLFFBQVEsQ0FBQyxDQUFDO0FBQ2xELFVBQUksQ0FBQyxNQUFNLENBQUMsSUFBSSxDQUFDLE1BQU0sQ0FBQyxDQUFDO0tBQzFCOzs7U0FyQ2tCLFlBQVk7OztxQkFBWixZQUFZIiwiZmlsZSI6ImVzNi9zaW5rcy9zb2NrZXQtY2xpZW50LmpzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IEJhc2VMZm8gZnJvbSAnLi4vY29yZS9iYXNlLWxmbyc7XG5pbXBvcnQgeyBlbmNvZGVNZXNzYWdlIH0gZnJvbSAnLi4vdXRpbHMvc29ja2V0LXV0aWxzJztcblxuLy8gc2VuZCBhbiBMZm8gc3RyZWFtIGZyb20gdGhlIGJyb3dzZXIgb3ZlciB0aGUgbmV0d29ya1xuLy8gdGhyb3VnaCBhIFdlYlNvY2tldCAtIHNob3VsZCBiZSBwYWlyZWQgd2l0aCBhIFNvY2tldFNvdXJjZVNlcnZlclxuLy8gQE5PVEU6IGRvZXMgaXQgbmVlZCB0byBpbXBsZW1lbnQgc29tZSBwaW5nIHByb2Nlc3MgdG8gbWFpbnRhaW4gY29ubmVjdGlvbiA/XG5leHBvcnQgZGVmYXVsdCBjbGFzcyBTb2NrZXRDbGllbnQgZXh0ZW5kcyBCYXNlTGZvIHtcbiAgY29uc3RydWN0b3Iob3B0aW9ucykge1xuICAgIHN1cGVyKHtcbiAgICAgIHBvcnQ6IDMwMzAsXG4gICAgICBhZGRyZXNzOiB3aW5kb3cubG9jYXRpb24uaG9zdG5hbWVcbiAgICB9LCBvcHRpb25zKTtcblxuICAgIHRoaXMuc29ja2V0ID0gbnVsbDtcbiAgICB0aGlzLmluaXRDb25uZWN0aW9uKCk7XG4gIH1cblxuICBpbml0Q29ubmVjdGlvbigpIHtcbiAgICB2YXIgc29ja2V0QWRkciA9ICd3czovLycgKyB0aGlzLnBhcmFtcy5hZGRyZXNzICsgJzonICsgdGhpcy5wYXJhbXMucG9ydDtcbiAgICB0aGlzLnNvY2tldCA9IG5ldyBXZWJTb2NrZXQoc29ja2V0QWRkcik7XG4gICAgdGhpcy5zb2NrZXQuYmluYXJ5VHlwZSA9ICdhcnJheWJ1ZmZlcic7XG5cbiAgICAvLyBjYWxsYmFjayB0byBzdGFydCB0byB3aGVuIFdlYlNvY2tldCBpcyBjb25uZWN0ZWRcbiAgICB0aGlzLnNvY2tldC5vbm9wZW4gPSAoKSA9PiB7XG4gICAgICB0aGlzLnBhcmFtcy5vbm9wZW4oKTtcbiAgICB9O1xuXG4gICAgdGhpcy5zb2NrZXQub25jbG9zZSA9ICgpID0+IHtcblxuICAgIH07XG5cbiAgICB0aGlzLnNvY2tldC5vbm1lc3NhZ2UgPSAoKSA9PiB7XG5cbiAgICB9O1xuXG4gICAgdGhpcy5zb2NrZXQub25lcnJvciA9IChlcnIpID0+IHtcbiAgICAgIGNvbnNvbGUuZXJyb3IoZXJyKTtcbiAgICB9O1xuICB9XG5cbiAgcHJvY2Vzcyh0aW1lLCBmcmFtZSwgbWV0YURhdGEpIHtcbiAgICB2YXIgYnVmZmVyID0gZW5jb2RlTWVzc2FnZSh0aW1lLCBmcmFtZSwgbWV0YURhdGEpO1xuICAgIHRoaXMuc29ja2V0LnNlbmQoYnVmZmVyKTtcbiAgfVxufVxuIl19
+exports.default = SocketClient;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNvY2tldC1jbGllbnQuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQTs7OztBQUNBOzs7Ozs7OztJQUtxQjs7O0FBQ25CLFdBRG1CLFlBQ25CLENBQVksT0FBWixFQUFxQjt3Q0FERixjQUNFOzs2RkFERix5QkFFWDtBQUNKLFlBQU0sSUFBTjtBQUNBLGVBQVMsT0FBTyxRQUFQLENBQWdCLFFBQWhCO09BQ1IsVUFKZ0I7O0FBTW5CLFVBQUssTUFBTCxHQUFjLElBQWQsQ0FObUI7QUFPbkIsVUFBSyxjQUFMLEdBUG1COztHQUFyQjs7NkJBRG1COztxQ0FXRjs7O0FBQ2YsVUFBSSxhQUFhLFVBQVUsS0FBSyxNQUFMLENBQVksT0FBWixHQUFzQixHQUFoQyxHQUFzQyxLQUFLLE1BQUwsQ0FBWSxJQUFaLENBRHhDO0FBRWYsV0FBSyxNQUFMLEdBQWMsSUFBSSxTQUFKLENBQWMsVUFBZCxDQUFkLENBRmU7QUFHZixXQUFLLE1BQUwsQ0FBWSxVQUFaLEdBQXlCLGFBQXpCOzs7QUFIZSxVQU1mLENBQUssTUFBTCxDQUFZLE1BQVosR0FBcUIsWUFBTTtBQUN6QixlQUFLLE1BQUwsQ0FBWSxNQUFaLEdBRHlCO09BQU4sQ0FOTjs7QUFVZixXQUFLLE1BQUwsQ0FBWSxPQUFaLEdBQXNCLFlBQU0sRUFBTixDQVZQOztBQWNmLFdBQUssTUFBTCxDQUFZLFNBQVosR0FBd0IsWUFBTSxFQUFOLENBZFQ7O0FBa0JmLFdBQUssTUFBTCxDQUFZLE9BQVosR0FBc0IsVUFBQyxHQUFELEVBQVM7QUFDN0IsZ0JBQVEsS0FBUixDQUFjLEdBQWQsRUFENkI7T0FBVCxDQWxCUDs7Ozs0QkF1QlQsTUFBTSxPQUFPLFVBQVU7QUFDN0IsVUFBSSxTQUFTLGdDQUFjLElBQWQsRUFBb0IsS0FBcEIsRUFBMkIsUUFBM0IsQ0FBVCxDQUR5QjtBQUU3QixXQUFLLE1BQUwsQ0FBWSxJQUFaLENBQWlCLE1BQWpCLEVBRjZCOzs7U0FsQ1oiLCJmaWxlIjoic29ja2V0LWNsaWVudC5qcyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBCYXNlTGZvIGZyb20gJy4uL2NvcmUvYmFzZS1sZm8nO1xuaW1wb3J0IHsgZW5jb2RlTWVzc2FnZSB9IGZyb20gJy4uL3V0aWxzL3NvY2tldC11dGlscyc7XG5cbi8vIHNlbmQgYW4gTGZvIHN0cmVhbSBmcm9tIHRoZSBicm93c2VyIG92ZXIgdGhlIG5ldHdvcmtcbi8vIHRocm91Z2ggYSBXZWJTb2NrZXQgLSBzaG91bGQgYmUgcGFpcmVkIHdpdGggYSBTb2NrZXRTb3VyY2VTZXJ2ZXJcbi8vIEBOT1RFOiBkb2VzIGl0IG5lZWQgdG8gaW1wbGVtZW50IHNvbWUgcGluZyBwcm9jZXNzIHRvIG1haW50YWluIGNvbm5lY3Rpb24gP1xuZXhwb3J0IGRlZmF1bHQgY2xhc3MgU29ja2V0Q2xpZW50IGV4dGVuZHMgQmFzZUxmbyB7XG4gIGNvbnN0cnVjdG9yKG9wdGlvbnMpIHtcbiAgICBzdXBlcih7XG4gICAgICBwb3J0OiAzMDMwLFxuICAgICAgYWRkcmVzczogd2luZG93LmxvY2F0aW9uLmhvc3RuYW1lXG4gICAgfSwgb3B0aW9ucyk7XG5cbiAgICB0aGlzLnNvY2tldCA9IG51bGw7XG4gICAgdGhpcy5pbml0Q29ubmVjdGlvbigpO1xuICB9XG5cbiAgaW5pdENvbm5lY3Rpb24oKSB7XG4gICAgdmFyIHNvY2tldEFkZHIgPSAnd3M6Ly8nICsgdGhpcy5wYXJhbXMuYWRkcmVzcyArICc6JyArIHRoaXMucGFyYW1zLnBvcnQ7XG4gICAgdGhpcy5zb2NrZXQgPSBuZXcgV2ViU29ja2V0KHNvY2tldEFkZHIpO1xuICAgIHRoaXMuc29ja2V0LmJpbmFyeVR5cGUgPSAnYXJyYXlidWZmZXInO1xuXG4gICAgLy8gY2FsbGJhY2sgdG8gc3RhcnQgdG8gd2hlbiBXZWJTb2NrZXQgaXMgY29ubmVjdGVkXG4gICAgdGhpcy5zb2NrZXQub25vcGVuID0gKCkgPT4ge1xuICAgICAgdGhpcy5wYXJhbXMub25vcGVuKCk7XG4gICAgfTtcblxuICAgIHRoaXMuc29ja2V0Lm9uY2xvc2UgPSAoKSA9PiB7XG5cbiAgICB9O1xuXG4gICAgdGhpcy5zb2NrZXQub25tZXNzYWdlID0gKCkgPT4ge1xuXG4gICAgfTtcblxuICAgIHRoaXMuc29ja2V0Lm9uZXJyb3IgPSAoZXJyKSA9PiB7XG4gICAgICBjb25zb2xlLmVycm9yKGVycik7XG4gICAgfTtcbiAgfVxuXG4gIHByb2Nlc3ModGltZSwgZnJhbWUsIG1ldGFEYXRhKSB7XG4gICAgdmFyIGJ1ZmZlciA9IGVuY29kZU1lc3NhZ2UodGltZSwgZnJhbWUsIG1ldGFEYXRhKTtcbiAgICB0aGlzLnNvY2tldC5zZW5kKGJ1ZmZlcik7XG4gIH1cbn1cbiJdfQ==

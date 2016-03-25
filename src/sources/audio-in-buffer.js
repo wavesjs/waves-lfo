@@ -164,8 +164,6 @@ export default class AudioInBuffer extends BaseLfo {
       this.time = time;
       this.output();
 
-      console.log('buffer in process');
-
       this.endTime = this.time + this.outFrame.length / sourceSampleRate;
     }
   }

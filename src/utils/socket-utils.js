@@ -16,7 +16,7 @@ function str2Uint16Array(str) {
 
 //http://stackoverflow.com/questions/8609289/convert-a-binary-nodejs-buffer-to-javascript-arraybuffer
 // converts a nodejs Buffer to ArrayBuffer
-module.exports.bufferToArrayBuffer = function(buffer) {
+export function bufferToArrayBuffer(buffer) {
   var ab = new ArrayBuffer(buffer.length);
   var view = new Uint8Array(ab);
   for (var i = 0; i < buffer.length; ++i) {
@@ -25,7 +25,7 @@ module.exports.bufferToArrayBuffer = function(buffer) {
   return ab;
 }
 
-module.exports.arrayBufferToBuffer = function(arrayBuffer) {
+export function arrayBufferToBuffer(arrayBuffer) {
   var buffer = new Buffer(arrayBuffer.byteLength);
   var view = new Uint8Array(arrayBuffer);
   for (var i = 0; i < buffer.length; ++i) {
@@ -44,7 +44,7 @@ module.exports.arrayBufferToBuffer = function(arrayBuffer) {
 //  * metaData      => rest of the message
 // @return  ArrayBuffer of the created message
 // @note    must create a new buffer each time because metaData length is not known
-module.exports.encodeMessage = function(time, frame, metaData) {
+export function encodeMessage(time, frame, metaData) {
    // should probably use use DataView instead
   // http://www.html5rocks.com/en/tutorials/webgl/typed_arrays/
   var time64 = new Float64Array(1);
@@ -73,7 +73,7 @@ module.exports.encodeMessage = function(time, frame, metaData) {
 
 // recreate the Lfo stream (time, frame, metaData) form a buffer
 // created with `encodeMessage`
-module.exports.decodeMessage = function(buffer) {
+export function decodeMessage(buffer) {
   // time is a float64Array of size 1 (8 bytes)
   var timeArray = new Float64Array(buffer.slice(0, 8));
   var time = timeArray[0];

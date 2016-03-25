@@ -1,6 +1,7 @@
 import BaseDraw from './base-draw';
 import { getRandomColor } from '../utils/draw-utils';
 
+
 export default class Spectrogram extends BaseDraw {
   constructor(options) {
     super({
@@ -19,6 +20,11 @@ export default class Spectrogram extends BaseDraw {
     return this.params.scale;
   }
 
+  // no need to scroll or anything
+  executeDraw(time, frame) {
+    this.drawCurve(frame);
+  }
+
   drawCurve(frame) {
     const nbrBins = frame.length;
     const width = this.params.width;
@@ -30,10 +36,11 @@ export default class Spectrogram extends BaseDraw {
     ctx.fillStyle = this.params.color;
     ctx.clearRect(0, 0, width, height);
 
-    for (let i = 0; i < nbrBins; i++) {
-      const x = Math.round(i / nbrBins * width);
-      const y = this.getYPosition(frame[i] * scale);
+    let error = 0;
 
+    for (let i = 0; i < nbrBins; i++) {
+      const x = Math.round(i * binWidth);
+      const y = this.getYPosition(frame[i] * scale);
       ctx.fillRect(x, y, binWidth, height - y);
     }
   }

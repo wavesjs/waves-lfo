@@ -1,37 +1,48 @@
 'use strict';
 
-var _get = require('babel-runtime/helpers/get')['default'];
-
-var _inherits = require('babel-runtime/helpers/inherits')['default'];
-
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
-
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
 
 var _baseDraw = require('./base-draw');
 
 var _baseDraw2 = _interopRequireDefault(_baseDraw);
 
-var _utilsDrawUtils = require('../utils/draw-utils');
+var _drawUtils = require('../utils/draw-utils');
 
-var Waveform = (function (_BaseDraw) {
-  _inherits(Waveform, _BaseDraw);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Waveform = function (_BaseDraw) {
+  (0, _inherits3.default)(Waveform, _BaseDraw);
 
   function Waveform(options) {
-    _classCallCheck(this, Waveform);
-
-    _get(Object.getPrototypeOf(Waveform.prototype), 'constructor', this).call(this, {
-      color: (0, _utilsDrawUtils.getRandomColor)()
-    }, options);
+    (0, _classCallCheck3.default)(this, Waveform);
+    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Waveform).call(this, {
+      color: (0, _drawUtils.getRandomColor)()
+    }, options));
   }
 
-  _createClass(Waveform, [{
+  (0, _createClass3.default)(Waveform, [{
     key: 'drawCurve',
     value: function drawCurve(frame, previousFrame, iShift) {
       var ctx = this.ctx;
@@ -43,7 +54,6 @@ var Waveform = (function (_BaseDraw) {
       ctx.fillStyle = this.params.color;
       ctx.beginPath();
 
-      // console.log(this.getYPosition(0));
       ctx.moveTo(0, this.getYPosition(0));
       ctx.lineTo(0, max);
 
@@ -61,10 +71,8 @@ var Waveform = (function (_BaseDraw) {
       ctx.restore();
     }
   }]);
-
   return Waveform;
-})(_baseDraw2['default']);
+}(_baseDraw2.default);
 
-exports['default'] = Waveform;
-module.exports = exports['default'];
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImVzNi9zaW5rcy93YXZlZm9ybS5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7O3dCQUFxQixhQUFhOzs7OzhCQUNILHFCQUFxQjs7SUFHL0IsUUFBUTtZQUFSLFFBQVE7O0FBQ2hCLFdBRFEsUUFBUSxDQUNmLE9BQU8sRUFBRTswQkFERixRQUFROztBQUV6QiwrQkFGaUIsUUFBUSw2Q0FFbkI7QUFDSixXQUFLLEVBQUUscUNBQWdCO0tBQ3hCLEVBQUUsT0FBTyxFQUFFO0dBQ2I7O2VBTGtCLFFBQVE7O1dBT2xCLG1CQUFDLEtBQUssRUFBRSxhQUFhLEVBQUUsTUFBTSxFQUFFO0FBQ3RDLFVBQU0sR0FBRyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUM7QUFDckIsVUFBTSxHQUFHLEdBQUcsSUFBSSxDQUFDLFlBQVksQ0FBQyxLQUFLLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQztBQUN4QyxVQUFNLEdBQUcsR0FBRyxJQUFJLENBQUMsWUFBWSxDQUFDLEtBQUssQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDOztBQUV4QyxTQUFHLENBQUMsSUFBSSxFQUFFLENBQUM7O0FBRVgsU0FBRyxDQUFDLFNBQVMsR0FBRyxJQUFJLENBQUMsTUFBTSxDQUFDLEtBQUssQ0FBQztBQUNsQyxTQUFHLENBQUMsU0FBUyxFQUFFLENBQUM7OztBQUdoQixTQUFHLENBQUMsTUFBTSxDQUFDLENBQUMsRUFBRSxJQUFJLENBQUMsWUFBWSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7QUFDcEMsU0FBRyxDQUFDLE1BQU0sQ0FBQyxDQUFDLEVBQUUsR0FBRyxDQUFDLENBQUM7O0FBRW5CLFVBQUksYUFBYSxFQUFFO0FBQ2pCLFlBQU0sT0FBTyxHQUFHLElBQUksQ0FBQyxZQUFZLENBQUMsYUFBYSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7QUFDcEQsWUFBTSxPQUFPLEdBQUcsSUFBSSxDQUFDLFlBQVksQ0FBQyxhQUFhLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQztBQUNwRCxXQUFHLENBQUMsTUFBTSxDQUFDLENBQUMsTUFBTSxFQUFFLE9BQU8sQ0FBQyxDQUFDO0FBQzdCLFdBQUcsQ0FBQyxNQUFNLENBQUMsQ0FBQyxNQUFNLEVBQUUsT0FBTyxDQUFDLENBQUM7T0FDOUI7O0FBRUQsU0FBRyxDQUFDLE1BQU0sQ0FBQyxDQUFDLEVBQUUsR0FBRyxDQUFDLENBQUM7O0FBRW5CLFNBQUcsQ0FBQyxTQUFTLEVBQUUsQ0FBQztBQUNoQixTQUFHLENBQUMsSUFBSSxFQUFFLENBQUM7QUFDWCxTQUFHLENBQUMsT0FBTyxFQUFFLENBQUM7S0FDZjs7O1NBakNrQixRQUFROzs7cUJBQVIsUUFBUSIsImZpbGUiOiJlczYvc2lua3Mvd2F2ZWZvcm0uanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgQmFzZURyYXcgZnJvbSAnLi9iYXNlLWRyYXcnO1xuaW1wb3J0IHsgZ2V0UmFuZG9tQ29sb3IgfSBmcm9tICcuLi91dGlscy9kcmF3LXV0aWxzJztcblxuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBXYXZlZm9ybSBleHRlbmRzIEJhc2VEcmF3IHtcbiAgY29uc3RydWN0b3Iob3B0aW9ucykge1xuICAgIHN1cGVyKHtcbiAgICAgIGNvbG9yOiBnZXRSYW5kb21Db2xvcigpLFxuICAgIH0sIG9wdGlvbnMpO1xuICB9XG5cbiAgZHJhd0N1cnZlKGZyYW1lLCBwcmV2aW91c0ZyYW1lLCBpU2hpZnQpIHtcbiAgICBjb25zdCBjdHggPSB0aGlzLmN0eDtcbiAgICBjb25zdCBtaW4gPSB0aGlzLmdldFlQb3NpdGlvbihmcmFtZVswXSk7XG4gICAgY29uc3QgbWF4ID0gdGhpcy5nZXRZUG9zaXRpb24oZnJhbWVbMV0pO1xuXG4gICAgY3R4LnNhdmUoKTtcblxuICAgIGN0eC5maWxsU3R5bGUgPSB0aGlzLnBhcmFtcy5jb2xvcjtcbiAgICBjdHguYmVnaW5QYXRoKCk7XG5cbiAgICAvLyBjb25zb2xlLmxvZyh0aGlzLmdldFlQb3NpdGlvbigwKSk7XG4gICAgY3R4Lm1vdmVUbygwLCB0aGlzLmdldFlQb3NpdGlvbigwKSk7XG4gICAgY3R4LmxpbmVUbygwLCBtYXgpO1xuXG4gICAgaWYgKHByZXZpb3VzRnJhbWUpIHtcbiAgICAgIGNvbnN0IHByZXZNaW4gPSB0aGlzLmdldFlQb3NpdGlvbihwcmV2aW91c0ZyYW1lWzBdKTtcbiAgICAgIGNvbnN0IHByZXZNYXggPSB0aGlzLmdldFlQb3NpdGlvbihwcmV2aW91c0ZyYW1lWzFdKTtcbiAgICAgIGN0eC5saW5lVG8oLWlTaGlmdCwgcHJldk1heCk7XG4gICAgICBjdHgubGluZVRvKC1pU2hpZnQsIHByZXZNaW4pO1xuICAgIH1cblxuICAgIGN0eC5saW5lVG8oMCwgbWluKTtcblxuICAgIGN0eC5jbG9zZVBhdGgoKTtcbiAgICBjdHguZmlsbCgpO1xuICAgIGN0eC5yZXN0b3JlKCk7XG4gIH1cbn1cbiJdfQ==
+exports.default = Waveform;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndhdmVmb3JtLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUE7Ozs7QUFDQTs7OztJQUdxQjs7O0FBQ25CLFdBRG1CLFFBQ25CLENBQVksT0FBWixFQUFxQjt3Q0FERixVQUNFO3dGQURGLHFCQUVYO0FBQ0osYUFBTyxnQ0FBUDtPQUNDLFVBSGdCO0dBQXJCOzs2QkFEbUI7OzhCQU9ULE9BQU8sZUFBZSxRQUFRO0FBQ3RDLFVBQU0sTUFBTSxLQUFLLEdBQUwsQ0FEMEI7QUFFdEMsVUFBTSxNQUFNLEtBQUssWUFBTCxDQUFrQixNQUFNLENBQU4sQ0FBbEIsQ0FBTixDQUZnQztBQUd0QyxVQUFNLE1BQU0sS0FBSyxZQUFMLENBQWtCLE1BQU0sQ0FBTixDQUFsQixDQUFOLENBSGdDOztBQUt0QyxVQUFJLElBQUosR0FMc0M7O0FBT3RDLFVBQUksU0FBSixHQUFnQixLQUFLLE1BQUwsQ0FBWSxLQUFaLENBUHNCO0FBUXRDLFVBQUksU0FBSixHQVJzQzs7QUFVdEMsVUFBSSxNQUFKLENBQVcsQ0FBWCxFQUFjLEtBQUssWUFBTCxDQUFrQixDQUFsQixDQUFkLEVBVnNDO0FBV3RDLFVBQUksTUFBSixDQUFXLENBQVgsRUFBYyxHQUFkLEVBWHNDOztBQWF0QyxVQUFJLGFBQUosRUFBbUI7QUFDakIsWUFBTSxVQUFVLEtBQUssWUFBTCxDQUFrQixjQUFjLENBQWQsQ0FBbEIsQ0FBVixDQURXO0FBRWpCLFlBQU0sVUFBVSxLQUFLLFlBQUwsQ0FBa0IsY0FBYyxDQUFkLENBQWxCLENBQVYsQ0FGVztBQUdqQixZQUFJLE1BQUosQ0FBVyxDQUFDLE1BQUQsRUFBUyxPQUFwQixFQUhpQjtBQUlqQixZQUFJLE1BQUosQ0FBVyxDQUFDLE1BQUQsRUFBUyxPQUFwQixFQUppQjtPQUFuQjs7QUFPQSxVQUFJLE1BQUosQ0FBVyxDQUFYLEVBQWMsR0FBZCxFQXBCc0M7O0FBc0J0QyxVQUFJLFNBQUosR0F0QnNDO0FBdUJ0QyxVQUFJLElBQUosR0F2QnNDO0FBd0J0QyxVQUFJLE9BQUosR0F4QnNDOzs7U0FQckIiLCJmaWxlIjoid2F2ZWZvcm0uanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgQmFzZURyYXcgZnJvbSAnLi9iYXNlLWRyYXcnO1xuaW1wb3J0IHsgZ2V0UmFuZG9tQ29sb3IgfSBmcm9tICcuLi91dGlscy9kcmF3LXV0aWxzJztcblxuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBXYXZlZm9ybSBleHRlbmRzIEJhc2VEcmF3IHtcbiAgY29uc3RydWN0b3Iob3B0aW9ucykge1xuICAgIHN1cGVyKHtcbiAgICAgIGNvbG9yOiBnZXRSYW5kb21Db2xvcigpLFxuICAgIH0sIG9wdGlvbnMpO1xuICB9XG5cbiAgZHJhd0N1cnZlKGZyYW1lLCBwcmV2aW91c0ZyYW1lLCBpU2hpZnQpIHtcbiAgICBjb25zdCBjdHggPSB0aGlzLmN0eDtcbiAgICBjb25zdCBtaW4gPSB0aGlzLmdldFlQb3NpdGlvbihmcmFtZVswXSk7XG4gICAgY29uc3QgbWF4ID0gdGhpcy5nZXRZUG9zaXRpb24oZnJhbWVbMV0pO1xuXG4gICAgY3R4LnNhdmUoKTtcblxuICAgIGN0eC5maWxsU3R5bGUgPSB0aGlzLnBhcmFtcy5jb2xvcjtcbiAgICBjdHguYmVnaW5QYXRoKCk7XG5cbiAgICBjdHgubW92ZVRvKDAsIHRoaXMuZ2V0WVBvc2l0aW9uKDApKTtcbiAgICBjdHgubGluZVRvKDAsIG1heCk7XG5cbiAgICBpZiAocHJldmlvdXNGcmFtZSkge1xuICAgICAgY29uc3QgcHJldk1pbiA9IHRoaXMuZ2V0WVBvc2l0aW9uKHByZXZpb3VzRnJhbWVbMF0pO1xuICAgICAgY29uc3QgcHJldk1heCA9IHRoaXMuZ2V0WVBvc2l0aW9uKHByZXZpb3VzRnJhbWVbMV0pO1xuICAgICAgY3R4LmxpbmVUbygtaVNoaWZ0LCBwcmV2TWF4KTtcbiAgICAgIGN0eC5saW5lVG8oLWlTaGlmdCwgcHJldk1pbik7XG4gICAgfVxuXG4gICAgY3R4LmxpbmVUbygwLCBtaW4pO1xuXG4gICAgY3R4LmNsb3NlUGF0aCgpO1xuICAgIGN0eC5maWxsKCk7XG4gICAgY3R4LnJlc3RvcmUoKTtcbiAgfVxufVxuIl19

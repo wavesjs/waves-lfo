@@ -1,36 +1,51 @@
 'use strict';
 
-var _get = require('babel-runtime/helpers/get')['default'];
-
-var _inherits = require('babel-runtime/helpers/inherits')['default'];
-
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
-
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _coreBaseLfo = require('../core/base-lfo');
+var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
-var _coreBaseLfo2 = _interopRequireDefault(_coreBaseLfo);
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
 
-var Max = (function (_BaseLfo) {
-  _inherits(Max, _BaseLfo);
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _get2 = require('babel-runtime/helpers/get');
+
+var _get3 = _interopRequireDefault(_get2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+var _baseLfo = require('../core/base-lfo');
+
+var _baseLfo2 = _interopRequireDefault(_baseLfo);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Max = function (_BaseLfo) {
+  (0, _inherits3.default)(Max, _BaseLfo);
 
   function Max(options) {
-    _classCallCheck(this, Max);
-
-    _get(Object.getPrototypeOf(Max.prototype), 'constructor', this).call(this, options);
+    (0, _classCallCheck3.default)(this, Max);
+    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Max).call(this, options));
   }
 
-  _createClass(Max, [{
+  (0, _createClass3.default)(Max, [{
     key: 'initialize',
     value: function initialize(inStreamParams) {
-      _get(Object.getPrototypeOf(Max.prototype), 'initialize', this).call(this, inStreamParams, {
+      (0, _get3.default)((0, _getPrototypeOf2.default)(Max.prototype), 'initialize', this).call(this, inStreamParams, {
         frameSize: 1
       });
     }
@@ -44,10 +59,8 @@ var Max = (function (_BaseLfo) {
       this.output();
     }
   }]);
-
   return Max;
-})(_coreBaseLfo2['default']);
+}(_baseLfo2.default);
 
-exports['default'] = Max;
-module.exports = exports['default'];
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImVzNi9vcGVyYXRvcnMvbWF4LmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7MkJBQW9CLGtCQUFrQjs7OztJQUVqQixHQUFHO1lBQUgsR0FBRzs7QUFDWCxXQURRLEdBQUcsQ0FDVixPQUFPLEVBQUU7MEJBREYsR0FBRzs7QUFFcEIsK0JBRmlCLEdBQUcsNkNBRWQsT0FBTyxFQUFFO0dBQ2hCOztlQUhrQixHQUFHOztXQUtaLG9CQUFDLGNBQWMsRUFBRTtBQUN6QixpQ0FOaUIsR0FBRyw0Q0FNSCxjQUFjLEVBQUU7QUFDL0IsaUJBQVMsRUFBRSxDQUFDO09BQ2IsRUFBRTtLQUNKOzs7V0FFTSxpQkFBQyxJQUFJLEVBQUUsS0FBSyxFQUFFLFFBQVEsRUFBRTtBQUM3QixVQUFJLENBQUMsSUFBSSxHQUFHLElBQUksQ0FBQztBQUNqQixVQUFJLENBQUMsUUFBUSxDQUFDLENBQUMsQ0FBQyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUMsS0FBSyxDQUFDLElBQUksRUFBRSxLQUFLLENBQUMsQ0FBQztBQUMvQyxVQUFJLENBQUMsUUFBUSxHQUFHLFFBQVEsQ0FBQzs7QUFFekIsVUFBSSxDQUFDLE1BQU0sRUFBRSxDQUFDO0tBQ2Y7OztTQWpCa0IsR0FBRzs7O3FCQUFILEdBQUciLCJmaWxlIjoiZXM2L29wZXJhdG9ycy9tYXguanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgQmFzZUxmbyBmcm9tICcuLi9jb3JlL2Jhc2UtbGZvJztcblxuZXhwb3J0IGRlZmF1bHQgY2xhc3MgTWF4IGV4dGVuZHMgQmFzZUxmbyB7XG4gIGNvbnN0cnVjdG9yKG9wdGlvbnMpIHtcbiAgICBzdXBlcihvcHRpb25zKTtcbiAgfVxuXG4gIGluaXRpYWxpemUoaW5TdHJlYW1QYXJhbXMpIHtcbiAgICBzdXBlci5pbml0aWFsaXplKGluU3RyZWFtUGFyYW1zLCB7XG4gICAgICBmcmFtZVNpemU6IDEsXG4gICAgfSk7XG4gIH1cblxuICBwcm9jZXNzKHRpbWUsIGZyYW1lLCBtZXRhRGF0YSkge1xuICAgIHRoaXMudGltZSA9IHRpbWU7XG4gICAgdGhpcy5vdXRGcmFtZVswXSA9IE1hdGgubWF4LmFwcGx5KG51bGwsIGZyYW1lKTtcbiAgICB0aGlzLm1ldGFEYXRhID0gbWV0YURhdGE7XG5cbiAgICB0aGlzLm91dHB1dCgpO1xuICB9XG59XG4iXX0=
+exports.default = Max;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1heC5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQTs7Ozs7O0lBRXFCOzs7QUFDbkIsV0FEbUIsR0FDbkIsQ0FBWSxPQUFaLEVBQXFCO3dDQURGLEtBQ0U7d0ZBREYsZ0JBRVgsVUFEYTtHQUFyQjs7NkJBRG1COzsrQkFLUixnQkFBZ0I7QUFDekIsdURBTmlCLCtDQU1BLGdCQUFnQjtBQUMvQixtQkFBVyxDQUFYO1FBREYsQ0FEeUI7Ozs7NEJBTW5CLE1BQU0sT0FBTyxVQUFVO0FBQzdCLFdBQUssSUFBTCxHQUFZLElBQVosQ0FENkI7QUFFN0IsV0FBSyxRQUFMLENBQWMsQ0FBZCxJQUFtQixLQUFLLEdBQUwsQ0FBUyxLQUFULENBQWUsSUFBZixFQUFxQixLQUFyQixDQUFuQixDQUY2QjtBQUc3QixXQUFLLFFBQUwsR0FBZ0IsUUFBaEIsQ0FINkI7O0FBSzdCLFdBQUssTUFBTCxHQUw2Qjs7O1NBWFoiLCJmaWxlIjoibWF4LmpzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IEJhc2VMZm8gZnJvbSAnLi4vY29yZS9iYXNlLWxmbyc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIE1heCBleHRlbmRzIEJhc2VMZm8ge1xuICBjb25zdHJ1Y3RvcihvcHRpb25zKSB7XG4gICAgc3VwZXIob3B0aW9ucyk7XG4gIH1cblxuICBpbml0aWFsaXplKGluU3RyZWFtUGFyYW1zKSB7XG4gICAgc3VwZXIuaW5pdGlhbGl6ZShpblN0cmVhbVBhcmFtcywge1xuICAgICAgZnJhbWVTaXplOiAxLFxuICAgIH0pO1xuICB9XG5cbiAgcHJvY2Vzcyh0aW1lLCBmcmFtZSwgbWV0YURhdGEpIHtcbiAgICB0aGlzLnRpbWUgPSB0aW1lO1xuICAgIHRoaXMub3V0RnJhbWVbMF0gPSBNYXRoLm1heC5hcHBseShudWxsLCBmcmFtZSk7XG4gICAgdGhpcy5tZXRhRGF0YSA9IG1ldGFEYXRhO1xuXG4gICAgdGhpcy5vdXRwdXQoKTtcbiAgfVxufVxuIl19
