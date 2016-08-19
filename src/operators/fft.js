@@ -58,7 +58,8 @@ export default class Fft extends BaseLfo {
       this.normalizeCoefs // object populated with the normalization coefs
     );
 
-    // buffers to be reused in `process`
+    const { linear, power } = this.normalizeCoefs;
+    this.windowScale = (this.params.outType === 'magnitude') ? linear : power;
     this.complexFrame = new complexArray.ComplexArray(fftSize);
     this.windowedFrame = new Float32Array(fftSize);
   }
@@ -75,8 +76,9 @@ export default class Fft extends BaseLfo {
     const fftSize = this.params.fftSize;
 
     // apply window on the input frame
+    // @todo - test the `windowScale` factor
     for (let i = 0; i < windowSize; i++)
-      this.windowedFrame[i] = frame[i] * this.window[i];
+      this.windowedFrame[i] = frame[i] * this.window[i] * this.windowScale;
 
     // if windowedFrame is bigger then input frame, fill with zeros
     if (windowSize < fftSize)
