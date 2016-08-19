@@ -7,7 +7,7 @@
   "license": "BSD-3",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wavesjs/lfo"
+    "url": "https://github.com/wavesjs/waves-lfo"
   },
   "bugs": {
     "url": "https://github.com/wavesjs/lfo/issues"
@@ -26,8 +26,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.6.1",
-    "jsfft": "dntj/jsfft",
-    "ws": "^0.7.1"
+    "jsfft": "dntj/jsfft"
   },
   "devDependencies": {
     "babel-core": "^6.6.5",
@@ -38,7 +37,10 @@
     "browserify": "^13.0.0",
     "colors": "^1.1.2",
     "fs-extra": "^0.26.5",
+    "jsdoc": "^3.4.0",
+    "jsdoc-template": "collective-soundworks/jsdoc-template",
     "ora": "^0.2.0",
+    "tape": "^4.6.0",
     "uglify-js": "^2.6.2",
     "watch": "^0.17.1"
   }

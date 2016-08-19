@@ -2,10 +2,10 @@ import BaseLfo from '../core/base-lfo';
 
 
 /**
- * Output the max value of the current frame.
+ * Output the min value of the current frame.
  * @todo - define if their are options
  */
-export default class Max extends BaseLfo {
+export default class Min extends BaseLfo {
   constructor(options) {
     super({}, options);
   }
@@ -17,13 +17,13 @@ export default class Max extends BaseLfo {
   }
 
   process(time, frame, metaData) {
-    let max = -Infinity;
+    let min = +Infinity;
 
     for (let i = 0; i < frame.length; i++)
-      if (frame[i] > max) max = frame[i];
+      if (frame[i] < min) min = frame[i];
 
     this.time = time;
-    this.outFrame[0] = max;
+    this.outFrame[0] = min;
     this.metaData = metaData;
 
     this.output();

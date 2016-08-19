@@ -279,7 +279,7 @@ function biquadArrayDf1(coefs, state, inFrame, outFrame, size) {
 /* a0 = 1, a1 = a[0], a2 = a[1] */
 /* 2 states */
 function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
-  for(let i = 0; i < size; i++) {
+  for (let i = 0; i < size; i++) {
     outFrame[i] = coefs.b0 * inFrame[i] + state.xn_1[i];
 
     // update states
@@ -289,7 +289,6 @@ function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
 }
 
 export default class Biquad extends BaseLfo {
-
   constructor(options) {
     super({
       filterType:'lowpass',

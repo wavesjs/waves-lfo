@@ -87,12 +87,13 @@ export default class MovingAverage extends BaseLfo {
   }
 
   process(time, frame, metaData) {
-    if(this.frameSize > 1)
+    if (this.frameSize > 1)
       this.inputArray(frame);
     else
       this.outFrame[0] = this.inputScalar(frame[0]);
 
-    if(this.streamParams.sourceSampleRate)
+    // shift time to take account of the added latency
+    if (this.streamParams.sourceSampleRate)
       time -= (0.5 * (this.params.order - 1) / this.streamParams.sourceSampleRate);
 
     this.output(time, this.outFrame, metaData);

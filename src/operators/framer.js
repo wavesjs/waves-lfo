@@ -1,6 +1,10 @@
 import BaseLfo from '../core/base-lfo';
 
 
+/**
+ * Change the frameSize, frameRate and hopSize of the signal.
+ * Typically used in front of a fft...
+ */
 export default class Framer extends BaseLfo {
   constructor(options) {
     super({

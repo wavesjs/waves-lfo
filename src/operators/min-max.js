@@ -20,8 +20,8 @@ export default class MinMax extends BaseLfo {
 
     for (let i = 0, l = frame.length; i < l; i++) {
       const value = frame[i];
-      if (value < min) { min = value; }
-      if (value > max) { max = value; }
+      if (value < min) min = value;
+      if (value > max) max = value;
     }
 
     this.time = time;

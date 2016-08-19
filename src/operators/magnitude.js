@@ -1,18 +1,23 @@
 import BaseLfo from '../core/base-lfo';
 
 
+const sqrt = Math.sqrt;
+
+
+/**
+ *
+ * is an rms is `power === false` (default)
+ */
 export default class Magnitude extends BaseLfo {
   constructor(options) {
     super({
-      normalize: true,
-      power: false,
+      normalize: true,  // static ?
+      power: false,     // static ?
     }, options);
   }
 
   initialize(inStreamParams) {
-    super.initialize(inStreamParams, {
-      frameSize: 1,
-    });
+    super.initialize(inStreamParams, { frameSize: 1 });
   }
 
   inputArray(frame) {
@@ -29,7 +34,7 @@ export default class Magnitude extends BaseLfo {
       mag /= frameSize;
 
     if (!this.params.power)
-      mag = Math.sqrt(mag);
+      mag = sqrt(mag);
 
     outFrame[0] = mag;
 

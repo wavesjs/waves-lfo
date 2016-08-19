@@ -1,0 +1,21 @@
+{
+  "source": {
+    "include": [
+      "README.md",
+      "src/core/base-lfo.js"
+    ]
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "opts": {
+    "destination": "./doc",
+    "projectTitle": "WavesJS - Low Frequency Operators",
+    "template": "node_modules/jsdoc-template"
+  },
+  "templates": {
+    "default": {
+      "useLongnameInNav": true
+    }
+  }
+}

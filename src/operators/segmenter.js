@@ -1,7 +1,10 @@
 import BaseLfo from '../core/base-lfo';
 import MovingAverage from './moving-average';
 
-
+/**
+ * Create segment based on attacks
+ *
+ */
 export default class Segmenter extends BaseLfo {
   constructor(options) {
     super({
@@ -27,7 +30,7 @@ export default class Segmenter extends BaseLfo {
     const minInput = this.params.minInput;
     let fill = minInput;
 
-    if(this.params.logInput && minInput > 0)
+    if (this.params.logInput && minInput > 0)
       fill = Math.log(minInput);
 
     this.movingAverage = new MovingAverage({

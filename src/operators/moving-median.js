@@ -1,14 +1,18 @@
 import BaseLfo from '../core/base-lfo';
 
+
+/**
+ * @todo - reimplement with a proper ring buffer
+ * @todo - review to match movingAverage philosophy (scalar or vector vs. frame)
+ */
 export default class MovingMedian extends BaseLfo {
   constructor(options) {
     super({
       order: 9,
     }, options);
 
-    if (this.params.order % 2 === 0) {
+    if (this.params.order % 2 === 0)
       throw new Error('order must be an odd number');
-    }
 
     this.queue = new Float32Array(this.params.order);
     this.sorter = [];
@@ -21,6 +25,10 @@ export default class MovingMedian extends BaseLfo {
       this.queue[i] = 0;
     }
   }
+
+  inputArray() {}
+
+  inputScalar() {}
 
   process(time, frame, metaData) {
     const outFrame = this.outFrame;

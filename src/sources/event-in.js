@@ -1,6 +1,9 @@
 import BaseLfo from '../core/base-lfo';
 
-
+/**
+ *
+ * @todo - Revise how time is provided to make it compatible with node
+ */
 export default class EventIn extends BaseLfo {
   constructor(options) {
     super({
@@ -28,20 +31,19 @@ export default class EventIn extends BaseLfo {
     this.initialize();
     this.reset();
 
-    const currentTime = this.params.ctx.currentTime;
-
-    // should be setted in the first process call
     this._isStarted = true;
+    // define in the first `process` call
     this._startTime = undefined;
-    this._lastTime = undefined;
+    this._audioTime = undefined;
   }
 
   stop() {
     if (this._isStarted && this._startTime) {
       const currentTime = this.params.ctx.currentTime;
-      const endTime = this.time + (currentTime - this._lastTime);
+      const endTime = this.time + (currentTime - this._audioTime);
 
       this.finalize(endTime);
+      this._isStarted = false;
     }
   }
 
@@ -50,26 +52,24 @@ export default class EventIn extends BaseLfo {
 
     const currentTime = this.params.ctx.currentTime;
     // if no time provided, use audioContext.currentTime
-    time = !isNaN(parseFloat(time)) && isFinite(time) ?
-      time : currentTime;
+    time = Number.isFinite(time) ? time : currentTime;
 
-    // set `startTime` if first call after a `start`
     if (!this._startTime)
       this._startTime = time;
 
-    // handle time according to config
     if (this.params.absoluteTime === false)
       time = time - this._startTime;
 
-    // if scalar, create a vector
-    if (frame.length === undefined)
+    // deal with scalar input
+    if (!frame.length)
       frame = [frame];
 
-    // works if frame is an array
-    this.outFrame.set(frame, 0);
+    for (let i = 0; i < this.streamParam.frameSize; i++)
+      this.outFrame[i] = frame[i];
+
     this.time = time;
     this.metaData = metaData;
-    this._lastTime = currentTime;
+    this._audioTime = currentTime;
 
     this.output();
   }
