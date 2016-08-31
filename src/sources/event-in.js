@@ -47,7 +47,7 @@ export default class EventIn extends BaseLfo {
     }
   }
 
-  process(time, frame, metaData = {}) {
+  process(time, frame, metadata = {}) {
     if (!this._isStarted) return;
 
     const currentTime = this.params.ctx.currentTime;
@@ -68,7 +68,7 @@ export default class EventIn extends BaseLfo {
       this.outFrame[i] = frame[i];
 
     this.time = time;
-    this.metaData = metaData;
+    this.metadata = metadata;
     this._audioTime = currentTime;
 
     this.output();

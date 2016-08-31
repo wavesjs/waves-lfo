@@ -41,8 +41,8 @@ export default class Magnitude extends BaseLfo {
     return outFrame;
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     this.inputArray(frame);
-    this.output(time, this.outFrame, metaData);
+    this.output(time, this.outFrame, metadata);
   }
 }

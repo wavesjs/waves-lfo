@@ -1,19 +1,20 @@
 import BaseLfo from '../core/base-lfo';
 
-
 /**
  * Output the max value of the current frame.
- * @todo - define if their are options
+ *
+ *
+ *
  * @note - not sure if it's usefull, but let's use it as a exercice
  */
-export default class Max extends BaseLfo {
+class Max extends BaseLfo {
   constructor(options) {
     super({
       order: 1,
     }, options);
 
     // 'dyanmic' because should call it's own initialize method, even if
-    // there is no need to propagate to chidren
+    // there is no need to propagate to children
     this.addIntegerParam('order', 1, Infinity, 'dynamic');
   }
 
@@ -68,15 +69,18 @@ export default class Max extends BaseLfo {
     return outFrame;
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     if (this.streamParam.frameSize > 1)
       this.inputArray(frame)
     else
       this.outFrame[0] = this.inputScalar(frame[0]);
 
-    this.time = time;
-    this.metaData = metaData;
+    this.time = time; // should time be updated ?
+    this.metadata = metadata;
 
     this.output();
   }
 }
+
+export default Max;
+

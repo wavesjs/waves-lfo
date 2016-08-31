@@ -108,7 +108,7 @@ export default class Segmenter extends BaseLfo {
     super.finalize(endTime);
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     const rawValue = frame[0];
     const minInput = this.params.minInput;
     let value = Math.max(rawValue, minInput);
@@ -119,7 +119,7 @@ export default class Segmenter extends BaseLfo {
     const diff = value - this.lastMvavrg;
     this.lastMvavrg = this.movingAverage.inputScalar(value);
 
-    this.metaData = metaData;
+    this.metadata = metadata;
 
     if (diff > this.params.threshold && time - this.onsetTime > this.params.minInter) {
       if(this.insideSegment)

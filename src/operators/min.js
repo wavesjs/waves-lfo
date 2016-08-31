@@ -16,7 +16,7 @@ export default class Min extends BaseLfo {
     });
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     let min = +Infinity;
 
     for (let i = 0; i < frame.length; i++)
@@ -24,7 +24,7 @@ export default class Min extends BaseLfo {
 
     this.time = time;
     this.outFrame[0] = min;
-    this.metaData = metaData;
+    this.metadata = metadata;
 
     this.output();
   }

@@ -8,10 +8,10 @@ export default class Noop extends BaseLfo {
     super(options);
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     this.outFrame.set(frame, 0);
     this.time = time;
-    this.metaData = metaData;
+    this.metadata = metadata;
 
     this.output();
   }

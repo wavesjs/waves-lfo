@@ -86,7 +86,7 @@ export default class MovingAverage extends BaseLfo {
     return outFrame;
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     if (this.frameSize > 1)
       this.inputArray(frame);
     else
@@ -96,6 +96,6 @@ export default class MovingAverage extends BaseLfo {
     if (this.streamParams.sourceSampleRate)
       time -= (0.5 * (this.params.order - 1) / this.streamParams.sourceSampleRate);
 
-    this.output(time, this.outFrame, metaData);
+    this.output(time, this.outFrame, metadata);
   }
 }

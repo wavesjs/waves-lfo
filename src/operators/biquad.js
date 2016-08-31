@@ -335,9 +335,9 @@ export default class Biquad extends BaseLfo {
     calculateCoefs(this.params.filterType, normF0, q, gain, this.coefs);
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     biquadArrayDf1(this.coefs, this.state, frame, this.outFrame, frame.length);
     // console.log(this.outFrame);
-    this.output(time, this.outFrame, metaData);
+    this.output(time, this.outFrame, metadata);
   }
 }

@@ -32,7 +32,7 @@ export default class Operator extends BaseLfo {
     }
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     // apply the callback to the frame
     if (this.params.type === 'vector') {
       var outTime = this.callback(time, frame, this.outFrame);
@@ -47,7 +47,7 @@ export default class Operator extends BaseLfo {
     }
 
     this.time = time;
-    this.metaData = metaData;
+    this.metadata = metadata;
 
     this.output();
   }

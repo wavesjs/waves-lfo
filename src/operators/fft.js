@@ -70,7 +70,7 @@ export default class Fft extends BaseLfo {
    * If this comes from the FFT memory allocation, maybe make a dummy call of
    * `this.complexFrame.FFT` in `initialize` ?
    */
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     const windowSize = this.windowSize;
     const outFrameSize = this.streamParams.frameSize;
     const fftSize = this.params.fftSize;

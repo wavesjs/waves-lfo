@@ -81,7 +81,7 @@ export default class DataRecorder extends BaseLfo {
     this.stop();
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     if (!this._isStarted) { return; }
 
     this.outFrame = new Float32Array(frame);

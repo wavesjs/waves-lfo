@@ -5,7 +5,7 @@ const min = Math.min;
 const max = Math.max;
 
 function clip(value, lower, upper) {
-  return max(lower, min(upper), value);
+  return max(lower, min(upper, value));
 }
 
 /**
@@ -43,8 +43,8 @@ class Param {
    *  begining of `node.process` would be safer...
    */
   onUpdate() {
-    if (kind === 'dynamic')
-      this._node.initialize();
+    if (this._kind === 'dynamic')
+      this._node.paramUpdated = true;
   }
 }
 
@@ -54,12 +54,22 @@ class Param {
  */
 class BooleanParam extends Param {
   constructor(name, value, kind, node) {
+    value = !!value;
     super(name, 'boolean', value, kind, node);
   }
 
   set value(value) {
-    this._value = !!value;
-    this.onUpdate();
+    value = !!value;
+
+    if (this._value !== value) {
+      this._value = value;
+      this.onUpdate();
+    }
+
+    return this._value;
+  }
+
+  get value() {
     return this._value;
   }
 }
@@ -73,12 +83,21 @@ class IntegerParam extends Param {
     super(name, 'integer', value, kind, node);
 
     this._lower = lower;
-    this._uppper = upper;
+    this._upper = upper;
   }
 
   set value(value) {
-    this._value = clip(parseInt(value, 10), this._lower, this._upper);
-    this.onUpdate();
+    value = clip(parseInt(value, 10), this._lower, this._upper);
+
+    if (this._value !== value) {
+      this._value = value;
+      this.onUpdate();
+    }
+
+    return this._value;
+  }
+
+  get value() {
     return this._value;
   }
 }
@@ -88,16 +107,25 @@ class IntegerParam extends Param {
  * @private
  */
 class FloatParam extends Param {
-  constructor(name, min, max, value, kind, node) {
+  constructor(name, lower, upper, value, kind, node) {
     super(name, 'float', value, kind, node);
 
     this._lower = lower;
-    this._uppper = upper;
+    this._upper = upper;
   }
 
   set value(value) {
-    this._value = clip(value * 1, this.min, this.max);
-    this.onUpdate();
+    value = clip(value * 1, this._lower, this._upper);
+
+    if (this._value !== value) {
+      this._value = value;
+      this.onUpdate();
+    }
+
+    return this._value;
+  }
+
+  get value() {
     return this._value;
   }
 }
@@ -112,8 +140,17 @@ class StringParam extends Param {
   }
 
   set value(value) {
-    this._value = value + '';
-    this.onUpdate();
+    value = value + '';
+
+    if (this._value !== value) {
+      this._value = value;
+      this.onUpdate();
+    }
+
+    return this._value;
+  }
+
+  get value() {
     return this._value;
   }
 }
@@ -130,12 +167,18 @@ class EnumParam extends Param {
   }
 
   set value(value) {
-    if (list.indexOf(value) === -1) {
-      if (!this._value)
-        this._value = this._list[0];
-    } else {
+    if (this._list.indexOf(value) === -1)
+      throw new Error(`Invalid value for param "${this._name}" (valid values: ${this._list})`);
+
+    if (this._value !== value) {
       this._value = value;
+      this.onUpdate();
     }
+
+    return this._value;
+  }
+
+  get value() {
     return this._value;
   }
 }
@@ -150,8 +193,15 @@ class AnyParam extends Param {
   }
 
   set value(value) {
-    this._value = value;
-    this.onUpdate();
+    if (this._value !== value) {
+      this._value = value;
+      this.onUpdate();
+    }
+
+    return this._value;
+  }
+
+  get value() {
     return this._value;
   }
 }
@@ -194,12 +244,24 @@ class BaseLfo {
     this.params = {};
 
     /**
+     * Define if a `dynamic` parameter has been changed since the last input
+     * frame. When set to `true` the sub-graph starting at the current node
+     * is reinitialized.
+     * @type {Boolean}
+     * @name paramUpdated
+     * @instance
+     * @memberof BaseLfo
+     * @private
+     */
+    this.paramUpdated = false;
+
+    /**
      * Parameters of the stream from the point of vue of the current node.
      * Set to `null` when the node is destroyed.
      * @type {Object}
      * @property {Number} frameSize - Frame size at the output of the node.
      * @property {Number} frameRate - Frame rate at the output of the node.
-     * @property {Number} sourceSampleRate - Sample rate of the source of the signal.
+     * @property {Number} sourceSampleRate - Sample rate of the source of the graph.
      *  _This value should be defined by the sources and never modified later_.
      * @name streamParams
      * @instance
@@ -213,7 +275,7 @@ class BaseLfo {
 
     /**
      * List of nodes connected to the ouput of the node (lower in the graph).
-     * At each frame, the node forward its `time`, `outFrame` and `metaData` to
+     * At each frame, the node forward its `time`, `outFrame` and `metadata` to
      * to all its children.
      * @type {Array<BaseLfo>}
      * @name children
@@ -256,13 +318,27 @@ class BaseLfo {
     /**
      * _Stream_ - Metadata associated to the current frame.
      * @type {Float32Array}
-     * @name metaData
+     * @name metadata
      * @instance
      * @memberof BaseLfo
      */
-    this.metaData = {};
+    this.metadata = {};
 
     this._initParams = Object.assign({}, defaults, options);
+  }
+
+
+  /**
+   * Check param name availability and if a default value is provided.
+   * @param {String} name - Name of the parameter.
+   * @rpivate
+   */
+  _checkParamName(name) {
+    if (this.params[name] !== undefined)
+      throw new Error('Param "${name}" already defined');
+
+    if (Object.keys(this._initParams).indexOf(name) === -1)
+      throw new Error('Undefined default value for param "${name}"');
   }
 
   /**
@@ -285,12 +361,13 @@ class BaseLfo {
    * `options` given at instanciation.
    *
    * @param {String} name - Name of the parameter.
-   * @param {Number} lower - Minimum possible value.
-   * @param {Number} upper - Maximum possible value.
+   * @param {Number} lower - Minimum value.
+   * @param {Number} upper - Maximum value.
    * @param {String} kind - Define if the parameter is either `static` or
    *  `dynamic`.
    */
   addIntegerParam(name, lower, upper, kind) {
+    this._checkParamName(name);
     const param = new IntegerParam(name, lower, upper, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -301,13 +378,14 @@ class BaseLfo {
    * `options` given at instanciation.
    *
    * @param {String} name - Name of the parameter.
-   * @param {Number} lower - Minimum possible value.
-   * @param {Number} upper - Maximum possible value.
+   * @param {Number} lower - Minimum value.
+   * @param {Number} upper - Maximum value.
    * @param {String} kind - Define if the parameter is either `static` or
    *  `dynamic`.
    */
   addFloatParam(name, lower, upper, kind) {
-    const param = new IntegerParam(name, lower, upper, this._initParams[name], kind, this);
+    this._checkParamName(name);
+    const param = new FloatParam(name, lower, upper, this._initParams[name], kind, this);
     this.params[name] = param;
   }
 
@@ -321,6 +399,7 @@ class BaseLfo {
    *  `dynamic`.
    */
   addStringParam(name, kind) {
+    this._checkParamName(name);
     const param = new StringParam(name, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -336,7 +415,8 @@ class BaseLfo {
    *  `dynamic`.
    */
   addEnumParam(name, list, kind) {
-    const param = new StringParam(name, list, this._initParams[name], kind, this);
+    this._checkParamName(name);
+    const param = new EnumParam(name, list, this._initParams[name], kind, this);
     this.params[name] = param;
   }
 
@@ -350,7 +430,8 @@ class BaseLfo {
    *  `dynamic`.
    */
   addAnyParam(name, kind) {
-    const param = new StringParam(name, this._initParams[name], kind, this);
+    this._checkParamName(name);
+    const param = new AnyParam(name, this._initParams[name], kind, this);
     this.params[name] = param;
   }
 
@@ -363,7 +444,12 @@ class BaseLfo {
    * @param {Mixed} value - New value of the parameter.
    */
   setParam(name, value) {
-    return this.params[name].value = value;
+    if (!this.params[name])
+      throw new Error(`Undefined parameter "${name}"`);
+
+    this.params[name].value = value;
+    // use the value cast done by the Param
+    return this.params[name].value;
   }
 
   /**
@@ -373,18 +459,25 @@ class BaseLfo {
    * @return {Mixed}
    */
   getParam(name) {
+    if (!this.params[name])
+      throw new Error(`Undefined parameter "${name}"`);
+
     return this.params[name].value;
   }
 
   /**
-   * Connect the node (aka `parent`) to another node (aka `child`). A given node
-   * can be connected to several children to which the stream is forwarded once
-   * the logic defined `process` is applied. This method allows to create lfo
-   * graphs.
+   * Connect the current node (the `parent`) to another node (the `child`).
+   * A given node can be connected to several children to which the stream
+   * is forwarded on each `process` call.
    *
-   * @param {BaseLfo} child - Next node in the graph.
+   * @param {BaseLfo} child - Child node.
+   * @see {@link BaseLfo#process}
+   * @see {@link BaseLfo#disconnect}
    */
   connect(child) {
+    if (!(child instanceof BaseLfo))
+      throw new Error('Child node is not an instance of `BaseLfo`');
+
     if (this.streamParams === null || child.streamParams === null)
       throw new Error('cannot connect a dead lfo node');
 
@@ -393,26 +486,30 @@ class BaseLfo {
   }
 
   /**
-   * Remove the `lfo` from its parent's children. Children of the current node
-   * are still connected, thus allow to connect all the subgraph from the
-   * current node to another parent.
-   *
-   * @todo - confirm it is the desired behavior in all cases.
+   * Remove the `lfo` from its parent's children.
+   * @todo Confirm it is the desired behavior in all cases, maybe we want to
+   *  destroy all the node of the sub-graph.
    */
   disconnect() {
     const index = this.parent.children.indexOf(this);
     this.parent.children.splice(index, 1);
+    this.parent = null;
   }
 
   /**
-   * Initialize the current node `streamParams` and `outFrame` buffer,
-   * propagates the computed stream attributes of the node to all its children.
-   * This method is internally called when a `lfo` source is started or when a
+   * Initialize the node `streamParams` attribute according to the paren's
+   * `streamParams`. Propagates the `streamParam` values to the children.
+   * Create the `outFrame` buffer according to the `streamParams` by calling
+   * the `setupStream` method.
+   * Is automatically called when a `lfo` source node is started or when a
    * `dynamic` parameter is updated.
    *
    * @param {Object} [inStreamParams={}] - Stream parameters of the parent node.
-   * @param {Object} [outStreamParams={}] - Optionnal parameters that can override
-   *  the ones given by the parent.
+   * @param {Object} [outStreamParams={}] - Optionnal parameters that override
+   *  the parameters given by the parent.
+   *
+   * @see {@link BaseLfo#setupStream}
+   * @see {@link BaseLfo#streamParams}
    */
   initialize(inStreamParams = {}, outStreamParams = {}) {
     Object.assign(this.streamParams, inStreamParams, outStreamParams);
@@ -424,36 +521,13 @@ class BaseLfo {
   }
 
   /**
-   * Destroy all the nodes in the sub-graph starting from the current node.
-   * When detroyed, the `streamParams` of the object are set to `null`, this
-   * prevent to use it again in a graph.
+   * Create the `outFrame` buffer according to the `streamParams`. To prevent
+   * memory allocation, this buffer should be reused at each call of the
+   * `process` method.
    *
-   * @see {BaseLfo.connect}
-   */
-  destroy() {
-    // destroy all chidren
-    let index = this.children.length;
-
-    while (index--)
-      this.children[index].destroy();
-
-    // delete itself from the parent node
-    if (this.parent) {
-      const index =  this.parent.children.indexOf(this);
-      this.parent.children.splice(index, 1);
-    }
-
-    // cannot use a dead object as parent
-    this.streamParams = null;
-    // clean it's own references / disconnect audio nodes if needed
-  }
-
-  /**
-   * Create the `outFrame` buffer according to the defined `streamParams`.
-   * This buffer should be reused at each call of the `process` method to
-   * prevent memory allocation.
-   *
-   * @see {BaseLfo.process}
+   * @see {@link BaseLfo#initialize}
+   * @see {@link BaseLfo#process}
+   * @todo Define if it should be merged with `initialize`.
    */
   setupStream() {
     const frameSize = this.streamParams.frameSize;
@@ -464,30 +538,51 @@ class BaseLfo {
 
   /**
    * Set all the values `outframe` buffer to 0.
-   * This method first propagate to all the children of the node, the stream is
-   * thus reset from the bottom to the top of the graph.
-   * `reset` is automatically called when a source is started, just after
-   * `initialize`.
+   * This method first propagate to all the children of the node, the graph
+   * then resets from bottom to top.
+   * This method is automatically called when a source is started, just
+   * after the call of `initialize`.
    *
-   * @see {BaseLfo.initialize}
-   * @todo - Check perfs of `Float32Array.fill` against `for` loop.
+   * @see {@link BaseLfo#initialize}
    */
   reset() {
     for (let i = 0, l = this.children.length; i < l; i++)
       this.children[i].reset();
 
-    // sinks have no `outFrame`
+    // sinks don't have any `outFrame`
     if (!this.outFrame)
       return;
 
-    // this.outFrame.fill(0); // probably better but doesn't work yet
     for (let i = 0, l = this.outFrame.length; i < l; i++)
       this.outFrame[i] = 0;
   }
 
   /**
+   * Destroy all the nodes in the sub-graph starting from the current node.
+   * When detroyed, the `streamParams` of the node are set to `null`, this
+   * prevent to reconnect it to another node.
+   *
+   * @see {@link BaseLfo#connect}
+   */
+  destroy() {
+    // destroy all chidren
+    let index = this.children.length;
+
+    while (index--)
+      this.children[index].destroy();
+
+    // delete itself from the parent node
+    if (this.parent)
+      this.disconnect();
+
+    // mark the object as dead
+    this.streamParams = null;
+  }
+
+
+  /**
    * Finalize the stream. This method is automatically called when a source is
-   * stopped with the corresponding logical time.
+   * stopped.
    *
    * @param {Number} endTime - Logical time at which the graph is stopped.
    */
@@ -497,36 +592,57 @@ class BaseLfo {
   }
 
   /**
-   * Forward the current frame along with the current time and metadatas to
-   * the children of the node. This method should be called at the end of the
-   * process if the node is not a `sink` node.
+   * Forward the current `time`, `outFrame` and `metadata` to the children.
+   * This method should be considered as a helper to be called at the end
+   * of the `process` method.
    *
    * @param {Number} [time=this.time] - Time corresponding to the current frame.
    * @param {Float32Array} [outFrame=this.outFrame] - Current frame.
-   * @param {Object} [metaData=this.metaData] - Associated metadatas.
+   * @param {Object} [metadata=this.metadata] - Associated metadatas.
+   * @see {@link BaseLfo#process}
    */
-  output(time = this.time, outFrame = this.outFrame, metaData = this.metaData) {
+  output(time = this.time, outFrame = this.outFrame, metadata = this.metadata) {
     for (let i = 0, l = this.children.length; i < l; i++)
-      this.children[i].process(time, outFrame, metaData);
+      this.children[i].process(time, outFrame, metadata);
   }
 
   /**
-   * The main function to override to create a new node, this is where the
-   * particular logic of a node the stream should be implemented.
-   * The implementation **must** update `this.time`, `this.frame` (optionnaly
-   * `this.metadata`) and call `process` on all the node's children (if the
-   * node is not a sink).
+   * Define the particular logic the derived node apply on the stream.
+   * The implementation **must** update `this.time`, `this.frame` and
+   * `this.metadata` according to the values forwarded by the parent.
+   * If the node is not a `sink` node, the implemention **must** also
+   * terminate the process with a call to `this.ouput()` to forward the current
+   * values to all the children of the node.
    *
    * @param {Number} time - Time of the current frame as given by the parent node.
    * @param {Float32Array} frame - Current frame as given by the parent node.
-   * @param {object} metaData - Metadatas forwarded by the parent node.
+   * @param {object} metadata - Metadatas as given by  by the parent node.
+   * @example
+   * // in the definition of a `DivideByTwo` lfo operator
+   * process(time, frame, metadata) {
+   *   super.process(time, frame, metadata);
+   *
+   *   const frameSize = this.streamParams.frameSize;
+   *   for (let i = 0; i < frameSize; i++)
+   *     this.outFrame[i] = frame[i] / 2;
+   *
+   *   this.time = time;
+   *   this.metadata = metadata;
+   *   this.output();
+   * }
    */
-  process(time, frame, metaData) {
-    this.time = time;
-    this.outFrame = frame;
-    this.metaData = metaData;
+  process(time, frame, metadata) {
+    if (this.paramUpdated === true) {
+      this.initialize();
+      this.reset();
+      this.paramUpdated = false;
+    }
 
-    this.output();
+    // this.time = time;
+    // this.outFrame = frame;
+    // this.metadata = metadata;
+
+    // this.output();
   }
 }
 

@@ -104,11 +104,11 @@ export default class BaseDraw extends BaseLfo {
    * @inheritdoc
    * @final
    */
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     const buffer = frame.buffer.slice(0); // copy values instead of reference
     const copy = new Float32Array(buffer);
 
-    this._stack.push({ time, frame: copy, metaData });
+    this._stack.push({ time, frame: copy, metadata });
   }
 
   draw() {

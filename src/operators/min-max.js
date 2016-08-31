@@ -14,7 +14,7 @@ export default class MinMax extends BaseLfo {
     });
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     let min = +Infinity;
     let max = -Infinity;
 
@@ -27,7 +27,7 @@ export default class MinMax extends BaseLfo {
     this.time = time;
     this.outFrame[0] = min;
     this.outFrame[1] = max;
-    this.metaData = metaData;
+    this.metadata = metadata;
 
     this.output();
   }

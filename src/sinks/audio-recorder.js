@@ -142,7 +142,7 @@ export default class AudioRecorder extends BaseLfo {
     this.stop();
   }
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     if (!this._isStarted) { return; }
     // `this.outFrame` must be recreated each time because
     // it is copied in the worker and lost for this context

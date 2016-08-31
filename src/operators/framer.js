@@ -40,7 +40,7 @@ export default class Framer extends BaseLfo {
     super.finalize(endTime);
   }
 
-  process(time, block, metaData) {
+  process(time, block, metadata) {
     const outFrame = this.outFrame;
     const sampleRate = this.streamParams.sourceSampleRate;
     const samplePeriod = 1 / sampleRate;
@@ -89,8 +89,8 @@ export default class Framer extends BaseLfo {
             this.time = time + (blockIndex - frameSize) * samplePeriod;
           }
 
-          // forward metaData ?
-          this.metaData = metaData;
+          // forward metadata ?
+          this.metadata = metadata;
 
           // forward to next nodes
           this.output();

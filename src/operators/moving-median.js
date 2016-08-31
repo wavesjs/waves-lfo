@@ -30,7 +30,7 @@ export default class MovingMedian extends BaseLfo {
 
   inputScalar() {}
 
-  process(time, frame, metaData) {
+  process(time, frame, metadata) {
     const outFrame = this.outFrame;
     const frameSize = frame.length;
     const order = this.params.order;
@@ -49,6 +49,6 @@ export default class MovingMedian extends BaseLfo {
       outFrame[i] = this.sorter[medianIndex];
     }
 
-    this.output(time, outFrame, metaData);
+    this.output(time, outFrame, metadata);
   }
 }
