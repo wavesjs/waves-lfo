@@ -20,30 +20,15 @@ function clip(value, lower, upper) {
  */
 class Param {
   constructor(name, type, value, kind, node) {
-    this._name = name;
-    this._type = type;
+    this.name = name;
+    this.type = type;
+    this.kind = kind;
+    this.node = node;
     this._value = value;
-    this._kind = kind;
-    this._node = node;
   }
 
   set value(value) {}
-
-  get value() {
-    return this._value;
-  }
-
-  /**
-   * If a dyncamic parameter is updated, re-initialize the node and
-   * propagate changes in the subgraph.
-   * @private
-   * @note - Maybe just setting a flag to true that would be checked in the
-   *  begining of `node.process` would be safer...
-   */
-  onUpdate() {
-    if (this._kind === 'dynamic')
-      this._node.paramUpdated = true;
-  }
+  get value() { return this._value; }
 }
 
 /**
@@ -53,15 +38,19 @@ class Param {
 export class BooleanParam extends Param {
   constructor(name, value, kind, node) {
     value = !!value;
+
     super(name, 'boolean', value, kind, node);
   }
 
   set value(value) {
+    if (this.kind === 'constant')
+      throw new Error(`Cannot update constant param "${this.name}"`);
+
     value = !!value;
 
     if (this._value !== value) {
       this._value = value;
-      this.onUpdate();
+      this.node.onParamUpdate(this.kind, this.name, value);
     }
 
     return this._value;
@@ -78,6 +67,8 @@ export class BooleanParam extends Param {
  */
 export class IntegerParam extends Param {
   constructor(name, lower, upper, value, kind, node) {
+    value = clip(parseInt(value, 10), lower, upper);
+
     super(name, 'integer', value, kind, node);
 
     this._lower = lower;
@@ -85,11 +76,14 @@ export class IntegerParam extends Param {
   }
 
   set value(value) {
+    if (this.kind === 'constant')
+      throw new Error(`Cannot update constant param "${this.name}"`);
+
     value = clip(parseInt(value, 10), this._lower, this._upper);
 
     if (this._value !== value) {
       this._value = value;
-      this.onUpdate();
+      this.node.onParamUpdate(this.kind, this.name, value);
     }
 
     return this._value;
@@ -106,6 +100,8 @@ export class IntegerParam extends Param {
  */
 export class FloatParam extends Param {
   constructor(name, lower, upper, value, kind, node) {
+    value = clip(value * 1, lower, upper);
+
     super(name, 'float', value, kind, node);
 
     this._lower = lower;
@@ -113,11 +109,14 @@ export class FloatParam extends Param {
   }
 
   set value(value) {
+    if (this.kind === 'constant')
+      throw new Error(`Cannot update constant param "${this.name}"`);
+
     value = clip(value * 1, this._lower, this._upper);
 
     if (this._value !== value) {
       this._value = value;
-      this.onUpdate();
+      this.node.onParamUpdate(this.kind, this.name, value);
     }
 
     return this._value;
@@ -134,15 +133,20 @@ export class FloatParam extends Param {
  */
 export class StringParam extends Param {
   constructor(name, value, kind, node) {
+    value = value + '';
+
     super(name, 'string', value, kind, node);
   }
 
   set value(value) {
+    if (this.kind === 'constant')
+      throw new Error(`Cannot update constant param "${this.name}"`);
+
     value = value + '';
 
     if (this._value !== value) {
       this._value = value;
-      this.onUpdate();
+      this.node.onParamUpdate(this.kind, this.name, value);
     }
 
     return this._value;
@@ -159,18 +163,24 @@ export class StringParam extends Param {
  */
 export class EnumParam extends Param {
   constructor(name, list, value, kind, node) {
+    if (list.indexOf(value) === -1)
+      throw new Error(`Invalid value for param "${name}" (valid values: ${list})`);
+
     super(name, 'enum', value, kind, node);
 
-    this._list = list;
+    this.list = list;
   }
 
   set value(value) {
-    if (this._list.indexOf(value) === -1)
-      throw new Error(`Invalid value for param "${this._name}" (valid values: ${this._list})`);
+    if (this.kind === 'constant')
+      throw new Error(`Cannot update constant param "${this.name}"`);
+
+    if (this.list.indexOf(value) === -1)
+      throw new Error(`Invalid value for param "${this.name}" (valid values: ${this.list})`);
 
     if (this._value !== value) {
       this._value = value;
-      this.onUpdate();
+      this.node.onParamUpdate(this.kind, this.name, value);
     }
 
     return this._value;
@@ -191,9 +201,12 @@ export class AnyParam extends Param {
   }
 
   set value(value) {
+    if (this.kind === 'constant')
+      throw new Error(`Cannot update constant param "${this.name}"`);
+
     if (this._value !== value) {
       this._value = value;
-      this.onUpdate();
+      this.node.onParamUpdate(this.kind, this.name, value);
     }
 
     return this._value;
@@ -203,23 +216,4 @@ export class AnyParam extends Param {
     return this._value;
   }
 }
-
-/**
- * Parameter representing a constant value.
- * @private
- */
-export class ConstantParam extends {
-  constructor(name, value, node) {
-    super(name, 'constant', value, 'constant', node);
-  }
-
-  set value(value) {
-    throw new Error(`Cannot set value to contant param "${this._name}"`);
-  }
-
-  get value() {
-    return this._value;
-  }
-}
-
 
