@@ -9,7 +9,7 @@ $ npm install wavesjs/waves-lfo [--save]
 ```
 
 ```js
-// @todo - create a working example that does something
+// @todo - create a working example that does something more funny...
 import * as lfo from 'waves-lfo';
 
 const source = new lfo.source.EventIn({ frameSize: 1 });
@@ -21,7 +21,6 @@ max.connect(sink);
 
 source.start();
 source.process(null, [0, 1]);
-
 ```
 
 ## Structure of a graph
@@ -55,7 +54,7 @@ __Stream__ - flux a frames, the state of the stream is defined in the `streamPar
 a `vector`
 
 
-## Exemple implementation of a new `lfo` operator
+## Implement a new `lfo` operator
 
 ```js
 class Multiplier extends BaseLfo {
