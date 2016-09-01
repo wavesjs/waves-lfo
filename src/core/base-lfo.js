@@ -4,7 +4,8 @@ import {
   FloatParam,
   StringParam,
   EnumParam,
-  AnyParam
+  AnyParam,
+  ConstantParam
 } from './params';
 
 let id = 0;
@@ -74,6 +75,8 @@ class BaseLfo {
       frameSize: 1,
       frameRate: 0,
       sourceSampleRate: 0,
+      inputType: null,
+      outputType: null,
     };
 
     /**
@@ -235,6 +238,20 @@ class BaseLfo {
   addAnyParam(name, kind) {
     this._checkParamName(name);
     const param = new AnyParam(name, this._initParams[name], kind, this);
+    this.params[name] = param;
+  }
+
+  /**
+   * Add a constant parameter to the node. The value of this parameter cannot
+   * be changed
+   * The value of the parameter should be defined in `defaults` or in the
+   * `options` given at instanciation.
+   *
+   * @param {String} name - Name of the parameter.
+   */
+  addConstantParam(name) {
+    this._checkParamName(name);
+    const param = new ConstantParam(name, this._initParams[name], this);
     this.params[name] = param;
   }
 

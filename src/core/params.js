@@ -204,4 +204,22 @@ export class AnyParam extends Param {
   }
 }
 
+/**
+ * Parameter representing a constant value.
+ * @private
+ */
+export class ConstantParam extends {
+  constructor(name, value, node) {
+    super(name, 'constant', value, 'constant', node);
+  }
+
+  set value(value) {
+    throw new Error(`Cannot set value to contant param "${this._name}"`);
+  }
+
+  get value() {
+    return this._value;
+  }
+}
+
 
