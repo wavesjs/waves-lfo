@@ -1,6 +1,7 @@
 import tape from 'tape';
 import BaseLfo from '../src/core/base-lfo';
 
+
 tape('Param', (test) => {
   test.comment('Param definition');
 

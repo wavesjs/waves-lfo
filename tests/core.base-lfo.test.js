@@ -29,6 +29,17 @@ tape('BaseLfo', (test) => {
       super.destroy();
       this.destroyCalled = true;
     }
+
+    finalize(endTime) {
+      super.finalize(endTime);
+      this.finalizeCalled = endTime;
+    }
+
+    process(time, frame, metadata) {
+      this.time = time;
+      this.frame = frame;
+      this.metadata = metadata;
+    }
   }
 
   const parent = new ParentNode({ test: true });
@@ -132,11 +143,43 @@ tape('BaseLfo', (test) => {
 
   // --------------------------------------------------
   test.comment('finalize');
+  const endTime = 1234;
+  parent.finalize(endTime);
+
+  test.deepEqual(child.finalizeCalled, endTime, 'should propagate `endTime` to children');
+
   // --------------------------------------------------
   test.comment('output');
+  const time = 1234;
+  const frame = [2];
+  const metadata = {};
+
+  parent.output(time, frame, metadata);
+
+  test.deepEqual(child.time, time, 'should call children `process` with time');
+  test.deepEqual(child.frame, frame, 'should call children `process` with frame');
+  test.deepEqual(child.metadata, metadata, 'should call children `process` with metadata');
+
   // --------------------------------------------------
   test.comment('process');
 
+  const oldInitialize = parent.initialize;
+  const oldReset = parent.reset;
+
+  parent.initialize = () => { parent.initializedCalled = true; }
+  parent.reset = () => { parent.resetCalled = true; }
+
+  parent.paramUpdated = true;
+  parent.process();
+
+  test.deepEqual(parent.initializedCalled, true, 'should call `initialize` if a dynamic param changed');
+  test.deepEqual(parent.resetCalled, true, 'should call `reset` if a dynamic param changed');
+  test.deepEqual(parent.paramUpdated, false, 'should reset `paramUpdated` to false');
+
+
+  // restore object state
+  parent.initialize = oldInitialize;
+  parent.reset = oldReset;
 
   // --------------------------------------------------
   test.comment('destroy');
