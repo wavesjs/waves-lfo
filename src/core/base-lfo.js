@@ -267,8 +267,13 @@ class BaseLfo {
   }
 
   /**
+   * Function called when a param is updated. By default is set the `reinit`
+   * flag to `true` if the param is `dynamic`.
    *
-   *
+   * @param {String} king - Kind of node, as defined at its creation: `static`
+   *  or `dynamic` (`constant` cannot be updated).
+   * @param {String} name - Name of the param.
+   * @param {Mixed} value - Current sanitized value of the param.
    */
   onParamUpdate(kind, name, value) {
     if (kind === 'dynamic')
@@ -359,12 +364,9 @@ class BaseLfo {
     for (let i = 0, l = this.children.length; i < l; i++)
       this.children[i].reset();
 
-    // sinks don't have any `outFrame`
-    if (!this.outFrame)
-      return;
-
-    for (let i = 0, l = this.outFrame.length; i < l; i++)
-      this.outFrame[i] = 0;
+    // sinks don't have `outFrame`
+    if (this.outFrame)
+      this.outFrame.fill(0)
   }
 
   /**
