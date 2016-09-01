@@ -1,5 +1,3 @@
 import BaseLfo from './base-lfo';
 
-export default {
-  BaseLfo
-};
+export default { BaseLfo };

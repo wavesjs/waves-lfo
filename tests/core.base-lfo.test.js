@@ -2,7 +2,7 @@ import BaseLfo from '../src/core/base-lfo';
 import tape from 'tape';
 
 
-tape('BaseLfo', (test) => {
+tape('BaseLfo', (t) => {
 
   class ParentNode extends BaseLfo {
     constructor(options) {
@@ -45,41 +45,41 @@ tape('BaseLfo', (test) => {
   const parent = new ParentNode({ test: true });
 
   // --------------------------------------------------
-  test.comment('constructor');
+  t.comment('constructor');
 
-  test.deepEqual(parent.getParam('test'), true, 'should override defaults with options');
+  t.deepEqual(parent.getParam('test'), true, 'should override defaults with options');
 
-  test.comment('getParam / setParam');
-  test.deepEqual(parent.setParam('test', false), false, '`setParam` should return the new value');
-  test.throws(() => parent.getParam('dontexists'), '`getParam` should throw an error if invalid param name');
-  test.throws(() => parent.setParam('dontexists'), '`setParam` should throw an error if invalid param name');
+  t.comment('getParam / setParam');
+  t.deepEqual(parent.setParam('test', false), false, '`setParam` should return the new value');
+  t.throws(() => parent.getParam('dontexists'), '`getParam` should throw an error if invalid param name');
+  t.throws(() => parent.setParam('dontexists'), '`setParam` should throw an error if invalid param name');
 
 
   // --------------------------------------------------
-  test.comment('connect');
+  t.comment('connect');
 
-  test.throws(() => parent.connect({}), 'should throw error if child is not a `BaseLfo` instance');
+  t.throws(() => parent.connect({}), 'should throw error if child is not a `BaseLfo` instance');
 
   const aliveChild = new ChildNode();
   parent.connect(aliveChild);
-  test.notDeepEqual(parent.children.indexOf(aliveChild), -1, 'should add child node to `children` attribute');
-  test.deepEqual(aliveChild.parent, parent, 'should be defined as the parent of the child node');
+  t.notDeepEqual(parent.children.indexOf(aliveChild), -1, 'should add child node to `children` attribute');
+  t.deepEqual(aliveChild.parent, parent, 'should be defined as the parent of the child node');
 
   const deadChild = new ChildNode();
   deadChild.streamParams = null;
-  test.throws(() => parent.connect(deadChild), 'should throw an error if trying to connect to a dead node');
+  t.throws(() => parent.connect(deadChild), 'should throw an error if trying to connect to a dead node');
 
 
   // --------------------------------------------------
-  test.comment('disconnect');
+  t.comment('disconnect');
 
   aliveChild.disconnect();
-  test.deepEqual(parent.children.indexOf(aliveChild), -1, 'should remove child node from parent\'s `children` attribute');
-  test.deepEqual(parent.parent, null, 'should set `parent` attribute to null');
+  t.deepEqual(parent.children.indexOf(aliveChild), -1, 'should remove child node from parent\'s `children` attribute');
+  t.deepEqual(parent.parent, null, 'should set `parent` attribute to null');
 
 
   // --------------------------------------------------
-  test.comment('initialize');
+  t.comment('initialize');
 
   // trace `setupStream` call
   const oldSetupStream = parent.setupStream;
@@ -101,32 +101,32 @@ tape('BaseLfo', (test) => {
 
   parent.initialize(inStreamParams, outStreamParams);
 
-  test.deepEqual(child.initializedCalled, true, 'should call `initialize` on children');
-  test.deepEqual(parent.setupStreamCalled, true, 'should call `setupStream`');
+  t.deepEqual(child.initializedCalled, true, 'should call `initialize` on children');
+  t.deepEqual(parent.setupStreamCalled, true, 'should call `setupStream`');
 
-  test.deepEqual(parent.streamParams.frameSize, outStreamParams.frameSize, 'should merge inStreamParams and outStreamParams');
-  test.deepEqual(parent.streamParams.frameRate, outStreamParams.frameRate, 'should merge inStreamParams and outStreamParams');
-  test.deepEqual(parent.streamParams.sourceSampleRate, inStreamParams.sourceSampleRate, 'should merge inStreamParams and outStreamParams');
+  t.deepEqual(parent.streamParams.frameSize, outStreamParams.frameSize, 'should merge inStreamParams and outStreamParams');
+  t.deepEqual(parent.streamParams.frameRate, outStreamParams.frameRate, 'should merge inStreamParams and outStreamParams');
+  t.deepEqual(parent.streamParams.sourceSampleRate, inStreamParams.sourceSampleRate, 'should merge inStreamParams and outStreamParams');
 
-  test.deepEqual(child.streamParams.frameSize,outStreamParams.frameSize, 'should propagate streamParams to children');
-  test.deepEqual(child.streamParams.frameRate, outStreamParams.frameRate, 'should propagate streamParams to children');
-  test.deepEqual(child.streamParams.sourceSampleRate, inStreamParams.sourceSampleRate, 'should propagate streamParams to children');
+  t.deepEqual(child.streamParams.frameSize,outStreamParams.frameSize, 'should propagate streamParams to children');
+  t.deepEqual(child.streamParams.frameRate, outStreamParams.frameRate, 'should propagate streamParams to children');
+  t.deepEqual(child.streamParams.sourceSampleRate, inStreamParams.sourceSampleRate, 'should propagate streamParams to children');
 
   // clean object
   parent.setupStream = oldSetupStream;
   parent.setupStremaCalled = undefined;
 
   // --------------------------------------------------
-  test.comment('setupStream');
+  t.comment('setupStream');
 
   parent.setupStream();
 
-  test.deepEqual((parent.outFrame instanceof Float32Array), true, 'should create the `outFrame` buffer');
-  test.deepEqual(parent.outFrame.length, parent.streamParams.frameSize, 'length of  `outFrame` buffer should be equal to `streamParams.frameSize`');
+  t.deepEqual((parent.outFrame instanceof Float32Array), true, 'should create the `outFrame` buffer');
+  t.deepEqual(parent.outFrame.length, parent.streamParams.frameSize, 'length of  `outFrame` buffer should be equal to `streamParams.frameSize`');
 
 
   // --------------------------------------------------
-  test.comment('reset');
+  t.comment('reset');
   const length = parent.outFrame.length;
   const expected = new Float32Array(length);
 
@@ -137,31 +137,31 @@ tape('BaseLfo', (test) => {
 
   parent.reset();
 
-  test.deepEqual(child.resetCalled, true, 'should call `reset` on children');
-  test.deepLooseEqual(parent.outFrame, expected, 'should fill `outFrame` with 0');
+  t.deepEqual(child.resetCalled, true, 'should call `reset` on children');
+  t.deepLooseEqual(parent.outFrame, expected, 'should fill `outFrame` with 0');
 
 
   // --------------------------------------------------
-  test.comment('finalize');
+  t.comment('finalize');
   const endTime = 1234;
   parent.finalize(endTime);
 
-  test.deepEqual(child.finalizeCalled, endTime, 'should propagate `endTime` to children');
+  t.deepEqual(child.finalizeCalled, endTime, 'should propagate `endTime` to children');
 
   // --------------------------------------------------
-  test.comment('output');
+  t.comment('output');
   const time = 1234;
   const frame = [2];
   const metadata = {};
 
   parent.output(time, frame, metadata);
 
-  test.deepEqual(child.time, time, 'should call children `process` with time');
-  test.deepEqual(child.frame, frame, 'should call children `process` with frame');
-  test.deepEqual(child.metadata, metadata, 'should call children `process` with metadata');
+  t.deepEqual(child.time, time, 'should call children `process` with time');
+  t.deepEqual(child.frame, frame, 'should call children `process` with frame');
+  t.deepEqual(child.metadata, metadata, 'should call children `process` with metadata');
 
   // --------------------------------------------------
-  test.comment('process');
+  t.comment('process');
 
   const oldInitialize = parent.initialize;
   const oldReset = parent.reset;
@@ -169,12 +169,12 @@ tape('BaseLfo', (test) => {
   parent.initialize = () => { parent.initializedCalled = true; }
   parent.reset = () => { parent.resetCalled = true; }
 
-  parent.paramUpdated = true;
+  parent.reinit = true;
   parent.process();
 
-  test.deepEqual(parent.initializedCalled, true, 'should call `initialize` if a dynamic param changed');
-  test.deepEqual(parent.resetCalled, true, 'should call `reset` if a dynamic param changed');
-  test.deepEqual(parent.paramUpdated, false, 'should reset `paramUpdated` to false');
+  t.deepEqual(parent.initializedCalled, true, 'should call `initialize` if a dynamic param changed');
+  t.deepEqual(parent.resetCalled, true, 'should call `reset` if a dynamic param changed');
+  t.deepEqual(parent.reinit, false, 'should reset `reinit` to false');
 
 
   // restore object state
@@ -182,12 +182,12 @@ tape('BaseLfo', (test) => {
   parent.reset = oldReset;
 
   // --------------------------------------------------
-  test.comment('destroy');
+  t.comment('destroy');
 
   parent.destroy();
 
-  test.deepEqual(child.destroyCalled, true, 'should call `destroy` on children');
-  test.deepEqual(parent.streamParams, null, 'should set `streamParams` to null');
+  t.deepEqual(child.destroyCalled, true, 'should call `destroy` on children');
+  t.deepEqual(parent.streamParams, null, 'should set `streamParams` to null');
 
-  test.end();
+  t.end();
 });

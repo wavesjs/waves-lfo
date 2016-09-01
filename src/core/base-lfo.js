@@ -4,7 +4,7 @@ import {
   FloatParam,
   StringParam,
   EnumParam,
-  AnyParam
+  AnyParam,
 } from './params';
 
 let id = 0;
@@ -32,6 +32,8 @@ let id = 0;
  * @param {String} name - Name of the node.
  * @param {Object} defaults - Default values for the parameters of the `lfo` node.
  * @param {Object} options - Values of parameters as defined during instanciation.
+ *
+ * @memberof module:core
  */
 class BaseLfo {
   constructor(defaults = {}, options = {}) {
@@ -42,21 +44,21 @@ class BaseLfo {
      * @type {Object}
      * @name params
      * @instance
-     * @memberof BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.params = {};
 
     /**
-     * Define if a `dynamic` parameter has been changed since the last input
-     * frame. When set to `true` the sub-graph starting at the current node
-     * is reinitialized.
+     * When set to `true` the sub-graph starting at the current node is
+     * reinitialized on the next process call. This attribute is typically
+     * set to `true` when a dynamic parameter is updated.
      * @type {Boolean}
-     * @name paramUpdated
+     * @name reinit
      * @instance
-     * @memberof BaseLfo
+     * @memberof module:core.BaseLfo
      * @private
      */
-    this.paramUpdated = false;
+    this.reinit = false;
 
     /**
      * Parameters of the stream from the point of vue of the current node.
@@ -64,16 +66,22 @@ class BaseLfo {
      * @type {Object}
      * @property {Number} frameSize - Frame size at the output of the node.
      * @property {Number} frameRate - Frame rate at the output of the node.
-     * @property {Number} sourceSampleRate - Sample rate of the source of the graph.
-     *  _This value should be defined by the sources and never modified later_.
+     * @property {Number} sourceSampleRate - Sample rate of the source of the
+     *  graph. _The value should be defined by sources and never modified_.
+     * @property {String} inputType - Type of input accepted by the node.
+     * @property {String} outputType - Type of output produced by the node.
+     * @property {Array|String} description - Describe the dimension(s) of
+     *  output stream.
      * @name streamParams
      * @instance
-     * @memberof BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.streamParams = {
       frameSize: 1,
       frameRate: 0,
       sourceSampleRate: 0,
+      inputType: null,
+      outputType: null,
     };
 
     /**
@@ -83,7 +91,7 @@ class BaseLfo {
      * @type {Array<BaseLfo>}
      * @name children
      * @instance
-     * @memberof BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.children = [];
 
@@ -94,7 +102,7 @@ class BaseLfo {
      * @type {BaseLfo}
      * @name parent
      * @instance
-     * @memberof BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.parent = null;
 
@@ -105,7 +113,7 @@ class BaseLfo {
      * @type {Number}
      * @name time
      * @instance
-     * @memberof BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.time = 0;
 
@@ -114,16 +122,16 @@ class BaseLfo {
      * @type {Float32Array}
      * @name output
      * @instance
-     * @memberof BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.outFrame = null;
 
     /**
      * _Stream_ - Metadata associated to the current frame.
-     * @type {Float32Array}
+     * @type {Object}
      * @name metadata
      * @instance
-     * @memberof BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.metadata = {};
 
@@ -134,7 +142,7 @@ class BaseLfo {
   /**
    * Check param name availability and if a default value is provided.
    * @param {String} name - Name of the parameter.
-   * @rpivate
+   * @private
    */
   _checkParamName(name) {
     if (this.params[name] !== undefined)
@@ -151,7 +159,7 @@ class BaseLfo {
    *
    * @param {String} name - Name of the parameter.
    * @param {String} kind - Define if the parameter is either `static` or
-   *  `dynamic`.
+   *  `dynamic` or `constant`.
    */
   addBooleanParam(name, kind) {
     const param = new BooleanParam(name, this._initParams[name], kind, this);
@@ -160,14 +168,12 @@ class BaseLfo {
 
   /**
    * Add a parameter of type `integer` to the node.
-   * The value of the parameter should be defined in `defaults` or in the
-   * `options` given at instanciation.
    *
    * @param {String} name - Name of the parameter.
    * @param {Number} lower - Minimum value.
    * @param {Number} upper - Maximum value.
    * @param {String} kind - Define if the parameter is either `static` or
-   *  `dynamic`.
+   *  `dynamic` or `constant`.
    */
   addIntegerParam(name, lower, upper, kind) {
     this._checkParamName(name);
@@ -177,14 +183,12 @@ class BaseLfo {
 
   /**
    * Add a parameter of type `integer` to the node.
-   * The value of the parameter should be defined in `defaults` or in the
-   * `options` given at instanciation.
    *
    * @param {String} name - Name of the parameter.
    * @param {Number} lower - Minimum value.
    * @param {Number} upper - Maximum value.
    * @param {String} kind - Define if the parameter is either `static` or
-   *  `dynamic`.
+   *  `dynamic` or `constant`.
    */
   addFloatParam(name, lower, upper, kind) {
     this._checkParamName(name);
@@ -194,12 +198,10 @@ class BaseLfo {
 
   /**
    * Add a parameter of type `integer` to the node.
-   * The value of the parameter should be defined in `defaults` or in the
-   * `options` given at instanciation.
    *
    * @param {String} name - Name of the parameter.
    * @param {String} kind - Define if the parameter is either `static` or
-   *  `dynamic`.
+   *  `dynamic` or `constant`.
    */
   addStringParam(name, kind) {
     this._checkParamName(name);
@@ -209,13 +211,11 @@ class BaseLfo {
 
   /**
    * Add a parameter of type `enum` to the node.
-   * The value of the parameter should be defined in `defaults` or in the
-   * `options` given at instanciation.
    *
    * @param {String} name - Name of the parameter.
    * @param {Array} list - Set of possible values for the parameter.
    * @param {String} kind - Define if the parameter is either `static` or
-   *  `dynamic`.
+   *  `dynamic` or `constant`.
    */
   addEnumParam(name, list, kind) {
     this._checkParamName(name);
@@ -225,12 +225,10 @@ class BaseLfo {
 
   /**
    * Add a parameter of `any` type to the node.
-   * The value of the parameter should be defined in `defaults` or in the
-   * `options` given at instanciation.
    *
    * @param {String} name - Name of the parameter.
    * @param {String} kind - Define if the parameter is either `static` or
-   *  `dynamic`.
+   *  `dynamic` or `constant`.
    */
   addAnyParam(name, kind) {
     this._checkParamName(name);
@@ -269,13 +267,27 @@ class BaseLfo {
   }
 
   /**
+   * Function called when a param is updated. By default is set the `reinit`
+   * flag to `true` if the param is `dynamic`.
+   *
+   * @param {String} king - Kind of node, as defined at its creation: `static`
+   *  or `dynamic` (`constant` cannot be updated).
+   * @param {String} name - Name of the param.
+   * @param {Mixed} value - Current sanitized value of the param.
+   */
+  onParamUpdate(kind, name, value) {
+    if (kind === 'dynamic')
+      this.reinit = true;
+  }
+
+  /**
    * Connect the current node (the `parent`) to another node (the `child`).
    * A given node can be connected to several children to which the stream
    * is forwarded on each `process` call.
    *
    * @param {BaseLfo} child - Child node.
-   * @see {@link BaseLfo#process}
-   * @see {@link BaseLfo#disconnect}
+   * @see {@link module:core.BaseLfo#process}
+   * @see {@link module:core.BaseLfo#disconnect}
    */
   connect(child) {
     if (!(child instanceof BaseLfo))
@@ -311,8 +323,8 @@ class BaseLfo {
    * @param {Object} [outStreamParams={}] - Optionnal parameters that override
    *  the parameters given by the parent.
    *
-   * @see {@link BaseLfo#setupStream}
-   * @see {@link BaseLfo#streamParams}
+   * @see {@link module:core.BaseLfo#setupStream}
+   * @see {@link module:core.BaseLfo#streamParams}
    */
   initialize(inStreamParams = {}, outStreamParams = {}) {
     Object.assign(this.streamParams, inStreamParams, outStreamParams);
@@ -328,8 +340,8 @@ class BaseLfo {
    * memory allocation, this buffer should be reused at each call of the
    * `process` method.
    *
-   * @see {@link BaseLfo#initialize}
-   * @see {@link BaseLfo#process}
+   * @see {@link module:core.BaseLfo#initialize}
+   * @see {@link module:core.BaseLfo#process}
    * @todo Define if it should be merged with `initialize`.
    */
   setupStream() {
@@ -346,18 +358,15 @@ class BaseLfo {
    * Is automatically called when a source is started, just after the call of
    * `initialize`.
    *
-   * @see {@link BaseLfo#initialize}
+   * @see {@link module:core.BaseLfo#initialize}
    */
   reset() {
     for (let i = 0, l = this.children.length; i < l; i++)
       this.children[i].reset();
 
-    // sinks don't have any `outFrame`
-    if (!this.outFrame)
-      return;
-
-    for (let i = 0, l = this.outFrame.length; i < l; i++)
-      this.outFrame[i] = 0;
+    // sinks don't have `outFrame`
+    if (this.outFrame)
+      this.outFrame.fill(0)
   }
 
   /**
@@ -365,7 +374,7 @@ class BaseLfo {
    * When detroyed, the `streamParams` of the node are set to `null`, this
    * prevent to reconnect it to another node.
    *
-   * @see {@link BaseLfo#connect}
+   * @see {@link module:core.BaseLfo#connect}
    */
   destroy() {
     // destroy all chidren
@@ -402,7 +411,7 @@ class BaseLfo {
    * @param {Number} [time=this.time] - Time corresponding to the current frame.
    * @param {Float32Array} [outFrame=this.outFrame] - Current frame.
    * @param {Object} [metadata=this.metadata] - Associated metadatas.
-   * @see {@link BaseLfo#process}
+   * @see {@link module:core.BaseLfo#process}
    */
   output(time = this.time, outFrame = this.outFrame, metadata = this.metadata) {
     for (let i = 0, l = this.children.length; i < l; i++)
@@ -435,10 +444,10 @@ class BaseLfo {
    * }
    */
   process(time, frame, metadata) {
-    if (this.paramUpdated === true) {
+    if (this.reinit === true) {
       this.initialize();
       this.reset();
-      this.paramUpdated = false;
+      this.reinit = false;
     }
 
     // this.time = time;
