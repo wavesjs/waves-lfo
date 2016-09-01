@@ -1,3 +1,9 @@
+/**
+ * @module core
+ * @module sources
+ * @module operators
+ * @module sinks
+ */
 export { default as core } from './core';
 export { default as sources } from './sources';
 export { default as sinks } from './sinks';
