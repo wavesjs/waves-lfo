@@ -3,7 +3,7 @@ import BaseLfo from '../core/base-lfo';
 /**
  * Output the max value of the current frame.
  *
- *
+ * @memberof module:operators
  *
  * @note - not sure if it's usefull, but let's use it as a exercice
  */
