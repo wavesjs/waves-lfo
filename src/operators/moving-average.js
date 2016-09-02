@@ -13,15 +13,22 @@ export default class MovingAverage extends BaseLfo {
     this.sum = null;
     this.ringBuffer = null;
     this.ringIndex = 0;
+
+    // don't need to reinit the whole sub graph, only the ringBuffer
+    this.addIntegerParam('order', 1, 1e9, 'static');
+    this.addFloatParam('fill', -Infinity, +Infinity, 'static');
   }
 
   initialize(inStreamParams) {
     super.initialize(inStreamParams);
 
-    this.ringBuffer = new Float32Array(this.params.order * this.streamParams.frameSize);
+    const frameSize = this.streamParams.frameSize;
+    const order = this.getParam('order');
 
-    if (this.streamParams.frameSize > 1)
-      this.sum = new Float32Array(this.streamParams.frameSize);
+    this.ringBuffer = new Float32Array(order * frameSize);
+
+    if (frameSize > 1)
+      this.sum = new Float32Array(frameSize);
     else
       this.sum = 0;
   }
@@ -29,9 +36,12 @@ export default class MovingAverage extends BaseLfo {
   reset() {
     super.reset();
 
-    this.ringBuffer.fill(this.params.fill);
+    const order = this.getParam('order');
+    const fill = this.getParam('fill');
 
-    const fillSum = this.params.order * this.params.fill;
+    this.ringBuffer.fill(fill);
+
+    const fillSum = order * fill;
 
     if (this.streamParams.frameSize > 1)
       this.sum.fill(fillSum);
@@ -42,7 +52,7 @@ export default class MovingAverage extends BaseLfo {
   }
 
   inputScalar(value) {
-    const order = this.params.order;
+    const order = this.getParam('order');
     const ringIndex = this.ringIndex;
     const ringBuffer = this.ringBuffer;
     let sum = this.sum;
@@ -57,28 +67,33 @@ export default class MovingAverage extends BaseLfo {
     return sum / order;
   }
 
+  /**
+   *
+   *
+   * @note - The fact of passing through an array seems to introduce more
+   * floating point errors.
+   */
   inputArray(frame) {
+    const order = this.getParam('order');
     const outFrame = this.outFrame;
-    const order = this.params.order;
     const frameSize = this.streamParams.frameSize;
     const ringIndex = this.ringIndex;
     const ringOffset = ringIndex * frameSize;
-    const ring = this.ringBuffer;
+    const ringBuffer = this.ringBuffer;
     const sum = this.sum;
     const scale = 1 / order;
 
     for (let i = 0; i < frameSize; i++) {
       const ringBufferIndex = ringOffset + i;
       const value = frame[i];
-      let sum = sum[i];
+      let localSum = sum[i];
 
-      sum -= ringBuffer[ringBufferIndex];
-      sum += value;
+      localSum -= ringBuffer[ringBufferIndex];
+      localSum += value;
 
-      outFrame[i] = sum * scale;
-
-      this.sum[i] = sum;
-      this.ringBuffer[ringBufferIndex] = value;
+      this.sum[i] = localSum;
+      outFrame[i] = localSum * scale;
+      ringBuffer[ringBufferIndex] = value;
     }
 
     this.ringIndex = (ringIndex + 1) % order;
@@ -87,6 +102,8 @@ export default class MovingAverage extends BaseLfo {
   }
 
   process(time, frame, metadata) {
+    const order = this.getParam('order');
+
     if (this.frameSize > 1)
       this.inputArray(frame);
     else
@@ -94,7 +111,7 @@ export default class MovingAverage extends BaseLfo {
 
     // shift time to take account of the added latency
     if (this.streamParams.sourceSampleRate)
-      time -= (0.5 * (this.params.order - 1) / this.streamParams.sourceSampleRate);
+      time -= (0.5 * (order - 1) / this.streamParams.sourceSampleRate);
 
     this.output(time, this.outFrame, metadata);
   }
