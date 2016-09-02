@@ -16,7 +16,7 @@ class Logger extends BaseLfo {
     }, options);
 
     this.addBooleanParam('time', 'static');
-    this.addBooleanParam('frame', 'static');
+    this.addBooleanParam('outFrame', 'static');
     this.addBooleanParam('metadata', 'static');
     this.addBooleanParam('streamParams', 'static');
   }
@@ -29,12 +29,14 @@ class Logger extends BaseLfo {
 
   process(time, frame, metadata) {
     if (this.getParam('time') === true)
-      console.log('%s' + time, 'color:blue');
+      console.log(time);
 
-    if (this.getParam('frame') === true)
+    if (this.getParam('outFrame') === true)
       console.log(frame);
 
     if (this.getParam('metadata') === true)
       console.log(metadata);
   }
 }
+
+export default Logger;
