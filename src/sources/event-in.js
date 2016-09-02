@@ -32,11 +32,10 @@ function getTimeFunction(audioContext = null) {
  * a stream from any source (eg. accelerometers) into a lfo graph.
  *
  * @param {Object} options - Override default parameters.
- * @param {String} [options.outType='block'] - Type of the output - allowed values:
- * `block` or `vector`.
+ * @param {String} [options.inputType='block'] - Type of the input - allowed
+ * values: `block` or `vector`.
  * @param {Number} [options.frameSize=1] - Size of the output frame.
- * @param {Number} [options.frameRate=0] - Frame rate of the stream. Also define the
- *  `sourceSampleRate` of the stream parameters.
+ * @param {Number} [options.sourceSampleRate=0] - Rate of the source stream.
  * @param {Array|String} [options.description] - Optionnal description describing
  *  the dimensions of the output frame
  * @param {Boolean} [options.absoluteTime=false] - Define if time should be used as
@@ -73,9 +72,9 @@ class EventIn extends BaseLfo {
 
     super({
       absoluteTime: false,
-      outputType: 'block',
+      inputType: 'block',
       frameSize: 1,
-      frameRate: 0,
+      sourceSampleRate: 0,
       description: null,
     }, options);
 
@@ -86,23 +85,31 @@ class EventIn extends BaseLfo {
     this._systemTime = undefined;
 
     this.addBooleanParam('absoluteTime', 'constant');
-    this.addConstantParam('outputType', ['block', 'vector'], 'constant');
+    this.addEnumParam('inputType', ['block', 'vector'], 'constant');
     this.addIntegerParam('frameSize', 1, 1e9, 'dynamic');
-    this.addFloatParam('frameRate', 0, 1e9, 'dynamic');
-    this.addAnyParam('frameRate', 'constant');
+    this.addFloatParam('sourceSampleRate', 0, 1e9, 'dynamic');
+    this.addAnyParam('description', 'constant');
   }
 
   initialize() {
     const frameSize = this.getParam('frameSize');
-    const frameRate = this.getParam('frameRate');
-    const sourceSampleRate = this.getParam('frameRate');
-    const outputType = this.getParam('outputType');
+    const sourceSampleRate = this.getParam('sourceSampleRate');
+    const inputType = this.getParam('inputType');
+    const outputType = inputType;
     const description = this.getParam('description');
+
+    let frameRate;
+
+    if (inputType === 'vector')
+      frameRate = sourceSampleRate;
+    else
+      frameRate = sourceSampleRate / frameSize;
 
     super.initialize({
       frameSize,
       frameRate,
       sourceSampleRate,
+      inputType,
       outputType,
       description,
     });
@@ -155,7 +162,7 @@ class EventIn extends BaseLfo {
     if (!frame.length)
       frame = [frame];
 
-    for (let i = 0; i < this.streamParam.frameSize; i++)
+    for (let i = 0; i < this.streamParams.frameSize; i++)
       this.outFrame[i] = frame[i];
 
     this.time = time;
