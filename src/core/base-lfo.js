@@ -5,7 +5,7 @@ import {
   StringParam,
   EnumParam,
   AnyParam,
-} from './params';
+} from './parameters';
 
 let id = 0;
 
@@ -144,7 +144,7 @@ class BaseLfo {
    * @param {String} name - Name of the parameter.
    * @private
    */
-  _checkParamName(name) {
+  _validateParamRequirements(name) {
     if (this.params[name] !== undefined)
       throw new Error('Param "${name}" already defined');
 
@@ -162,6 +162,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addBooleanParam(name, kind) {
+    this._validateParamRequirements(name);
     const param = new BooleanParam(name, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -176,7 +177,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addIntegerParam(name, lower, upper, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new IntegerParam(name, lower, upper, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -191,7 +192,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addFloatParam(name, lower, upper, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new FloatParam(name, lower, upper, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -204,7 +205,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addStringParam(name, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new StringParam(name, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -218,7 +219,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addEnumParam(name, list, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new EnumParam(name, list, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -231,7 +232,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addAnyParam(name, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new AnyParam(name, this._initParams[name], kind, this);
     this.params[name] = param;
   }
