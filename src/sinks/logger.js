@@ -9,10 +9,10 @@ import BaseLfo from '../core/base-lfo';
 class Logger extends BaseLfo {
   constructor(options) {
     super({
-      time: true,
-      outFrame: true,
-      metadata: true,
-      streamParams: true,
+      time: false,
+      outFrame: false,
+      metadata: false,
+      streamParams: false,
     }, options);
 
     this.addBooleanParam('time', 'static');
@@ -23,7 +23,6 @@ class Logger extends BaseLfo {
 
   initialize(inStreamParams) {
     super.initialize(inStreamParams);
-
     console.log(inStreamParams);
   }
 
