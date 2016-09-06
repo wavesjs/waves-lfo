@@ -1,9 +1,44 @@
 import BaseLfo from '../core/base-lfo';
 
-// NOTES:
-// - add 'symetrical' option (how to deal with values between frames ?) ?
-// - can we improve algorithm implementation ?
-export default class MovingAverage extends BaseLfo {
+/**
+ * Compute a moving average operation on the incomming value(s).
+ *
+ * The input of this node is considered as a vector then if the `frameSize` is
+ * superior to one, each index of the input frame is considered as belonging
+ * to a different dimension and processed in parallel.
+ * The node also expose two methods `inputScalar` and `inputArray` that allows
+ * to use it outside a graph (eg. inside another node)
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {Number} [options.order=10] - Number of successive values on which
+ *  the average is computed.
+ * @param {Number} [options.fill=0] - Value to fill the ring buffer with before
+ *  the firsts input frames.
+ *
+ * @memberof module:operators
+ * @example
+ * import * as lfo from 'waves-lfo';
+ *
+ * const eventIn = new lfo.sources.EventIn({ frameSize: 2, inputType: 'vector' });
+ * const movingAverage = new lfo.operators.MovingAverage({ order: 5, fill: 0 });
+ * const logger = new lfo.sinks.logger({ outFrame: true });
+ *
+ * eventIn.connect(movingAverage);
+ * movingAverage.connect(logger);
+ * eventIn.start();
+ *
+ * eventIn.process(null, [1, 1]);
+ * > [0.2, 0.2]
+ * eventIn.process(null, [1, 1]);
+ * > [0.4, 0.4]
+ * eventIn.process(null, [1, 1]);
+ * > [0.6, 0.6]
+ * eventIn.process(null, [1, 1]);
+ * > [0.8, 0.8]
+ * eventIn.process(null, [1, 1]);
+ * > [1, 1]
+ */
+class MovingAverage extends BaseLfo {
   constructor(options) {
     super({
       order: 10,
@@ -19,8 +54,31 @@ export default class MovingAverage extends BaseLfo {
     this.addFloatParam('fill', -Infinity, +Infinity, 'static');
   }
 
+  onParamUpdate(kind, name, value) {
+    super.onParamUpdate(kind, name, value);
+
+    // @todo - should be done lazily in process
+    switch (name) {
+      case 'order':
+        this.setupStream();
+        this.reset();
+        break;
+      case 'fill':
+        this.reset();
+        break;
+    }
+  }
+
   initialize(inStreamParams) {
-    super.initialize(inStreamParams);
+    super.initialize(inStreamParams, {
+      inputType: 'vector',
+      outputType: 'vector',
+      // inherit description from parent as the dimensions do not change
+    });
+  }
+
+  setupStream() {
+    super.setupStream();
 
     const frameSize = this.streamParams.frameSize;
     const order = this.getParam('order');
@@ -51,6 +109,25 @@ export default class MovingAverage extends BaseLfo {
     this.ringIndex = 0;
   }
 
+  /**
+   * Process the input value and outputs the average according to the order.
+   *
+   * This method allows for the use a `MovingAverage` outside a graph (eg.
+   * inside another node), in this case `initialize` and `reset` should be
+   * called manually on the node.
+   *
+   * @param {Number} value - Input value to process.
+   * @return {Number} - Average value.
+   *
+   * @example
+   * const movingAverage = new MovingAverage({ order: 5, fill: 0 });
+   * // the frame size must be defined manually as it is not forwarded by a parent node
+   * movingAverage.initialize({ frameSize: 1 });
+   * movingAverage.reset();
+   *
+   * movingAverage.inputScalar(1);
+   * > 0.2
+   */
   inputScalar(value) {
     const order = this.getParam('order');
     const ringIndex = this.ringIndex;
@@ -68,10 +145,22 @@ export default class MovingAverage extends BaseLfo {
   }
 
   /**
+   * Process the input values and outputs the moving average for each indices.
    *
+   * This method allows for the use of a `MovingAverage` outside a graph (eg.
+   * inside another node), in this case `initialize` and `reset` should be
+   * called manually on the node.
    *
-   * @note - The fact of passing through an array seems to introduce more
-   * floating point errors.
+   * @param {Array|Float32Array} frame - Input values to process.
+   * @return {Float32Array} - Average values.
+   * @example
+   * const movingAverage = new MovingAverage({ order: 5, fill: 0 });
+   * // the frame size must be defined manually as it is not forwarded by a parent node
+   * movingAverage.initialize({ frameSize: 2 });
+   * movingAverage.reset();
+   *
+   * movingAverage.inputArray([1, 1]);
+   * > [0.2, 0.2]
    */
   inputArray(frame) {
     const order = this.getParam('order');
@@ -102,9 +191,11 @@ export default class MovingAverage extends BaseLfo {
   }
 
   process(time, frame, metadata) {
+    super.process();
+
     const order = this.getParam('order');
 
-    if (this.frameSize > 1)
+    if (this.streamParams.frameSize > 1)
       this.inputArray(frame);
     else
       this.outFrame[0] = this.inputScalar(frame[0]);
@@ -116,3 +207,5 @@ export default class MovingAverage extends BaseLfo {
     this.output(time, this.outFrame, metadata);
   }
 }
+
+export default MovingAverage;
