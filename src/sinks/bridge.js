@@ -21,4 +21,12 @@ export default class Bridge extends BaseLfo {
   reset() {
     this.data.length = 0;
   }
+
+  process(time, frame, metadata) {
+    for (let i = 0; i < this.streamParams.frameSize; i++)
+      this.data[i] = frame[i];
+
+    this.time = 0;
+    this.metadata = metadata;
+  }
 }

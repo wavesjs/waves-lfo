@@ -2,6 +2,13 @@ import BaseLfo from '../core/base-lfo';
 import MovingAverage from '../operators/moving-average';
 
 
+/**
+ * Find the zero-crossing on the incomming signal.
+ *
+ * @todo - should throttle values to have a constant output frame rate
+ * now the output frame rate depends on the frequency of the signal, which
+ * can probably cause some problems.
+ */
 class ZeroCrossing extends BaseLfo {
 
   constructor(options) {
@@ -20,7 +27,6 @@ class ZeroCrossing extends BaseLfo {
     // how to handle that correctly ?
     this.addIntegerParam('order', 1, 1000, 'static');
 
-    console.log(this.getParam('order'));
     this.movingAverage = new MovingAverage({
       order: this.getParam('order'),
       fill: 0,
