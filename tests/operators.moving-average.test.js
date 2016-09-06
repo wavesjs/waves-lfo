@@ -20,7 +20,7 @@ tape('MovingAverage', (t) => {
   expected = new Float32Array(order);
   expected.fill(fill);
 
-  t.deepLooseEqual(node.ringBuffer, expected, `should define ring buffer size according to frameSize and with given fill values`);
+  t.deepLooseEqual(node.ringBuffer, expected, `should define ring buffer size according to order and frameSize filled with given default`);
 
 
   frameSize = 3;
@@ -29,7 +29,7 @@ tape('MovingAverage', (t) => {
   expected = new Float32Array(order * frameSize);
   expected.fill(fill);
 
-  t.deepLooseEqual(node.ringBuffer, expected, `should define ring buffer size according to frameSize and with given fill values`);
+  t.deepLooseEqual(node.ringBuffer, expected, `should define ring buffer size according to order and frameSize filled with given default`);
 
 
   t.comment('scalar input');
@@ -45,6 +45,7 @@ tape('MovingAverage', (t) => {
     const avg = sAvg.inputScalar(values[i]);
     t.deepEqual(avg, expected[i], 'should output a proper mean');
   }
+
 
   t.comment('array input');
 
@@ -63,6 +64,23 @@ tape('MovingAverage', (t) => {
       t.deepLooseEqual(avg[j].toFixed(2), expected[i][j], 'should output proper means');
   }
 
+
+  t.comment('update order parameter');
+
+  const updateOrder = new MovingAverage({ order: 3, fill: 0 });
+  updateOrder.initialize({ frameSize: 1 });
+  updateOrder.reset();
+  updateOrder.setParam('order', 5);
+
+  values = [1, 1, 1, 1, 1];
+  expected = [1/5, 2/5, 3/5, 4/5, 1];
+
+  for (let i = 0; i < values.length; i++) {
+    const avg = updateOrder.inputScalar(values[i]);
+    t.deepEqual(avg, expected[i], 'should output a proper mean');
+  }
+
+  t.comment('@todo - test `process`');
 
   t.end();
 });
