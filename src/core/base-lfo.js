@@ -292,10 +292,16 @@ class BaseLfo {
    */
   connect(child) {
     if (!(child instanceof BaseLfo))
-      throw new Error('Child node is not an instance of `BaseLfo`');
+      throw new Error('Invalid connection: child node is not an instance of `BaseLfo`');
 
     if (this.streamParams === null || child.streamParams === null)
-      throw new Error('cannot connect a dead lfo node');
+      throw new Error('Invalid connection: cannot connect a dead lfo node');
+
+    const outputType = this.streamParams.outputType;
+    const inputType = child.streamParams.inputType;
+
+    if (outputType !== inputType)
+      throw new Error(`Invalid connection: parent output is of type "${outputType}" - child input is of type "${inputType}"`);
 
     this.children.push(child);
     child.parent = this;
