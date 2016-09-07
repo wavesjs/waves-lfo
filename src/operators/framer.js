@@ -5,7 +5,7 @@ import BaseLfo from '../core/base-lfo';
  * Change the frameSize, frameRate and hopSize of the signal.
  * Typically used in front of a fft...
  *
- * @todo - Crash when hopSize > frameSize
+ * @todo - fix crash when hopSize > frameSize (allow to have a decimator for free)
  */
 export default class Framer extends BaseLfo {
   constructor(options) {
@@ -56,9 +56,8 @@ export default class Framer extends BaseLfo {
       let numSkip = 0;
 
       // skip block samples for negative frameIndex
-      if (frameIndex < 0) {
+      if (frameIndex < 0)
         numSkip = -frameIndex;
-      }
 
       if (numSkip < blockSize) {
         blockIndex += numSkip; // skip block segment
@@ -69,13 +68,12 @@ export default class Framer extends BaseLfo {
         // connot copy more than what fits into the frame
         const maxCopy = frameSize - frameIndex;
 
-        if (numCopy >= maxCopy) {
+        if (numCopy >= maxCopy)
           numCopy = maxCopy;
-        }
 
         // copy block segment into frame
+        // @todo - just do a loop
         const copy = block.subarray(blockIndex, blockIndex + numCopy);
-
         outFrame.set(copy, frameIndex);
 
         // advance block and frame index
@@ -85,11 +83,10 @@ export default class Framer extends BaseLfo {
         // send frame when completed
         if (frameIndex === frameSize) {
           // define time tag for the outFrame according to configuration
-          if (this.params.centeredTimeTag) {
+          if (this.params.centeredTimeTag)
             this.time = time + (blockIndex - frameSize / 2) * samplePeriod;
-          } else {
+          else
             this.time = time + (blockIndex - frameSize) * samplePeriod;
-          }
 
           // forward metadata ?
           this.metadata = metadata;
@@ -98,9 +95,8 @@ export default class Framer extends BaseLfo {
           this.output();
 
           // shift frame left
-          if (hopSize < frameSize) {
+          if (hopSize < frameSize)
             outFrame.set(outFrame.subarray(hopSize, frameSize), 0);
-          }
 
           frameIndex -= hopSize; // hop forward
         }
