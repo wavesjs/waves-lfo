@@ -1,4 +1,4 @@
-## Floating point errors
+## Notes on floating point errors
 
 some tests (cf moving-median) do hardcore clipping to test values, after convertion to 32bits, this leads to a fake impression of incorrectness when casting values.
 
