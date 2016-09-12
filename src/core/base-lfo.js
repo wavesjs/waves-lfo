@@ -80,8 +80,9 @@ class BaseLfo {
       frameSize: 1,
       frameRate: 0,
       sourceSampleRate: 0,
-      inputType: null,
-      outputType: null,
+      frameType: null,
+      description: null,
+      // outputType: null,
     };
 
     /**
@@ -297,11 +298,11 @@ class BaseLfo {
     if (this.streamParams === null || child.streamParams === null)
       throw new Error('Invalid connection: cannot connect a dead lfo node');
 
-    const outputType = this.streamParams.outputType;
-    const inputType = child.streamParams.inputType;
+    // const outputType = this.streamParams.outputType;
+    // const inputType = child.streamParams.inputType;
 
-    if (outputType !== inputType)
-      throw new Error(`Invalid connection: parent output is of type "${outputType}" - child input is of type "${inputType}"`);
+    // if (outputType !== inputType)
+    //   throw new Error(`Invalid connection: parent output is of type "${outputType}" - child input is of type "${inputType}"`);
 
     this.children.push(child);
     child.parent = this;
@@ -333,14 +334,14 @@ class BaseLfo {
    * @see {@link module:core.BaseLfo#setupStream}
    * @see {@link module:core.BaseLfo#streamParams}
    */
-  initialize(inStreamParams = {}, outStreamParams = {}) {
-    Object.assign(this.streamParams, inStreamParams, outStreamParams);
-    // create the `outFrame` arrayBuffer
-    this.setupStream();
-    // propagate initialization in the graph
-    for (let i = 0, l = this.children.length; i < l; i++)
-      this.children[i].initialize(this.streamParams);
-  }
+  // initialize(inStreamParams = {}, outStreamParams = {}) {
+  //   Object.assign(this.streamParams, inStreamParams, outStreamParams);
+  //   // create the `outFrame` arrayBuffer
+  //   this.setupStream();
+  //   // propagate initialization in the graph
+  //   for (let i = 0, l = this.children.length; i < l; i++)
+  //     this.children[i].initialize(this.streamParams);
+  // }
 
   /**
    * Create the `outFrame` buffer according to the `streamParams`. To prevent
@@ -351,11 +352,19 @@ class BaseLfo {
    * @see {@link module:core.BaseLfo#process}
    * @todo Define if it should be merged with `initialize`.
    */
-  setupStream() {
+  setupStream(inStreamParams) {
+    Object.assign(this.streamParams, inStreamParams);
+
+    this.streamParams.xxx = yyy;
+
+    this.streamParams = inStreamParams;
+
     const frameSize = this.streamParams.frameSize;
 
     if (frameSize > 0)
       this.outFrame = new Float32Array(frameSize);
+
+    // this.outputStreamParameters();
   }
 
   /**

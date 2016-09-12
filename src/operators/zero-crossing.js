@@ -5,9 +5,11 @@ import MovingAverage from '../operators/moving-average';
 /**
  * Find the zero-crossing on the incomming signal.
  *
- * @todo - should throttle values to have a constant output frame rate
- * now the output frame rate depends on the frequency of the signal, which
- * can probably cause some problems.
+ * @todo
+ * - implement proper outputRate, depends on signal freq...
+ * - validate implementation
+ * - validate chosen output values
+ * - quadratic interpolation ?
  */
 class ZeroCrossing extends BaseLfo {
 
