@@ -5,7 +5,7 @@ import {
   StringParam,
   EnumParam,
   AnyParam,
-} from './params';
+} from './parameters';
 
 let id = 0;
 
@@ -80,8 +80,9 @@ class BaseLfo {
       frameSize: 1,
       frameRate: 0,
       sourceSampleRate: 0,
-      inputType: null,
-      outputType: null,
+      frameType: null,
+      description: null,
+      // outputType: null,
     };
 
     /**
@@ -144,7 +145,7 @@ class BaseLfo {
    * @param {String} name - Name of the parameter.
    * @private
    */
-  _checkParamName(name) {
+  _validateParamRequirements(name) {
     if (this.params[name] !== undefined)
       throw new Error('Param "${name}" already defined');
 
@@ -162,6 +163,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addBooleanParam(name, kind) {
+    this._validateParamRequirements(name);
     const param = new BooleanParam(name, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -176,7 +178,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addIntegerParam(name, lower, upper, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new IntegerParam(name, lower, upper, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -191,7 +193,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addFloatParam(name, lower, upper, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new FloatParam(name, lower, upper, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -204,7 +206,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addStringParam(name, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new StringParam(name, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -218,7 +220,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addEnumParam(name, list, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new EnumParam(name, list, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -231,7 +233,7 @@ class BaseLfo {
    *  `dynamic` or `constant`.
    */
   addAnyParam(name, kind) {
-    this._checkParamName(name);
+    this._validateParamRequirements(name);
     const param = new AnyParam(name, this._initParams[name], kind, this);
     this.params[name] = param;
   }
@@ -291,10 +293,16 @@ class BaseLfo {
    */
   connect(child) {
     if (!(child instanceof BaseLfo))
-      throw new Error('Child node is not an instance of `BaseLfo`');
+      throw new Error('Invalid connection: child node is not an instance of `BaseLfo`');
 
     if (this.streamParams === null || child.streamParams === null)
-      throw new Error('cannot connect a dead lfo node');
+      throw new Error('Invalid connection: cannot connect a dead lfo node');
+
+    // const outputType = this.streamParams.outputType;
+    // const inputType = child.streamParams.inputType;
+
+    // if (outputType !== inputType)
+    //   throw new Error(`Invalid connection: parent output is of type "${outputType}" - child input is of type "${inputType}"`);
 
     this.children.push(child);
     child.parent = this;
@@ -326,14 +334,14 @@ class BaseLfo {
    * @see {@link module:core.BaseLfo#setupStream}
    * @see {@link module:core.BaseLfo#streamParams}
    */
-  initialize(inStreamParams = {}, outStreamParams = {}) {
-    Object.assign(this.streamParams, inStreamParams, outStreamParams);
-    // create the `outFrame` arrayBuffer
-    this.setupStream();
-    // propagate initialization in the graph
-    for (let i = 0, l = this.children.length; i < l; i++)
-      this.children[i].initialize(this.streamParams);
-  }
+  // initialize(inStreamParams = {}, outStreamParams = {}) {
+  //   Object.assign(this.streamParams, inStreamParams, outStreamParams);
+  //   // create the `outFrame` arrayBuffer
+  //   this.setupStream();
+  //   // propagate initialization in the graph
+  //   for (let i = 0, l = this.children.length; i < l; i++)
+  //     this.children[i].initialize(this.streamParams);
+  // }
 
   /**
    * Create the `outFrame` buffer according to the `streamParams`. To prevent
@@ -344,11 +352,19 @@ class BaseLfo {
    * @see {@link module:core.BaseLfo#process}
    * @todo Define if it should be merged with `initialize`.
    */
-  setupStream() {
+  setupStream(inStreamParams) {
+    Object.assign(this.streamParams, inStreamParams);
+
+    this.streamParams.xxx = yyy;
+
+    this.streamParams = inStreamParams;
+
     const frameSize = this.streamParams.frameSize;
 
     if (frameSize > 0)
       this.outFrame = new Float32Array(frameSize);
+
+    // this.outputStreamParameters();
   }
 
   /**

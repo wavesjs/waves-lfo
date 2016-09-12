@@ -9,32 +9,33 @@ import BaseLfo from '../core/base-lfo';
 class Logger extends BaseLfo {
   constructor(options) {
     super({
-      time: true,
-      outFrame: true,
-      metadata: true,
-      streamParams: true,
+      time: false,
+      outFrame: false,
+      metadata: false,
+      streamParams: false,
     }, options);
 
     this.addBooleanParam('time', 'static');
-    this.addBooleanParam('frame', 'static');
+    this.addBooleanParam('outFrame', 'static');
     this.addBooleanParam('metadata', 'static');
     this.addBooleanParam('streamParams', 'static');
   }
 
   initialize(inStreamParams) {
     super.initialize(inStreamParams);
-
     console.log(inStreamParams);
   }
 
   process(time, frame, metadata) {
     if (this.getParam('time') === true)
-      console.log('%s' + time, 'color:blue');
+      console.log(time);
 
-    if (this.getParam('frame') === true)
+    if (this.getParam('outFrame') === true)
       console.log(frame);
 
     if (this.getParam('metadata') === true)
       console.log(metadata);
   }
 }
+
+export default Logger;

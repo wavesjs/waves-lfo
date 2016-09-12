@@ -20,7 +20,7 @@ export default class Marker extends BaseDraw {
 
     if (value > this.params.threshold) {
       ctx.save();
-      ctx.strokeStyle = this.params.color;
+      ctx.strokeStyle = color;
       ctx.beginPath();
       ctx.moveTo(-iShift, this.getYPosition(this.params.min));
       ctx.lineTo(-iShift, this.getYPosition(this.params.max));

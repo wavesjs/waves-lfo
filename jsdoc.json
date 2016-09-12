@@ -4,7 +4,9 @@
       "README.md",
       "src/core/base-lfo.js",
 
-      "src/operators/max.js",
+      "src/operators/moving-average.js",
+      "src/operators/moving-median.js",
+      // "src/operators/max.js",
 
       "src/sources/event-in.js"
     ]
@@ -20,6 +22,7 @@
   "templates": {
     "default": {
       "useLongnameInNav": true
-    }
+    },
+    "footer": "custom footer, insert ircam logo etc."
   }
 }

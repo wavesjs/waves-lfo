@@ -9,16 +9,16 @@ export default class AudioInNode extends BaseLfo {
     super({
       frameSize: 512,
       channel: 0,
-      ctx: null,
-      src: null,
+      audioContext: null,
+      sourceNode: null,
     }, options);
 
     if (!this.params.ctx || !(this.params.ctx instanceof AudioContext)) {
-      throw new Error('Missing audio context parameter (ctx)');
+      throw new Error('Missing audio context parameter (audioContext)');
     }
 
     if (!this.params.src || !(this.params.src instanceof AudioNode)) {
-      throw new Error('Missing audio source node parameter (src)');
+      throw new Error('Missing audio source node parameter (sourceNode)');
     }
   }
 
