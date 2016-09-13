@@ -1,3 +1,3 @@
-import BaseLfo from './base-lfo';
+import BaseLfo from './BaseLfo';
 
 export default { BaseLfo };
