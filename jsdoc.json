@@ -2,13 +2,13 @@
   "source": {
     "include": [
       "README.md",
-      "src/core/base-lfo.js",
+      "src/core/BaseLfo.js"
 
-      "src/operators/moving-average.js",
-      "src/operators/moving-median.js",
+      // "src/operators/moving-average.js",
+      // "src/operators/moving-median.js",
       // "src/operators/max.js",
 
-      "src/sources/event-in.js"
+      // "src/sources/event-in.js"
     ]
   },
   "plugins": [

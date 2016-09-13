@@ -1,15 +1,14 @@
 import BaseLfo from '../core/base-lfo';
 
 /**
- * Create a function that return a time in seconds depending on the
- * environnement (node or browser)
+ * Create a function that returns time in seconds according to the current
+ * environnement (node or browser).
  * If running in node the time rely on `process.hrtime`, while if in the browser
- * it is provided by the current time of an `AudioContext`, this context can
+ * it is provided by the `currentTime` of an `AudioContext`, this context can
  * optionnaly be provided to keep time consistency between several `EventIn`
  * nodes.
  *
- * @param {AudioContext} [audioContext=null] - Optionnal audio context to be
- *  used to get the time.
+ * @param {AudioContext} [audioContext=null] - Optionnal audio context.
  * @return {Function}
  * @private
  */
@@ -28,8 +27,8 @@ function getTimeFunction(audioContext = null) {
 }
 
 /**
- * The `EventIn` class allows to manually create a stream of data or to feed
- * a stream from any source (eg. accelerometers) into a lfo graph.
+ * The `EventIn` operator allows to manually create a stream of data or to feed
+ * a stream from another source (eg. accelerometers) into a processing graph.
  *
  * @param {Object} options - Override default parameters.
  * @param {String} [options.inputType='block'] - Type of the input - allowed
