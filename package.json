@@ -29,7 +29,8 @@
   },
   "dependencies": {
     "babel-runtime": "^6.6.1",
-    "jsfft": "dntj/jsfft"
+    "jsfft": "dntj/jsfft",
+    "parameters": "ircam-jstools/parameters#v1.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",
