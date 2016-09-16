@@ -12,12 +12,14 @@ tape('BaseLfo', (t) => {
 
   class ChildNode extends BaseLfo {
     processStreamParams(prevStreamParams) {
-      Object.assign(this.streamParams, prevStreamParams);
+      this.prepareStreamParams(prevStreamParams);
+
+      this.frame.data = new Float32Array(this.streamParams.frameSize);
       this.processStreamParamsCalled = true;
     }
 
-    reset() {
-      super.reset();
+    resetStream() {
+      super.resetStream();
       this.resetCalled = true;
     }
 
@@ -26,15 +28,13 @@ tape('BaseLfo', (t) => {
       this.destroyCalled = true;
     }
 
-    finalize(endTime) {
-      super.finalize(endTime);
+    finalizeStream(endTime) {
+      super.finalizeStream(endTime);
       this.finalizeCalled = endTime;
     }
 
-    processFrame(frameTime, frameData, frameMetadata) {
-      this.frameTime = frameTime;
-      this.frameData = frameData;
-      this.frameMetadata = frameMetadata;
+    processFrame(frame) {
+      this.frame = frame;
     }
   }
 
@@ -91,42 +91,42 @@ tape('BaseLfo', (t) => {
   t.deepEqual(child.streamParams.sourceSampleRate, streamParams.sourceSampleRate, 'should propagate streamParams');
 
   // --------------------------------------------------
-  t.comment('reset');
+  t.comment('resetStream');
 
-  const length = parent.frameData.length;
+  const length = parent.frame.data.length;
   const expected = new Float32Array(length);
 
   for (let i = 0; i < length; i++) {
-    parent.frameData[i] = Math.random();
+    parent.frame.data[i] = Math.random();
     expected[i] = 0;
   }
 
-  parent.reset();
+  parent.resetStream();
 
   t.deepEqual(child.resetCalled, true, 'should call `reset` on children');
-  t.deepLooseEqual(parent.frameData, expected, 'should fill `frameData` with 0');
+  t.deepLooseEqual(parent.frame.data, expected, 'should fill `frameData` with 0');
 
 
   // --------------------------------------------------
-  t.comment('finalize');
+  t.comment('finalizeStream');
 
   const endTime = 1234;
-  parent.finalize(endTime);
+  parent.finalizeStream(endTime);
 
   t.deepEqual(child.finalizeCalled, endTime, 'should propagate `endTime` to children');
 
   // --------------------------------------------------
-  t.comment('outputFrame');
+  t.comment('propagateFrame');
 
-  parent.frameTime = 1234;
-  parent.frameData = [2];
-  parent.frameMetadata = {};
+  parent.frame.time = 1234;
+  parent.frame.data = [2];
+  parent.frame.metadata = {};
 
-  parent.outputFrame();
+  parent.propagateFrame();
 
-  t.deepEqual(child.frameTime, parent.frameTime, 'should call children `processFrame` with frameTime');
-  t.deepEqual(child.frameData, parent.frameData, 'should call children `processFrame` with frameData');
-  t.deepEqual(child.frameMetadata, parent.frameMetadata, 'should call children `processFrame` with frameMetadata');
+  t.deepEqual(child.frame.time, parent.frame.time, 'should call children `processFrame` with frameTime');
+  t.deepEqual(child.frame.data, parent.frame.data, 'should call children `processFrame` with frameData');
+  t.deepEqual(child.frame.metadata, parent.frame.metadata, 'should call children `processFrame` with frameMetadata');
 
   // --------------------------------------------------
   t.comment('processFrame');
@@ -138,7 +138,7 @@ tape('BaseLfo', (t) => {
   parent.reset = () => { parent.resetCalled = true; }
 
   parent.reinit = true;
-  parent.processFrame();
+  parent.processFrame({});
 
   t.deepEqual(parent.processStreamParamsCalled, true, 'should call `initialize` if a dynamic param changed');
   t.deepEqual(parent.resetCalled, true, 'should call `reset` if a dynamic param changed');

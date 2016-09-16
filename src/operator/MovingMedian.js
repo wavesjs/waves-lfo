@@ -1,14 +1,27 @@
-import BaseLfo from '../core/base-lfo';
+import BaseLfo from '../core/BaseLfo';
+import parameters from 'parameters';
 
+const definitions = {
+  order: {
+    type: 'integer',
+    min: 1,
+    max: 1e9,
+    default: 9,
+    metas: { kind: 'dyanmic' },
+  },
+  fill: {
+    type: 'float',
+    min: -Infinity,
+    max: +Infinity,
+    default: 0,
+    metas: { kind: 'dyanmic' },
+  },
+};
 
 /**
  * Compute a moving median operation on the incomming value(s).
  *
- * The input of this node is considered as a vector then if the `frameSize` is
- * superior to one, each index of the input frame is considered as belonging
- * to a different dimension and processed in parallel.
- * The node also expose two methods `inputScalar` and `inputArray` that allows
- * to use it outside a graph (eg. inside another node)
+ * @todo - Implement `processSignal`
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.order=9] - Number of successive values on which
@@ -28,85 +41,73 @@ import BaseLfo from '../core/base-lfo';
  * movingMedian.connect(logger);
  * eventIn.start();
  *
- * eventIn.process(null, [1, 1]);
+ * eventIn.processFrame(null, [1, 1]);
  * > [0, 0]
- * eventIn.process(null, [2, 2]);
+ * eventIn.processFrame(null, [2, 2]);
  * > [0, 0]
- * eventIn.process(null, [3, 3]);
+ * eventIn.processFrame(null, [3, 3]);
  * > [1, 1]
- * eventIn.process(null, [4, 4]);
+ * eventIn.processFrame(null, [4, 4]);
  * > [2, 2]
- * eventIn.process(null, [5, 5]);
+ * eventIn.processFrame(null, [5, 5]);
  * > [3, 3]
  */
 class MovingMedian extends BaseLfo {
   constructor(options) {
-    super({
-      order: 9,
-      fill: 0,
-    }, options);
+    super();
+
+    this.params = parameters(definitions, options);
+    this.params.addListener(this.onParamUpdate.bind(this));
 
     this.ringBuffer = null;
     this.sorter = null;
     this.ringIndex = 0;
 
-    this.addIntegerParam('order', 1, 1e9, 'static');
-    this.addFloatParam('fill', -Infinity, Infinity, 'static');
-
-    this.ensureOddOrder();
+    this._ensureOddOrder();
   }
 
   /** @private */
-  ensureOddOrder() {
-    const order = this.getParam('order');
-
-    if (order % 2 === 0)
+  _ensureOddOrder() {
+    if (this.params.get('order') % 2 === 0)
       throw new Error(`Invalid value ${order} for param "order" - should be odd`);
   }
 
   /** @inheritdoc */
-  onParamUpdate(kind, name, value) {
-    super.onParamUpdate(kind, name, value);
+  onParamUpdate(name, value, metas) {
+    super.onParamUpdate(name, value, metas);
 
     switch (name) {
       case 'order':
-        this.ensureOddOrder();
-        this.setupStream();
-        this.reset();
+        this._ensureOddOrder();
+        this.processStreamParams();
+        this.resetStream();
         break;
       case 'fill':
-        this.reset();
+        this.resetStream();
         break;
     }
   }
 
-  /** @inheritdoc */
-  initialize(inStreamParams) {
-    super.initialize(inStreamParams, {
-      inputType: 'vector',
-      outType: 'vector',
-      // inherit description from parent as the dimensions do not change
-    });
-  }
-
-  /** @inheritdoc */
-  setupStream() {
-    super.setupStream();
+  processStreamParams(prevStreamParams = {}) {
+    this.prepareStreamParams(prevStreamParams);
+    // outType is similar to input type
 
     const frameSize = this.streamParams.frameSize;
-    const order = this.getParam('order');
+    const order = this.params.get('order');
 
     this.ringBuffer = new Float32Array(frameSize * order);
     this.sortBuffer = new Float32Array(frameSize * order);
 
     this.minIndices = new Uint32Array(frameSize);
+
+    this.propagateStreamParams();
   }
 
   /** @inheritdoc */
-  reset() {
-    super.reset();
+  resetStream() {
+    super.resetStream();
 
-    const fill = this.getParam('fill');
+    const fill = this.params.get('fill');
 
     this.ringBuffer.fill(fill);
     this.ringIndex = 0;
@@ -115,18 +116,26 @@ class MovingMedian extends BaseLfo {
   /**
    * Process the input value and outputs the median according to the order.
    *
+   * @param {Number} frame - Frame given by the previous node.
+   */
+  processScalar(frame) {
+    const median = this.inputScalar(frame.data);
+    this.frame.data = median;
+  }
+
+  /**
    * This method allows for the use of a `MovingMedian` outside a graph (eg.
-   * inside another node), in this case `initialize` and `reset` should be
-   * called manually on the node.
+   * inside another node), in this case `processStreamParams` and `resetStream`
+   * should be called manually on the node.
    *
-   * @param {Number} value - Input value to process.
+   * @param {Number} value - Value to feed the moving median with.
    * @return {Number} - Median value.
    *
    * @example
    * const movingMedian = new MovingMedian({ order: 5, fill: 0 });
    * // the frame size must be defined manually as it is not forwarded by a parent node
-   * movingMedian.initialize({ frameSize: 1 });
-   * movingMedian.reset();
+   * movingMedian.processStreamParams({ frameSize: 1 });
+   * movingMedian.resetStream();
    *
    * movingMedian.inputScalar(1);
    * > 0
@@ -141,7 +150,7 @@ class MovingMedian extends BaseLfo {
     const ringIndex = this.ringIndex;
     const ringBuffer = this.ringBuffer;
     const sortBuffer = this.sortBuffer;
-    const order = this.getParam('order');
+    const order = this.params.get('order');
     const medianIndex = (order - 1) / 2;
     let startIndex = 0;
 
@@ -169,25 +178,34 @@ class MovingMedian extends BaseLfo {
       startIndex += 1;
     }
 
+    const median = sortBuffer[medianIndex];
     this.ringIndex = (ringIndex + 1) % order;
-    return sortBuffer[medianIndex];
+
+    return median;
   }
 
   /**
    * Process the input values and outputs the moving median for each indices.
    *
+   * @param {Array|Float32Array} frame - Frame given by the previous operator.
+   */
+  processVector(frame) {
+    this.inputVector(frame.data);
+  }
+
+  /**
    * This method allows for the use of a `MovingMedian` outside a graph (eg.
-   * inside another node), in this case `initialize` and `reset` should be
-   * called manually on the node.
+   * inside another node), in this case `processStreamParams` and `resetStream`
+   * should be called manually on the node.
    *
-   * @param {Array|Float32Array} frame - Input values to process.
-   * @return {Float32Array} - Median values foreach dimension.
+   * @param {Array} vector - Values to feed the moving median with.
+   * @return {Float32Array} - Median values for each dimension.
    *
    * @example
    * const movingMedian = new MovingMedian({ order: 5, fill: 0 });
    * // the frame size must be defined manually as it is not forwarded by a parent node
-   * movingMedian.initialize({ frameSize: 3 });
-   * movingMedian.reset();
+   * movingMedian.processStreamParams({ frameSize: 3 });
+   * movingMedian.resetStream();
    *
    * movingMedian.inputArray([1, 1]);
    * > [0, 0]
@@ -196,14 +214,14 @@ class MovingMedian extends BaseLfo {
    * movingMedian.inputArray([3, 3]);
    * > [2, 2]
    */
-  inputArray(frame) {
+  inputVector(vector) {
     const ringBuffer = this.ringBuffer;
     const ringIndex = this.ringIndex;
     const sortBuffer = this.sortBuffer;
-    const outFrame = this.outFrame;
+    const outFrame = this.frame.data;
     const minIndices = this.minIndices;
     const frameSize = this.streamParams.frameSize;
-    const order = this.getParam('order');
+    const order = this.params.get('order');
     const medianIndex = Math.floor(order / 2);
     let startIndex = 0;
 
@@ -217,10 +235,8 @@ class MovingMedian extends BaseLfo {
           const index = k * frameSize + j;
 
           // update ring buffer corresponding to current
-          if (k === ringIndex && i === 0) {
-            ringBuffer[index] = frame[j];
-            // console.log(j, Array.from(ringBuffer));
-          }
+          if (k === ringIndex && i === 0)
+            ringBuffer[index] = vector[j];
 
           // copy value in sort buffer on first pass
           if (i === 0) 
@@ -246,27 +262,25 @@ class MovingMedian extends BaseLfo {
       startIndex += 1;
     }
 
-    // console.log(sortBuffer);
     this.ringIndex = (ringIndex + 1) % order;
 
-    return this.outFrame;
+    return this.frame.data;
   }
 
-  process(time, frame, metadata) {
-    super.process();
+  processFrame(frame) {
+    // this.preprocessFrame(); // not needed as their is no static param
+    this.processFunction(frame);
 
-    const order = this.getParam('order');
-
-    if (this.streamParams.frameSize > 1)
-      this.inputArray(frame);
-    else
-      this.outFrame[0] = this.inputScalar(frame[0]);
-
+    const order = this.params.get('order');
+    let time = frame.time;
     // shift time to take account of the added latency
     if (this.streamParams.sourceSampleRate)
       time -= (0.5 * (order - 1) / this.streamParams.sourceSampleRate);
 
-    this.output(time, this.outFrame, metadata);
+    this.frame.time = time;
+    this.frame.metadata = frame.metadata;
+
+    this.propagateFrame(time, this.outFrame, metadata);
   }
 }
 

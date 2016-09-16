@@ -1,29 +1,24 @@
-const length = 1e6;
-const buf = new Float32Array(length);
-const arr = [];
-let err = 0;
+import EventIn from '../src/sources/EventIn';
+import Logger from '../src/sinks/Logger';
 
-let max = 0;
-let min = +Infinity;
+const eventIn = new EventIn({
+  frameType: 'scalar',
+});
 
-for (let i = 0; i < length; i++) {
-  const value = Math.random();
-  buf[i] = value;
-  arr[i] = value;
+const logger = new Logger({
+  streamParams: true,
+  frameTime: true,
+  frameData: true,
+});
 
-  const val = buf[i];
+eventIn.connect(logger);
+eventIn.start();
 
-  const diff = arr[i] - buf[i];
+let time = 0;
 
-  const abs = Math.abs(diff);
-  if (abs > max) max = abs;
-  if (abs < min) min = abs;
+(function loop() {
+  eventIn.processFrame(time, Math.random());
+  time += 1;
 
-  err += diff;
-}
-
-err /= length;
-
-console.log('mean error', err);
-console.log('min error', min);
-console.log('max error', max);
+  setTimeout(loop, 1000);
+}());
