@@ -1,4 +1,4 @@
-import BaseDraw from './BaseDraw';
+import BaseDisplay from './BaseDisplay';
 import MinMax from '../operator/MinMax';
 import RMS from '../operator/RMS';
 import { getRandomColor } from '../utils/draw-utils';
@@ -6,8 +6,9 @@ import { getRandomColor } from '../utils/draw-utils';
 
 const definitions = {
   color: {
-    type: 'any',
+    type: 'string',
     default: null,
+    nullable: true,
   },
   rms: {
     type: 'boolean',
@@ -57,7 +58,7 @@ const definitions = {
  * eventIn.process(0, [0, 0.5, 1, 0.5]);
  * eventIn.process(0.5, [0, -0.5, -1, -0.5]);
  */
-class Waveform extends BaseDraw {
+class WaveformDisplay extends BaseDisplay {
   constructor(options) {
     super(definitions, options);
 
@@ -120,4 +121,4 @@ class Waveform extends BaseDraw {
   }
 }
 
-export default Waveform;
+export default WaveformDisplay;

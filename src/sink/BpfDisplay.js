@@ -1,4 +1,4 @@
-import BaseDraw from './BaseDraw';
+import BaseDisplay from './BaseDisplay';
 import { getRandomColor } from '../utils/draw-utils';
 
 const definitions = {
@@ -69,7 +69,7 @@ const definitions = {
  *   setTimeout(generateVector, 250);
  * }());
  */
-class Bpf extends BaseDraw {
+class BpfDisplay extends BaseDisplay {
   constructor(options) {
     super(definitions, options);
     // for loop mode
@@ -126,5 +126,5 @@ class Bpf extends BaseDraw {
   }
 }
 
-export default Bpf;
+export default BpfDisplay;
 

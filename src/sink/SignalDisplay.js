@@ -1,4 +1,4 @@
-import BaseDraw from './BaseDraw';
+import BaseDisplay from './BaseDisplay';
 import { getRandomColor } from '../utils/draw-utils';
 
 const floor = Math.floor;
@@ -25,9 +25,10 @@ function downSample(data, targetLength) {
 
 const definitions = {
   color: {
-    type: 'any',
+    type: 'string',
     default: null,
-  }
+    nullable: true,
+  },
 };
 
 
@@ -74,7 +75,7 @@ const definitions = {
  * eventIn.process(0, [0, 0.5, 1, 0.5]);
  * eventIn.process(0.5, [0, -0.5, -1, -0.5]);
  */
-class Signal extends BaseDraw {
+class SignalDisplay extends BaseDisplay {
   constructor(options) {
     super(definitions, options);
 
@@ -135,4 +136,4 @@ class Signal extends BaseDraw {
   }
 }
 
-export default Signal;
+export default SignalDisplay;

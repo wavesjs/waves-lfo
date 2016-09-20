@@ -62,7 +62,7 @@ const commonDefinitions = {
  * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
  *  in which to draw. _constant parameter_
  */
-class BaseDraw extends BaseLfo {
+class BaseDisplay extends BaseLfo {
   constructor(defs, options) {
     super();
 
@@ -372,4 +372,4 @@ class BaseDraw extends BaseLfo {
   // }
 }
 
-export default BaseDraw;
+export default BaseDisplay;
