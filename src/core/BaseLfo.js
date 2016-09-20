@@ -1,15 +1,14 @@
-
 let id = 0;
 
 /**
  * Base `lfo` class to be extended in order to create new nodes.
  *
  * Nodes are divided in 3 categories:
- * - **`sources`** are responsible for acquering a signal and its properties
+ * - **`source`** are responsible for acquering a signal and its properties
  *   (frameRate, frameSize, etc.)
- * - **`sinks`** are endpoints of the graph, such nodes can be recorders,
+ * - **`sink`** are endpoints of the graph, such nodes can be recorders,
  *   visualizers, etc.
- * - **`operators`** are used to make computation on the input signal and
+ * - **`operator`** are used to make computation on the input signal and
  *   forward the results below in the graph.
  *
  * In most cases the methods to override / extend are:
@@ -52,7 +51,7 @@ class BaseLfo {
     /**
      * The node at which the current node is connected (upper in the graph) and
      * from which it receives frames to process at each cycle.
-     * For `sources`, this attribute is `null`.
+     * For `source`, this attribute is `null`.
      *
      * @type {BaseLfo}
      * @name prevOp
@@ -115,18 +114,6 @@ class BaseLfo {
      * @private
      */
     this.reinit = false;
-
-    /**
-     * Pointer to function to be called in `processFrame` according to the
-     * `streamParams.inputType`. Is dynamically assigned in `prepareStreamParams`.
-     *
-     * @type {Object}
-     * @name processFunction
-     * @instance
-     * @memberof module:core.BaseLfo
-     * @see {@link module:core.BaseLfo#prepareStreamParams}
-     */
-    this.processFunction = (frame) => this.frame = frame;
   }
 
   /**
@@ -137,7 +124,7 @@ class BaseLfo {
    * @param {Mixed} value - Value of the parameter.
    * @param {Object} metas - Metadata associated to the parameter.
    */
-  onParamUpdate(name, value, metas) {
+  onParamUpdate(name, value, metas = {}) {
     if (metas.kind === 'static')
       this.reinit = true;
   }
@@ -213,10 +200,12 @@ class BaseLfo {
    * @see {@link module:core.BaseLfo#processStreamParams}
    */
   resetStream() {
+    // buttom up
     for (let i = 0, l = this.nextOps.length; i < l; i++)
       this.nextOps[i].resetStream();
 
-    if (this.streamParams.frameType !== 'scalar')
+    // no buffer for `scalar` type or sink node
+    if (this.streamParams.frameType !== 'scalar' && this.frame.data !== null)
       this.frame.data.fill(0);
   }
 
@@ -265,10 +254,14 @@ class BaseLfo {
 
     switch (prevFrameType) {
       case 'scalar':
-        if (!('processScalar' in this))
-          throw new Error(`${this.constructor.name} - "processScalar" is not defined`);
-
-        this.processFunction = this.inputScalar;
+        if (this.processScalar)
+          this.processFunction = this.processScalar;
+        else if (this.processVector)
+          this.processFunction = this.processVector;
+        else if (this.processSignal)
+          this.processFunction = this.processSignal;
+        else
+          throw new Error(`${this.constructor.name} - no "process" function found`);
         break;
       case 'vector':
         if (!('processVector' in this))
@@ -296,8 +289,7 @@ class BaseLfo {
    * @see {@link module:core.BaseLfo#processStreamParams}
    */
   propagateStreamParams() {
-    if (this.streamParams.frameType !== 'scalar')
-      this.frame.data = new Float32Array(this.streamParams.frameSize);
+    this.frame.data = new Float32Array(this.streamParams.frameSize);
 
     for (let i = 0, l = this.nextOps.length; i < l; i++)
       this.nextOps[i].processStreamParams(this.streamParams);
@@ -346,6 +338,17 @@ class BaseLfo {
 
     this.processFunction(frame);
     this.propagateFrame();
+  }
+
+  /**
+   * Pointer to function to be called in `processFrame` according to the
+   * `streamParams.frameType`. Is dynamically assigned in `prepareStreamParams`.
+   *
+   * @see {@link module:core.BaseLfo#processFrame}
+   * @see {@link module:core.BaseLfo#prepareStreamParams}
+   */
+  processFunction(frame) {
+    this.frame = frame;
   }
 
   /**
