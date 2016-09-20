@@ -25,17 +25,17 @@ const definitions = {
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.order=9] - Number of successive values on which
- *  the median is searched. This value should be odd.
+ *  the median is searched. This value should be odd. _dynamic parameter_
  * @param {Number} [options.fill=0] - Value to fill the ring buffer with before
- *  the firsts input frames.
+ *  the firsts input frames. _dynamic parameter_
  *
- * @memberof module:operators
+ * @memberof module:operator
  * @example
  * import * as lfo from 'waves-lfo';
  *
- * const eventIn = new lfo.sources.EventIn({ frameSize: 2, inputType: 'vector' });
- * const movingMedian = new lfo.operators.MovingMedian({ order: 5, fill: 0 });
- * const logger = new lfo.sinks.logger({ outFrame: true });
+ * const eventIn = new lfo.source.EventIn({ frameSize: 2, frameType: 'vector' });
+ * const movingMedian = new lfo.operator.MovingMedian({ order: 5, fill: 0 });
+ * const logger = new lfo.sink.Logger({ outFrame: true });
  *
  * eventIn.connect(movingMedian);
  * movingMedian.connect(logger);
@@ -72,7 +72,7 @@ class MovingMedian extends BaseLfo {
       throw new Error(`Invalid value ${order} for param "order" - should be odd`);
   }
 
-  /** @inheritdoc */
+  /** @private */
   onParamUpdate(name, value, metas) {
     super.onParamUpdate(name, value, metas);
 
@@ -88,6 +88,7 @@ class MovingMedian extends BaseLfo {
     }
   }
 
+  /** @private */
   processStreamParams(prevStreamParams = {}) {
     this.prepareStreamParams(prevStreamParams);
     // outType is similar to input type
@@ -103,7 +104,7 @@ class MovingMedian extends BaseLfo {
     this.propagateStreamParams();
   }
 
-  /** @inheritdoc */
+  /** @private */
   resetStream() {
     super.resetStream();
 
@@ -113,19 +114,14 @@ class MovingMedian extends BaseLfo {
     this.ringIndex = 0;
   }
 
-  /**
-   * Process the input value and outputs the median according to the order.
-   *
-   * @param {Number} frame - Frame given by the previous node.
-   */
+  /** @private */
   processScalar(frame) {
-    const median = this.inputScalar(frame.data);
-    this.frame.data = median;
+    this.frame.data[0] = this.inputScalar(frame.data);
   }
 
   /**
-   * This method allows for the use of a `MovingMedian` outside a graph (eg.
-   * inside another node), in this case `processStreamParams` and `resetStream`
+   * Allows for the use of a `MovingMedian` outside a graph (e.g. inside
+   * another node), in this case `processStreamParams` and `resetStream`
    * should be called manually on the node.
    *
    * @param {Number} value - Value to feed the moving median with.
@@ -145,6 +141,9 @@ class MovingMedian extends BaseLfo {
    * > 1
    * movingMedian.inputScalar(4);
    * > 2
+   *
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
    */
   inputScalar(value) {
     const ringIndex = this.ringIndex;
@@ -184,18 +183,14 @@ class MovingMedian extends BaseLfo {
     return median;
   }
 
-  /**
-   * Process the input values and outputs the moving median for each indices.
-   *
-   * @param {Array|Float32Array} frame - Frame given by the previous operator.
-   */
+  /** @private */
   processVector(frame) {
     this.inputVector(frame.data);
   }
 
   /**
-   * This method allows for the use of a `MovingMedian` outside a graph (eg.
-   * inside another node), in this case `processStreamParams` and `resetStream`
+   * Allows for the use of a `MovingMedian` outside a graph (e.g. inside
+   * another node), in this case `processStreamParams` and `resetStream`
    * should be called manually on the node.
    *
    * @param {Array} vector - Values to feed the moving median with.
@@ -213,6 +208,9 @@ class MovingMedian extends BaseLfo {
    * > [1, 1]
    * movingMedian.inputArray([3, 3]);
    * > [2, 2]
+   *
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
    */
   inputVector(vector) {
     const ringBuffer = this.ringBuffer;
