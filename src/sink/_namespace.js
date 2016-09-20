@@ -7,8 +7,15 @@
 // import SynchronizedDraw from './synchronized-draw';
 // import Trace from './trace';
 // import Waveform from './waveform';
+import Bpf from './Bpf';
 import Logger from './Logger';
+import Signal from './Signal';
+import Waveform from './Waveform';
+
 
 export default {
-  Logger
+  Bpf,
+  Logger,
+  Signal,
+  Waveform,
 };
