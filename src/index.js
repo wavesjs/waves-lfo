@@ -1,8 +1,8 @@
 /**
  * @module core
- * @module sources
- * @module operators
- * @module sinks
+ * @module source
+ * @module operator
+ * @module sink
  */
 export { default as core } from './core/_namespace';
 export { default as source } from './source/_namespace';
