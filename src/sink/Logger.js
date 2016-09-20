@@ -1,18 +1,19 @@
 import BaseLfo from '../core/BaseLfo';
 import parameters from 'parameters';
 
+
 const definitions = {
-  frameTime: {
+  time: {
     type: 'boolean',
     default: false,
     metas: { kind: 'dynamic' }
   },
-  frameData: {
+  data: {
     type: 'boolean',
     default: false,
     metas: { kind: 'dynamic' }
   },
-  frameMetadata: {
+  metadata: {
     type: 'boolean',
     default: false,
     metas: { kind: 'dynamic' }
@@ -25,23 +26,25 @@ const definitions = {
 }
 
 /**
- * Utility sink to log the `frameTime`, `frameData`, `frameMetadata` and/or
- * the `streamAttributes` in any.
+ * Utility sink to log `frame.time`, `frame.data`, `frame.metadata` and/or
+ * `streamAttributes` of any node.
  *
  * @param {Object} options - Override parameters' default values.
- * @param {Boolean} [options.frameTime=false] - If set to true, log all
- *  incomming `frameTime`
- * @param {Boolean} [options.frameData=false] - If set to true, log all
- *  incomming `frameData`
- * @param {Boolean} [options.frameMetadata=false] - If set to true, log all
- *  incomming `frameMetadata`
+ * @param {Boolean} [options.time=false] - If set to true, log all
+ *  incomming `frame.time`
+ * @param {Boolean} [options.data=false] - If set to true, log all
+ *  incomming `frame.data`
+ * @param {Boolean} [options.metadata=false] - If set to true, log all
+ *  incomming `frame.metadata`
  * @param {Boolean} [options.streamParams=false] - If set to true, log
- *  `streamParams` of previous operator when the graph is started.
+ *  `streamParams` of the previous operator when the graph is started.
  *
  * @todo - should extends LfoSink
  *
+ * @memberof module:sink
+ *
  * @example
- * const logger = new Logger({ frameTime: true });
+ * const logger = new Logger({ data: true });
  * whateverOperator.connect(logger);
  */
 class Logger extends BaseLfo {
@@ -51,20 +54,22 @@ class Logger extends BaseLfo {
     this.params = parameters(definitions, options);
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     if (this.params.get('streamParams') === true)
       console.log(prevStreamParams);
   }
 
-  processFunction(frameTime, frameData, frameMetadata) {
-    if (this.params.get('frameTime') === true)
-      console.log(frameTime);
+  /** @private */
+  processFunction(frame) {
+    if (this.params.get('time') === true)
+      console.log(frame.time);
 
-    if (this.params.get('frameData') === true)
-      console.log(frameData);
+    if (this.params.get('data') === true)
+      console.log(frame.data);
 
-    if (this.params.get('frameMetadata') === true)
-      console.log(frameMetadata);
+    if (this.params.get('metadata') === true)
+      console.log(frame.metadata);
   }
 }
 
