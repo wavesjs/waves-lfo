@@ -28,9 +28,6 @@ function getTimeFunction(audioContext = null) {
 }
 
 
-/**
- * EventIn parameter definitions.
- */
 const definitions = {
   absoluteTime: {
     type: 'boolean',
@@ -66,30 +63,34 @@ const definitions = {
 
 /**
  * The `EventIn` operator allows to manually create a stream of data or to feed
- * a stream from another source (eg. accelerometers) into a processing graph.
+ * a stream from another source (e.g. accelerometers) into a processing graph.
  *
  * @param {Object} options - Override parameters' default values.
- * @param {String} [options.inputType='signal'] - Type of the input - allowed
+ * @param {String} [options.frameType='signal'] - Type of the input - allowed
  * values: `signal`,  `vector` or `scalar`.
  * @param {Number} [options.frameSize=1] - Size of the output frame.
  * @param {Number} [options.sampleRate=0] - Rate of the source stream.
- * @param {Array|String} [options.description] - Optionnal description describing
- *  the dimensions of the output frame
- * @param {Boolean} [options.absoluteTime=false] - Define if time should be used as
- *  forwarded as given in the process method, or relatively to the time of the
- *  first `process` call after start.
+ * @param {Array|String} [options.description] - Optionnal description
+ *  describing the dimensions of the output frame
+ * @param {Boolean} [options.absoluteTime=false] - Define if time should be used
+ *  as forwarded as given in the process method, or relatively to the time of
+ *  the first `process` call after start.
  *
- * @memberof module:sources
+ * @memberof module:source
+ *
+ * @todo - Add a `logicalTime` parameter to tag frame acoording to frame rate.
+ * @todo - Define if it makes sens to define a `frameRate` if time is defined
+ *  on the fly.
  *
  * @example
  * import * as lfo from 'waves-lfo';
  *
- * const eventIn = new EventIn({
+ * const eventIn = new lfo.source.EventIn({
  *   frameType: 'vector',
  *   frameSize: 3,
  *   frameRate: 1 / 50,
  *   description: ['alpha', 'beta', 'gamma']
- * })
+ * });
  *
  * // connect source to operators and sink(s)
  *
@@ -98,10 +99,13 @@ const definitions = {
  *
  * // feed `deviceorientation` data into the graph
  * window.addEventListener('deviceorientation', (e) => {
- *   const frame = [e.alpha, e.beta, e.gamma];
+ *   const frame = {
+ *     time: new Date().getTime(),
+ *     data: [e.alpha, e.beta, e.gamma],
+ *   };
  *   // by setting `time` to null, we let the node create
  *   // a relative time tag internally
- *   eventIn.processFrame(null, frame);
+ *   eventIn.processFrame(frame);
  * }, false);
  */
 class EventIn extends BaseLfo {
@@ -117,18 +121,18 @@ class EventIn extends BaseLfo {
 
     this._getTime = getTimeFunction(audioContext);
     this._isStarted = false;
-    this._startTime = undefined;
-    this._systemTime = undefined;
+    this._startTime = null;
+    this._systemTime = null;
     this._absoluteTime = this.params.get('absoluteTime');
   }
 
-  onParamUpdate(name, value, metas) {
-    super.onParamUpdate(name, value, metas);
-  }
-
   /**
-   * Start the whole graph, triggers the _initialization_ of all the node of the
-   * graph. Any call to `process` before `start` will be ignored.
+   * Start the whole graph, propagate the `streamParams` in the graph. Any call
+   * to `process` or `processFrame` before `start` will be ignored.
+   *
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
+   * @see {@link module:source.EventIn#stop}
    */
   start() {
     this.processStreamParams();
@@ -136,13 +140,16 @@ class EventIn extends BaseLfo {
 
     this._isStarted = true;
     // values set in the first `process` call
-    this._startTime = undefined;
-    this._systemTime = undefined;
+    this._startTime = null;
+    this._systemTime = null;
   }
 
   /**
-   * Stop the whole graph, triggers the _finalization_ of all the node of the
-   * graph. Any call to `process` after `stop` will be ignored.
+   * Stop the whole graph, and finalize the strem. Any call to `process` after
+   * `stop` will be ignored.
+   *
+   * @see {@link module:core.BaseLfo#finalizeStream}
+   * @see {@link module:source.EventIn#start}
    */
   stop() {
     if (this._isStarted && this._startTime) {
@@ -154,12 +161,12 @@ class EventIn extends BaseLfo {
     }
   }
 
+  /** @private */
   processStreamParams() {
-    // this.preprocessStreamParams(); // no need for that in a source
-    const frameSize = this.params.get('frameSize')
-    const frameType = this.params.get('frameType')
-    const sampleRate = this.params.get('sampleRate')
-    const description = this.params.get('description')
+    const frameSize = this.params.get('frameSize');
+    const frameType = this.params.get('frameType');
+    const sampleRate = this.params.get('sampleRate');
+    const description = this.params.get('description');
     // init operator's stream params
     this.streamParams.frameSize = frameSize;
     this.streamParams.frameType = frameType;
@@ -175,17 +182,48 @@ class EventIn extends BaseLfo {
   }
 
   /**
-   * As the `preprocessStreamParams` is not called and the logic is the same,
-   * whatever the input type, we can define the `processFunction` directly.
+   * Propagate a frame object in the graph.
+   *
+   * @param {Object} frame - Input frame.
+   * @param {Number} frame.time - Frame time.
+   * @param {Float32Array|Array} frame.data - Frame data.
+   * @param {Object} [frame.metadata=undefined] - Optionnal frame metadata.
+   *
+   * @example
+   * eventIn.processFrame({ time: 1, data: [0, 1, 2] });
    */
-  processFunction(frame) {
+  processFrame(frame) {
     if (!this._isStarted) return;
 
+    this.prepareFrame();
+    this.processFunction(frame);
+    this.propagateFrame();
+  }
+
+  /**
+   * Alternative interface to propagate a frame in the graph. Pack `time`,
+   * `data` and `metadata` in a frame object.
+   *
+   * @param {Number} time - Frame time.
+   * @param {Float32Array|Array} data - Frame data.
+   * @param {Object} metadata - Optionnal frame metadata.
+   *
+   * @example
+   * eventIn.process(1, [0, 1, 2]);
+   * // is equivalent to
+   * eventIn.processFrame({ time: 1, data: [0, 1, 2] });
+   */
+  process(time, data, metadata = null) {
+    this.processFrame({ time, data, metadata });
+  }
+
+  /** @private */
+  processFunction(frame) {
     const currentTime = this._getTime();
     // if no time provided, use system time
     let time = Number.isFinite(frame.time) ? frame.time : currentTime;
 
-    if (!this._startTime)
+    if (this._startTime = null)
       this._startTime = time;
 
     if (this._absoluteTime === false)
@@ -202,7 +240,7 @@ class EventIn extends BaseLfo {
     }
 
     this.frame.time = time;
-    this.frame.metadata = metadata;
+    this.frame.metadata = frame.metadata;
     // store current time to compute `endTime` on stop
     this._systemTime = currentTime;
   }

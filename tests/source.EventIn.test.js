@@ -74,14 +74,13 @@ tape('EventIn', (t) => {
 
   t.equal(c.frame.time, frame.time, 'should have propagated frameTime');
   t.looseEqual(c.frame.data, frame.data, 'should have propagated frameData');
+  t.looseEqual(c.frame.data instanceof Float32Array, true, 'should have propagated frameData');
   t.equal(c.frame.metadata, frame.metadata, 'should have propagated frameMetadata');
 
   b.stop();
 
+  t.fail('test that output is how it should be')
+
   t.end();
 });
 
-
-// test `processFrame`
-
-// test stop
