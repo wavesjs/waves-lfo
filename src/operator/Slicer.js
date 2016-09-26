@@ -22,9 +22,38 @@ const definitions = {
 /**
  * Change the frameSize and hopSize of the signal according to the given options.
  * The operator also updates the `frameRate` of the signal.
- * The `Slicer` can also be used as a decimator
  *
- * @todo - fix crash when hopSize > frameSize (allow to have a decimator for free)
+ * @memberof module:operator
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {Number} [options.frameSize=512] - Frame size of the output signal.
+ * @param {hopSize} [options.hopSize=null] - Number of samples between two
+ *  consecutive frames. If null, `hopSize` is set to `frameSize`.
+ * @param {centeredTimeTag} [options.centeredTimeTag] - Modify the input time to
+ *  be centered on the output signal.
+ *
+ * @example
+ * import * as lfo from 'waves-lfo';
+ *
+ * const eventIn = new lfo.source.EventIn({
+ *   frameType: 'signal',
+ *   frameSize: 10,
+ *   sampleRate: 2,
+ * });
+ *
+ * const framer = new Slicer({
+ *   frameSize: 4,
+ *   hopSize: 2
+ * });
+ *
+ * eventIn.connect(framer);
+ * eventIn.start();
+ *
+ * eventIn.process(0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+ * > { time: 0, data: [0, 1, 2, 3] }
+ * > { time: 1, data: [2, 3, 4, 5] }
+ * > { time: 2, data: [4, 5, 6, 7] }
+ * > { time: 3, data: [6, 7, 8, 9] }
  */
 class Slicer extends BaseLfo {
   constructor(options) {
