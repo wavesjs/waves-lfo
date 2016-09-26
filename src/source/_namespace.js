@@ -1,9 +1,9 @@
 import AudioInBuffer from './AudioInBuffer';
-// import AudioInNode from './audio-in-node';
+import AudioInNode from './AudioInNode';
 import EventIn from './EventIn';
 
 export default {
   AudioInBuffer,
-  // AudioInNode,
+  AudioInNode,
   EventIn,
 };
