@@ -90,14 +90,19 @@ class Magnitude extends BaseLfo {
   }
 
   /**
-   * @todo
+   * Allows for the use of a `Magnitude` outside a graph (e.g. inside another
+   * node), in this case `processStreamParams` and `resetStream` sould be
+   * called manually on the node.
+   *
+   * @param {Array|Float32Array} values - Values to process.
+   * @return {Number} - Magnitude value.
    */
-  inputVector(vector) {
-    const length = vector.length;
+  inputVector(values) {
+    const length = values.length;
     let sum = 0;
 
     for (let i = 0; i < length; i++)
-      sum += (vector[i] * vector[i]);
+      sum += (values[i] * values[i]);
 
     let mag = sum;
 
