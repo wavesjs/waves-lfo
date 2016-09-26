@@ -1,4 +1,4 @@
-import MovingAverage from '../src/operators/moving-average';
+import MovingAverage from '../src/operator/MovingAverage';
 import tape from 'tape';
 
 tape('MovingAverage', (t) => {
@@ -11,12 +11,12 @@ tape('MovingAverage', (t) => {
 
   const node = new MovingAverage({ order, fill });
 
-  t.deepEqual(node.getParam('order'), order, 'should override default `order` value');
-  t.deepEqual(node.getParam('fill'), fill, 'should override default `fill` value');
+  t.deepEqual(node.params.get('order'), order, 'should override default `order` value');
+  t.deepEqual(node.params.get('fill'), fill, 'should override default `fill` value');
 
   frameSize = 1;
-  node.initialize({ frameSize });
-  node.reset();
+  node.processStreamParams({ frameSize });
+  node.resetStream();
   expected = new Float32Array(order);
   expected.fill(fill);
 
@@ -24,8 +24,8 @@ tape('MovingAverage', (t) => {
 
 
   frameSize = 3;
-  node.initialize({ frameSize });
-  node.reset();
+  node.processStreamParams({ frameSize });
+  node.resetStream();
   expected = new Float32Array(order * frameSize);
   expected.fill(fill);
 
@@ -35,8 +35,8 @@ tape('MovingAverage', (t) => {
   t.comment('scalar input');
 
   const sAvg = new MovingAverage({ order: 5, fill: 0 });
-  sAvg.initialize({ frameSize: 1 });
-  sAvg.reset();
+  sAvg.processStreamParams({ frameSize: 1 });
+  sAvg.resetStream();
 
   values = [1, 1, 1, 1, 1];
   expected = [1/5, 2/5, 3/5, 4/5, 1];
@@ -50,14 +50,14 @@ tape('MovingAverage', (t) => {
   t.comment('array input');
 
   const aAvg = new MovingAverage({ order: 5, fill: 0 });
-  aAvg.initialize({ frameSize: 2 });
-  aAvg.reset();
+  aAvg.processStreamParams({ frameSize: 2 });
+  aAvg.resetStream();
 
   values = [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1]];
   expected = [[1/5, 1/5], [2/5, 2/5], [3/5, 3/5], [4/5, 4/5], [1, 1], ];
 
   for (let i = 0; i < values.length; i++) {
-    const avg = aAvg.inputArray(values[i]);
+    const avg = aAvg.inputVector(values[i]);
 
     // ignore floating point errors introduced who knows why (Float32Array ?)...
     for (let j = 0; j < avg.length; j++)
@@ -68,9 +68,9 @@ tape('MovingAverage', (t) => {
   t.comment('update order parameter');
 
   const updateOrder = new MovingAverage({ order: 3, fill: 0 });
-  updateOrder.initialize({ frameSize: 1 });
-  updateOrder.reset();
-  updateOrder.setParam('order', 5);
+  updateOrder.processStreamParams({ frameSize: 1 });
+  updateOrder.resetStream();
+  updateOrder.params.set('order', 5);
 
   values = [1, 1, 1, 1, 1];
   expected = [1/5, 2/5, 3/5, 4/5, 1];
