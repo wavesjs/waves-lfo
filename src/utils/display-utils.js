@@ -1,3 +1,5 @@
+const colors = ['steelblue', 'red', 'orange', 'green', 'purple'];
+
 // http://stackoverflow.com/questions/1484506/random-color-generator-in-javascript
 export const getRandomColor = function() {
   var letters = '0123456789ABCDEF'.split('');

@@ -40,6 +40,12 @@ const commonDefinitions = {
     default: null,
     constant: true,
   },
+  referenceTime: {
+    type: 'float',
+    default: null,
+    nullable: true,
+    constant: true,
+  }
 }
 
 /**
@@ -61,6 +67,11 @@ const commonDefinitions = {
  *  in which to insert the canvas. _constant parameter_
  * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
  *  in which to draw. _constant parameter_
+ * @param {Number} [options.referenceTime=null] - Optionnal reference time the
+ *  display should considerer as the origin. Is only usefull when synchronizing
+ *  several displays using the `DisplaySync` class.
+ *
+ * @see {@link module:utils.DisplaySync}
  */
 class BaseDisplay extends BaseLfo {
   constructor(defs, options) {
@@ -100,6 +111,13 @@ class BaseDisplay extends BaseLfo {
     this.previousFrame = {};
     this.lastShiftError = 0;
     this.currentPartialShift = 0;
+
+
+    /**
+     * Instance of the `DisplaySync` used to synchronize the different displays
+     * @private
+     */
+    this.displaySync = false;
 
     //
     this._stack;
@@ -299,14 +317,21 @@ class BaseDisplay extends BaseLfo {
   // default draw mode
   scrollModeDraw(frame) {
     const time = frame.time;
-    const prevTime = this.previousFrame.time;
     const ctx = this.ctx;
     const width = this.canvasWidth;
     const height = this.canvasHeight;
     const duration = this.params.get('duration');
+    const referenceTime = this.params.get('referenceTime');
     let iShift = 0;
 
-    if (prevTime !== undefined) {
+    let prevTime = null;
+
+    if (this.previousFrame.time)
+      prevTime = this.previousFrame.time;
+    else if (!this.previousFrame.time && referenceTime !== null)
+      prevTime = referenceTime;
+
+    if (prevTime !== null) {
       const dt = time - prevTime;
       const fShift = (dt / duration) * width - this.lastShiftError;
       iShift = Math.round(fShift);
@@ -316,12 +341,13 @@ class BaseDisplay extends BaseLfo {
       this.shiftCanvas(partialShift);
 
       // shift all siblings if synchronized
-      if (this.params.isSynchronized && this.synchronizer)
-        this.synchronizer.shiftSiblings(partialShift, this);
+      if (this.displaySync)
+        this.displaySync.shiftSiblings(partialShift, this);
     } else {
       iShift = 0;
     }
 
+    console.log(iShift);
     // translate to the current frame and draw a new polygon
     ctx.save();
     ctx.translate(width, 0);
