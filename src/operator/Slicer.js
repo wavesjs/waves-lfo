@@ -20,8 +20,9 @@ const definitions = {
 }
 
 /**
- * Change the frameSize, frameRate and hopSize of the signal.
- * Typically used in front of a fft...
+ * Change the frameSize and hopSize of the signal according to the given options.
+ * The operator also updates the `frameRate` of the signal.
+ * The `Slicer` can also be used as a decimator
  *
  * @todo - fix crash when hopSize > frameSize (allow to have a decimator for free)
  */
@@ -42,7 +43,8 @@ class Slicer extends BaseLfo {
     this.frameIndex = 0;
   }
 
-  processStreamParams(prevStreamParams) {
+  /** private */
+  processStreamParams(prevStreamParams = {}) {
     this.prepareStreamParams(prevStreamParams);
 
     const hopSize = this.params.get('hopSize');
@@ -70,17 +72,20 @@ class Slicer extends BaseLfo {
     super.finalizeStream(endTime);
   }
 
+  /** private */
   processFrame(frame) {
     this.prepareFrame();
     this.processFunction(frame);
     // don't call `propagateFrame` as it is call in the `processSignal`
   }
 
+  /** private */
   processSignal(frame) {
     const time = frame.time;
     const block = frame.data;
     const metadata = frame.metadata;
 
+    const centeredTimeTag = this.params.get('centeredTimeTag');
     const hopSize = this.params.get('hopSize');
     const outFrame = this.frame.data;
     const frameSize = this.streamParams.frameSize;
@@ -102,10 +107,8 @@ class Slicer extends BaseLfo {
 
       if (numSkip < blockSize) {
         blockIndex += numSkip; // skip block segment
-
         // can copy all the rest of the incoming block
         let numCopy = blockSize - blockIndex;
-
         // connot copy more than what fits into the frame
         const maxCopy = frameSize - frameIndex;
 
@@ -115,7 +118,6 @@ class Slicer extends BaseLfo {
         // copy block segment into frame
         const copy = block.subarray(blockIndex, blockIndex + numCopy);
         outFrame.set(copy, frameIndex);
-
         // advance block and frame index
         blockIndex += numCopy;
         frameIndex += numCopy;
@@ -123,13 +125,12 @@ class Slicer extends BaseLfo {
         // send frame when completed
         if (frameIndex === frameSize) {
           // define time tag for the outFrame according to configuration
-          if (this.params.centeredTimeTag)
+          if (centeredTimeTag)
             this.frame.time = time + (blockIndex - frameSize / 2) * samplePeriod;
           else
             this.frame.time = time + (blockIndex - frameSize) * samplePeriod;
 
           this.frame.metadata = metadata;
-
           // forward to next nodes
           this.propagateFrame();
 
