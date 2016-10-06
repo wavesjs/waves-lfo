@@ -2,13 +2,25 @@
   "source": {
     "include": [
       "README.md",
-      "src/core/BaseLfo.js"
+      "src/core/BaseLfo.js",
 
-      // "src/operators/moving-average.js",
-      // "src/operators/moving-median.js",
-      // "src/operators/max.js",
+      "src/operator/Magnitude.js",
+      "src/operator/MinMax.js",
+      "src/operator/MovingAverage.js",
+      "src/operator/MovingMedian.js",
+      "src/operator/RMS.js",
+      "src/operator/Slicer.js",
 
-      // "src/sources/event-in.js"
+      "src/source/AudioInBuffer.js",
+      "src/source/AudioInNode.js",
+      "src/source/EventIn.js",
+
+      "src/sink/BpfDisplay.js",
+      "src/sink/Logger.js",
+      "src/sink/SignalDisplay.js",
+      "src/sink/WaveformDisplay.js",
+
+      "src/utils/DisplaySync.js"
     ]
   },
   "plugins": [
