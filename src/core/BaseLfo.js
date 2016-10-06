@@ -248,7 +248,7 @@ class BaseLfo {
    *
    * @param {Object} prevStreamParams - `streamParams` of the previous operator.
    */
-  prepareStreamParams(prevStreamParams) {
+  prepareStreamParams(prevStreamParams = {}) {
     Object.assign(this.streamParams, prevStreamParams);
     const prevFrameType = prevStreamParams.frameType;
 

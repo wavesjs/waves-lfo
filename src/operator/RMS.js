@@ -6,9 +6,10 @@ const sqrt = Math.sqrt;
 /**
  * Compute the Root Mean Sqaure of a signal.
  *
+ * @memberof module:operator
  */
 class RMS extends BaseLfo {
-  processStreamParams(prevStreamParams = {}) {
+  processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
     this.streamParams.frameSize = 1;
     this.streamParams.frameType = 'scalar';
@@ -22,6 +23,15 @@ class RMS extends BaseLfo {
 
   }
 
+  /**
+   * Allows for the use of a `RMS` outside a graph (e.g. inside
+   * another node). Return the rms of the given signal block.
+   *
+   * @param {Number} signal - Signal block to be computed.
+   * @return {Number} - rms of the input signal block.
+   *
+   * @todo - example
+   */
   inputSignal(signal) {
     const length = signal.length;
     let rms = 0;

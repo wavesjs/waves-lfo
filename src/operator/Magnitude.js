@@ -42,13 +42,9 @@ const definitions = {
  * eventIn.processFrame(null, [1, 1]);
  * > [1]
  * eventIn.processFrame(null, [2, 2]);
- * > [2]
+ * > [2.82842712475]
  * eventIn.processFrame(null, [3, 3]);
- * > [3]
- * eventIn.processFrame(null, [4, 4]);
- * > [2, 2]
- * eventIn.processFrame(null, [5, 5]);
- * > [3, 3]
+ * > [4.24264068712]
  */
 class Magnitude extends BaseLfo {
   constructor(options) {
@@ -76,7 +72,7 @@ class Magnitude extends BaseLfo {
   }
 
   /** @private */
-  processStreamParams(prevStreamParams = {}) {
+  processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
     this.streamParams.frameSize = 1;
     this.streamParams.frameType = 'scalar';

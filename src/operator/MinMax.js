@@ -26,7 +26,7 @@ import BaseLfo from '../core/BaseLfo';
  * > [1, 512];
  */
 class MinMax extends BaseLfo {
-  /** private */
+  /** @private */
   processStreamParams(prevStreamParams= {}) {
     this.prepareStreamParams(prevStreamParams);
 
@@ -75,7 +75,7 @@ class MinMax extends BaseLfo {
     return outData;
   }
 
-  /** private */
+  /** @private */
   processSignal(frame) {
     this.inputSignal(frame.data);
   }

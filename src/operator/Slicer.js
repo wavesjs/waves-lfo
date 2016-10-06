@@ -21,16 +21,15 @@ const definitions = {
 
 /**
  * Change the frameSize and hopSize of the signal according to the given options.
- * The operator also updates the `frameRate` of the signal.
+ * This operator can update the `frameRate` of the stream parameters.
  *
  * @memberof module:operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.frameSize=512] - Frame size of the output signal.
- * @param {hopSize} [options.hopSize=null] - Number of samples between two
+ * @param {Number} [options.hopSize=null] - Number of samples between two
  *  consecutive frames. If null, `hopSize` is set to `frameSize`.
- * @param {centeredTimeTag} [options.centeredTimeTag] - Modify the input time to
- *  be centered on the output signal.
+ * @param {Boolean} [options.centeredTimeTag] - Center the time tag of the frame.
  *
  * @example
  * import * as lfo from 'waves-lfo';
@@ -72,8 +71,8 @@ class Slicer extends BaseLfo {
     this.frameIndex = 0;
   }
 
-  /** private */
-  processStreamParams(prevStreamParams = {}) {
+  /** @private */
+  processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
     const hopSize = this.params.get('hopSize');
@@ -85,13 +84,13 @@ class Slicer extends BaseLfo {
     this.propagateStreamParams();
   }
 
-  /** private */
+  /** @private */
   resetStream() {
     super.resetStream();
     this.frameIndex = 0;
   }
 
-  /** private */
+  /** @private */
   finalizeStream(endTime) {
     if (this.frameIndex > 0) {
       this.frame.data.fill(0, this.frameIndex);
@@ -101,14 +100,14 @@ class Slicer extends BaseLfo {
     super.finalizeStream(endTime);
   }
 
-  /** private */
+  /** @private */
   processFrame(frame) {
     this.prepareFrame();
     this.processFunction(frame);
     // don't call `propagateFrame` as it is call in the `processSignal`
   }
 
-  /** private */
+  /** @private */
   processSignal(frame) {
     const time = frame.time;
     const block = frame.data;

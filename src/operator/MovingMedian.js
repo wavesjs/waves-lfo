@@ -7,14 +7,14 @@ const definitions = {
     min: 1,
     max: 1e9,
     default: 9,
-    metas: { kind: 'dyanmic' },
+    metas: { kind: 'dynamic' },
   },
   fill: {
     type: 'float',
     min: -Infinity,
     max: +Infinity,
     default: 0,
-    metas: { kind: 'dyanmic' },
+    metas: { kind: 'dynamic' },
   },
 };
 
@@ -23,13 +23,14 @@ const definitions = {
  *
  * @todo - Implement `processSignal`
  *
+ * @memberof module:operator
+ *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.order=9] - Number of successive values on which
  *  the median is searched. This value should be odd. _dynamic parameter_
  * @param {Number} [options.fill=0] - Value to fill the ring buffer with before
  *  the firsts input frames. _dynamic parameter_
  *
- * @memberof module:operator
  * @example
  * import * as lfo from 'waves-lfo';
  *
@@ -89,7 +90,7 @@ class MovingMedian extends BaseLfo {
   }
 
   /** @private */
-  processStreamParams(prevStreamParams = {}) {
+  processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
     // outType is similar to input type
 
@@ -116,7 +117,7 @@ class MovingMedian extends BaseLfo {
 
   /** @private */
   processScalar(frame) {
-    this.frame.data[0] = this.inputScalar(frame.data);
+    this.frame.data[0] = this.inputScalar(frame.data[0]);
   }
 
   /**
@@ -193,7 +194,7 @@ class MovingMedian extends BaseLfo {
    * another node), in this case `processStreamParams` and `resetStream`
    * should be called manually on the node.
    *
-   * @param {Array} vector - Values to feed the moving median with.
+   * @param {Array} values - Values to feed the moving median with.
    * @return {Float32Array} - Median values for each dimension.
    *
    * @example
@@ -212,14 +213,14 @@ class MovingMedian extends BaseLfo {
    * @see {@link module:core.BaseLfo#processStreamParams}
    * @see {@link module:core.BaseLfo#resetStream}
    */
-  inputVector(vector) {
+  inputVector(values) {
+    const order = this.params.get('order');
     const ringBuffer = this.ringBuffer;
     const ringIndex = this.ringIndex;
     const sortBuffer = this.sortBuffer;
     const outFrame = this.frame.data;
     const minIndices = this.minIndices;
     const frameSize = this.streamParams.frameSize;
-    const order = this.params.get('order');
     const medianIndex = Math.floor(order / 2);
     let startIndex = 0;
 
@@ -234,7 +235,7 @@ class MovingMedian extends BaseLfo {
 
           // update ring buffer corresponding to current
           if (k === ringIndex && i === 0)
-            ringBuffer[index] = vector[j];
+            ringBuffer[index] = values[j];
 
           // copy value in sort buffer on first pass
           if (i === 0) 
@@ -266,7 +267,7 @@ class MovingMedian extends BaseLfo {
   }
 
   processFrame(frame) {
-    // this.preprocessFrame(); // not needed as their is no static param
+    this.preprocessFrame();
     this.processFunction(frame);
 
     const order = this.params.get('order');
