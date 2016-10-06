@@ -42,14 +42,15 @@ const commonDefinitions = {
   },
   referenceTime: {
     type: 'float',
-    default: null,
-    nullable: true,
+    default: 0,
     constant: true,
   }
 }
 
 /**
  * Base class to extend in order to create graphical sinks.
+ *
+ * @todo - propagate float rounding errors
  *
  * @memberof module:sink
  * @param {Object} options - Override default parameters.
@@ -69,7 +70,7 @@ const commonDefinitions = {
  *  in which to draw. _constant parameter_
  * @param {Number} [options.referenceTime=null] - Optionnal reference time the
  *  display should considerer as the origin. Is only usefull when synchronizing
- *  several displays using the `DisplaySync` class.
+ *  several display using the `DisplaySync` class.
  *
  * @see {@link module:utils.DisplaySync}
  */
@@ -108,10 +109,11 @@ class BaseDisplay extends BaseLfo {
     this.cachedCanvas = document.createElement('canvas');
     this.cachedCtx = this.cachedCanvas.getContext('2d');
 
-    this.previousFrame = {};
-    this.lastShiftError = 0;
-    this.currentPartialShift = 0;
+    this.previousFrame = null;
+    // this.lastShiftError = 0;
+    // this.currentPartialShift = 0;
 
+    this.currentTime = this.params.get('referenceTime');
 
     /**
      * Instance of the `DisplaySync` used to synchronize the different displays
@@ -124,6 +126,9 @@ class BaseDisplay extends BaseLfo {
     this._rafId;
 
     this.renderStack = this.renderStack.bind(this);
+
+    this.shiftError = 0;
+    this.frameWidthError = 0;
 
     this._resize();
   }
@@ -181,8 +186,17 @@ class BaseDisplay extends BaseLfo {
     ctx.canvas.height = this.canvasHeight;
     ctx.canvas.style.width = `${width}px`;
     ctx.canvas.style.height = `${height}px`;
+
     // update scale
     this._setYScale();
+  }
+
+  /**
+   * Returns the width in pixel a `vector` frame needs to be drawn.
+   * @private
+   */
+  getMinimumFrameWidth() {
+    return 1; // need one pixel to draw the line
   }
 
   /** @private */
@@ -226,7 +240,6 @@ class BaseDisplay extends BaseLfo {
   /**
    * Add the current frame to the frames to draw. Should not be overriden.
    * @inheritdoc
-   * @final
    */
   processFrame(frame) {
     const frameSize = this.streamParams.frameSize;
@@ -257,6 +270,248 @@ class BaseDisplay extends BaseLfo {
   executeDraw(frame) {
     this.scrollModeDraw(frame);
   }
+
+  scrollModeDraw(frame) {
+    const frameType = this.streamParams.frameType;
+    const frameRate = this.streamParams.frameRate;
+    const frameSize = this.streamParams.frameSize;
+    const sourceSampleRate = this.streamParams.sourceSampleRate;
+
+    const canvasDuration = this.params.get('duration');
+    const ctx = this.ctx;
+    const canvasWidth = this.canvasWidth;
+    const canvasHeight = this.canvasHeight;
+
+    const previousFrame = this.previousFrame;
+
+    const currentTime = this.currentTime; // current time at the left of the canvas
+    const frameStartTime = frame.time;
+    const lastFrameTime = previousFrame ? previousFrame.time : 0;
+    const lastFrameDuration = this.lastFrameDuration ? this.lastFrameDuration : 0;
+
+    let frameDuration;
+
+    if (frameType === 'scalar' || frameType === 'vector') {
+      const pixelDuration = canvasDuration / canvasWidth;
+      frameDuration = this.getMinimumFrameWidth() * pixelDuration;
+    } else if (this.streamParams.frameType === 'signal') {
+      frameDuration = frameSize / sourceSampleRate;
+    }
+
+    const frameEndTime = frameStartTime + frameDuration;
+    // define if we need to shift the canvas
+    const shiftTime = frameEndTime - currentTime;
+
+    // if (frameType === 'scalar')
+    //   console.log(shiftTime);
+
+    // if the canvas is not synced, should never go to `else`
+    if (shiftTime > 0) {
+      // shift the canvas of shiftTime in pixels
+      const fShift = (shiftTime / canvasDuration) * canvasWidth - this.shiftError;
+      const iShift = Math.floor(fShift + 0.5);
+      this.shiftError = fShift - iShift;
+
+      const currentTime = frameStartTime + frameDuration;
+      this.shiftCanvas(iShift, currentTime);
+
+      // @todo - propagate to siblings (nbr of pixels and `frameEnd` (new currentTime))
+      if (this.displaySync)
+        this.displaySync.shiftSiblings(iShift, currentTime, this);
+    } else {
+      // @todo - all the frame can be drawn inside the currently displayed canvas
+    }
+
+    // @todo - check possibility of maintaining these values only from shift
+    //  to maintain error tracking at only one place ?
+
+    // width of the frame in pixels
+    const fFrameWidth = (frameDuration / canvasDuration) * canvasWidth;
+    const frameWidth = Math.floor(fFrameWidth + 0.5);
+
+    // define position of the head in the canvas
+    const canvasStartTime = this.currentTime - canvasDuration;
+    const startTimeRatio = (frameStartTime - canvasStartTime) / canvasDuration;
+    const startTimePosition = startTimeRatio * canvasWidth;
+
+    // number of pixels since last frame
+    let pixelsSinceLastFrame = this.lastFrameWidth;
+
+    if ((frameType === 'scalar' || frameType === 'vector') && previousFrame) {
+      const frameInterval = frame.time - previousFrame.time;
+      pixelsSinceLastFrame = (frameInterval / canvasDuration) * canvasWidth;
+    }
+
+    // draw current frame
+    ctx.save();
+    ctx.translate(startTimePosition, 0);
+    this.processFunction(frame, frameWidth, pixelsSinceLastFrame);
+    ctx.restore();
+
+    // copy canvas into cached canvas
+    this.cachedCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.cachedCtx.drawImage(this.canvas, 0, 0, this.canvasWidth, this.canvasHeight);
+
+    // update lastFrameDuration, lastFrameWidth
+    this.lastFrameDuration = frameDuration;
+    this.lastFrameWidth = frameWidth;
+    this.previousFrame = frame;
+  }
+
+  shiftCanvas(iShift, time) {
+    const ctx = this.ctx;
+    const cache = this.cachedCanvas;
+    const width = this.canvasWidth;
+    const height = this.canvasHeight;
+
+    ctx.clearRect(0, 0, width, height);
+    const croppedWidth = width - iShift;
+
+    this.currentTime = time;
+
+    ctx.drawImage(this.cachedCanvas, iShift, 0, croppedWidth, height, 0, 0, croppedWidth, height);
+
+    this.cachedCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.cachedCtx.drawImage(this.canvas, 0, 0, this.canvasWidth, this.canvasHeight);
+  }
+
+  // /**
+  //  * Default draw mode. Draw from right to left, pushing old content as new
+  //  * content arrive.
+  //  *
+  //  * @param {Object} frame
+  //  */
+  // scrollModeDraw(frame) {
+  //   const frameType = this.streamParams.frameType;
+  //   const frameRate = this.streamParams.frameRate;
+  //   const frameSize = this.streamParams.frameSize;
+  //   const sourceSampleRate = this.streamParams.sourceSampleRate;
+
+  //   const canvasDuration = this.params.get('duration');
+  //   const ctx = this.ctx;
+  //   const canvasWidth = this.canvasWidth;
+  //   const canvasHeight = this.canvasHeight;
+
+  //   // shift canvas according to first frame time and reference time
+  //   if (!this.previousFrame) {
+  //     // return;
+  //     // // `lastTime` is set to `referenceTime`
+  //     // const firstHopDuration = frame.time - this.lastTime;
+  //     // // no shift error so far...
+  //     // const fShift = (firstHopDuration / canvasDuration) * canvasWidth;
+  //     // const iShift = Math.floor(fShift + 0.5);
+  //     // const error = iShift - fShift;
+
+  //     // this.shiftCanvas(iShift);
+  //     // this.lastShiftError = error;
+  //     // this.lastTime = frame.time;
+  //   }
+
+  //   // duration of the frame
+  //   let frameDisplayDuration = 0;
+
+  //   if (
+  //     this.streamParams.frameType === 'scalar' ||
+  //     this.streamParams.frameType === 'vector'
+  //   ) {
+  //     const frameWidth = this.getMinimumFrameWidth();
+  //     const pixelDuration = canvasDuration / canvasWidth;
+  //     frameDisplayDuration = pixelDuration * frameWidth;
+
+  //     if (this.previousFrame)
+  //       frameDisplayDuration += frame.time - this.lastTime;
+
+  //     console.log(frame.time, this.lastTime);
+
+  //   } else if (this.streamParams.frameType === 'signal') {
+  //     // don't deal with hopsizes for now
+  //     frameDisplayDuration = frameSize / sourceSampleRate;
+  //   }
+
+  //   const fShift = (frameDisplayDuration / canvasDuration) * canvasWidth - this.lastShiftError;
+  //   const iShift = Math.floor(fShift + 0.5);
+  //   this.lastShiftError = iShift - fShift;
+
+  //   console.log(this.constructor.name + '.iShift', iShift);
+  //   console.log(this.constructor.name + '.currentPartialShift', this.currentPartialShift);
+
+  //   const shift = iShift - this.currentPartialShift;
+
+  //   console.log(this.constructor.name + '.shift', shift);
+
+  //   this.lastTime += frameDisplayDuration;
+  //   this.previousFrame = frame;
+
+  //   if (shift > 0) {
+  //     this.shiftCanvas(shift, this.lastTime);
+
+  //     if (this.displaySync)
+  //       this.displaySync.shiftSiblings(shift, this.lastTime, this);
+
+  //     // remove the added partial shift for the crop
+  //     this.currentPartialShift -= shift;
+  //   }
+
+  //   // console.log(this.constructor.name + '.currentPartialShift', this.currentPartialShift);
+
+
+  //   if (shift < 0) {
+  //     this.writeHead += shift;
+  //     this.currentPartialShift += shift;
+  //   }
+
+
+
+  //   // console.log(this.constructor.name + '.writeHead', writeHead);
+  //   // translate to the current frame and draw a new polygon
+  //   ctx.save();
+  //   ctx.translate(this.writeHead, 0);
+  //   console.log(this.constructor.name + '.writeHead', this.writeHead);
+
+  //   this.processFunction(frame, this.previousFrame, iShift);
+
+  //   ctx.restore();
+
+  //   // save current state into buffering canvas
+  //   this.cachedCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+  //   this.cachedCtx.drawImage(this.canvas, 0, 0, canvasWidth, canvasHeight);
+  // }
+
+  // shiftCanvas(shift, time) {
+  //   const ctx = this.ctx;
+  //   const width = this.canvasWidth;
+  //   const height = this.canvasHeight;
+
+  //   // if (fromSibling)
+  //   this.currentPartialShift += shift;
+
+  //   if (time > this.lastTime)
+  //     this.lastTime = time;
+
+  //   ctx.clearRect(0, 0, width, height);
+  //   ctx.save();
+
+  //   const croppedWidth = width - this.currentPartialShift;
+
+  //   ctx.drawImage(this.cachedCanvas,
+  //     this.currentPartialShift, 0, croppedWidth, height,
+  //     0, 0, croppedWidth, height
+  //   );
+
+  //   ctx.restore();
+  // }
+
+  /**
+   * Interface method to implement in order to define how to draw the shape
+   * between the previous and the current frame, assuming the canvas context
+   * is centered on the current frame.
+   *
+   * @param {Object} frame - Current frame.
+   * @param {Object} prevFrame - Previous frame.
+   * @param {Number} iShift - Number of pixels between the last and the current
+   *  frame.
+   */
+
 
   // @todo - Fix trigger mode
   // allow to witch easily between the 2 modes
@@ -314,88 +569,6 @@ class BaseDisplay extends BaseLfo {
   //   }
   // }
 
-  // default draw mode
-  scrollModeDraw(frame) {
-    const time = frame.time;
-    const ctx = this.ctx;
-    const width = this.canvasWidth;
-    const height = this.canvasHeight;
-    const duration = this.params.get('duration');
-    const referenceTime = this.params.get('referenceTime');
-    let iShift = 0;
-
-    let prevTime = null;
-
-    if (this.previousFrame.time)
-      prevTime = this.previousFrame.time;
-    else if (!this.previousFrame.time && referenceTime !== null)
-      prevTime = referenceTime;
-
-    if (prevTime !== null) {
-      const dt = time - prevTime;
-      const fShift = (dt / duration) * width - this.lastShiftError;
-      iShift = Math.round(fShift);
-      this.lastShiftError = iShift - fShift;
-
-      const partialShift = iShift - this.currentPartialShift;
-      this.shiftCanvas(partialShift);
-
-      // shift all siblings if synchronized
-      if (this.displaySync)
-        this.displaySync.shiftSiblings(partialShift, this);
-    } else {
-      iShift = 0;
-    }
-
-    console.log(iShift);
-    // translate to the current frame and draw a new polygon
-    ctx.save();
-    ctx.translate(width, 0);
-
-    this.processFunction(frame, this.previousFrame, iShift);
-
-    ctx.restore();
-    // keep track of the error
-    this.currentPartialShift -= iShift;
-    // save current state into buffering canvas
-    this.cachedCtx.clearRect(0, 0, width, height);
-    this.cachedCtx.drawImage(this.canvas, 0, 0, width, height);
-
-    this.previousFrame = frame;
-  }
-
-  shiftCanvas(shift) {
-    const ctx = this.ctx;
-    const width = this.canvasWidth;
-    const height = this.canvasHeight;
-
-    this.currentPartialShift += shift;
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.save();
-
-    const croppedWidth = width - this.currentPartialShift;
-
-    ctx.drawImage(this.cachedCanvas,
-      this.currentPartialShift, 0, croppedWidth, height,
-      0, 0, croppedWidth, height
-    );
-
-    ctx.restore();
-  }
-
-  /**
-   * Interface method to implement in order to define how to draw the shape
-   * between the previous and the current frame, assuming the canvas context
-   * is centered on the current frame.
-   * @param {Object} frame - Current frame.
-   * @param {Object} prevFrame - Previous frame.
-   * @param {Number} iShift - Number of pixels between the last and the current
-   *  frame.
-   */
-  // processFunction(frame, prevFrame, iShift) {
-  //   console.error('must be implemented');
-  // }
 }
 
 export default BaseDisplay;

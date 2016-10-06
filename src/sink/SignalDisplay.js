@@ -1,5 +1,5 @@
 import BaseDisplay from './BaseDisplay';
-import { getRandomColor } from '../utils/draw-utils';
+import { getRandomColor } from '../utils/display-utils';
 
 const floor = Math.floor;
 const ceil = Math.ceil;
@@ -86,38 +86,27 @@ class SignalDisplay extends BaseDisplay {
   }
 
   /** @private */
-  processSignal(frame, prevFrame, iShift) {
+  processSignal(frame, frameWidth, pixelsSinceLastFrame) {
     const color = this.params.get('color');
     const frameSize = this.streamParams.frameSize;
-    const prevData = prevFrame.data;
     const ctx = this.ctx;
     let data = frame.data;
 
-    // estimate `iShift` for the first frame
-    if (!prevData) {
-      const duration = this.params.get('duration');
-      const width = this.canvasWidth;
-      const frameDuration = 1 / this.streamParams.frameRate;
-      iShift = Math.floor((frameDuration / duration) * width);
-    }
-
-    if (iShift < frameSize)
-      data = downSample(data, iShift);
+    if (frameWidth < frameSize)
+      data = downSample(data, frameWidth);
 
     const length = data.length;
-    const hopX = iShift / length; // should be an integer and propagate error
+    const hopX = frameWidth / length;
     let posX = 0;
     let lastY = this.lastPosY;
 
     ctx.strokeStyle = this.params.get('color');
-    ctx.translate(-iShift, 0);
-    ctx.beginPath();
 
     for (let i = 0; i < data.length; i++) {
       const posY = this.getYPosition(data[i]);
 
       if (lastY === null) {
-        ctx.moveTo(0, posY);
+        ctx.moveTo(posX, posY);
       } else {
         if (i === 0)
           ctx.moveTo(-hopX, lastY);
@@ -129,10 +118,9 @@ class SignalDisplay extends BaseDisplay {
       lastY = posY;
     }
 
-    this.lastPosY = lastY;
-
     ctx.stroke();
-    ctx.closePath();
+
+    this.lastPosY = lastY;
   }
 }
 

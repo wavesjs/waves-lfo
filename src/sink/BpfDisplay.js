@@ -1,5 +1,5 @@
 import BaseDisplay from './BaseDisplay';
-import { getRandomColor } from '../utils/draw-utils';
+import { getRandomColor } from '../utils/display-utils';
 
 const definitions = {
   radius: {
@@ -72,44 +72,53 @@ const definitions = {
 class BpfDisplay extends BaseDisplay {
   constructor(options) {
     super(definitions, options);
-    // for loop mode
-    // this._currentXPosition = 0;
 
+    this.lastFrame = null;
+  }
+
+  getMinimumFrameWidth() {
+    return this.params.get('radius');
+  }
+
+  processStreamParams(prevStreamParams) {
+    super.processStreamParams(prevStreamParams);
+
+    console.log(this.streamParams.frameSize);
     if (this.params.get('colors') === null) {
       const colors = [];
 
       for (let i = 0, l = this.streamParams.frameSize; i < l; i++)
         colors.push(getRandomColor());
 
+      console.log(colors);
       this.params.set('colors', colors);
     }
   }
 
   /** @private */
-  processVector(frame, prevFrame, iShift) {
+  processVector(frame, frameWidth, pixelsSinceLastFrame) {
     const colors = this.params.get('colors');
     const radius = this.params.get('radius');
     const drawLine = this.params.get('line');
     const frameSize = this.streamParams.frameSize;
     const ctx = this.ctx;
-
     const data = frame.data;
-    const prevData = prevFrame.data;
+    const prevData = this.prevFrame ? this.prevFrame.data : null;
+
+    ctx.save();
 
     for (let i = 0, l = frameSize; i < l; i++) {
-      ctx.save();
-      // color should bechosen according to index
-      ctx.fillStyle = colors[i];
-      ctx.strokeStyle = colors[i];
-
       const posY = this.getYPosition(data[i]);
+      const color = colors[i];
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
 
       if (prevData && drawLine) {
         const lastPosY = this.getYPosition(prevData[i]);
-        // draw line
         ctx.beginPath();
-        ctx.moveTo(-(iShift + radius), lastPosY);
-        ctx.lineTo(-radius, posY);
+        ctx.moveTo(-pixelsSinceLastFrame, lastPosY);
+        ctx.lineTo(0, posY);
         ctx.stroke();
         ctx.closePath();
       }
@@ -121,8 +130,11 @@ class BpfDisplay extends BaseDisplay {
         ctx.closePath();
       }
 
-      ctx.restore();
     }
+
+    ctx.restore();
+
+    this.prevFrame = frame;
   }
 }
 

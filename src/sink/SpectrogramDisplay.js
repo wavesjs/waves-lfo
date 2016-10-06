@@ -28,6 +28,11 @@ const definitions = {
 };
 
 
+/**
+ *
+ *
+ *
+ */
 class SpectrogramDisplay extends BaseDisplay {
   constructor(options) {
     super(definitions, options);

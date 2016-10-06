@@ -1,7 +1,7 @@
 import BaseDisplay from './BaseDisplay';
 import MinMax from '../operator/MinMax';
 import RMS from '../operator/RMS';
-import { getRandomColor } from '../utils/draw-utils';
+import { getRandomColor } from '../utils/display-utils';
 
 
 const definitions = {
@@ -77,21 +77,20 @@ class WaveformDisplay extends BaseDisplay {
   }
 
   /** @private */
-  processSignal(frame, previousFrame, iShift) {
+  processSignal(frame, frameWidth, pixelsSinceLastFrame) {
     // keep track of these frames, or ignoring is ok ?
-    if (iShift < 1) return;
+    if (frameWidth < 1) return;
 
     const color = this.params.get('color');
     const showRms = this.params.get('rms');
     const ctx = this.ctx;
     const data = frame.data;
-    const iSamplesPerPixels = Math.floor(data.length / iShift);
+    const iSamplesPerPixels = Math.floor(data.length / frameWidth);
 
-    for (let index = 0; index < iShift; index++) {
+    for (let index = 0; index < frameWidth; index++) {
       const start = index * iSamplesPerPixels;
-      const end = index === iShift - 1 ? undefined : start + iSamplesPerPixels;
+      const end = index === frameWidth - 1 ? undefined : start + iSamplesPerPixels;
       const slice = data.subarray(start, end);
-      const x = -iShift + index;
       // signal
       const minMax = this.minMaxOperator.inputSignal(slice);
       const minY = this.getYPosition(minMax[0]);
@@ -99,8 +98,8 @@ class WaveformDisplay extends BaseDisplay {
 
       ctx.strokeStyle = color;
       ctx.beginPath();
-      ctx.moveTo(x, minY);
-      ctx.lineTo(x, maxY);
+      ctx.moveTo(index, minY);
+      ctx.lineTo(index, maxY);
       ctx.closePath();
       ctx.stroke();
 
@@ -112,8 +111,8 @@ class WaveformDisplay extends BaseDisplay {
 
         ctx.strokeStyle = 'orange';
         ctx.beginPath();
-        ctx.moveTo(x, rmsMinY);
-        ctx.lineTo(x, rmsMaxY);
+        ctx.moveTo(index, rmsMinY);
+        ctx.lineTo(index, rmsMaxY);
         ctx.closePath();
         ctx.stroke();
       }

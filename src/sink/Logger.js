@@ -58,10 +58,14 @@ class Logger extends BaseLfo {
   processStreamParams(prevStreamParams) {
     if (this.params.get('streamParams') === true)
       console.log(prevStreamParams);
+
+    this.index = 0;
   }
 
   /** @private */
   processFunction(frame) {
+    console.log(this.index++);
+
     if (this.params.get('time') === true)
       console.log(frame.time);
 
