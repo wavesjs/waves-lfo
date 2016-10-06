@@ -1,21 +1,20 @@
 // import AudioRecorder from './audio-recorder';
-// import Bpf from './bpf';
 // import Bridge from './bridge';
 // import DataRecorder from './data-recorder';
-// import Marker from './marker';
-// import Spectrogram from './spectrogram';
-// import SynchronizedDraw from './synchronized-draw';
 // import Trace from './trace';
-// import Waveform from './waveform';
-import Bpf from './Bpf';
+import BpfDisplay from './BpfDisplay';
 import Logger from './Logger';
-import Signal from './Signal';
-import Waveform from './Waveform';
+import MarkerDisplay from './MarkerDisplay';
+import SignalDisplay from './SignalDisplay';
+import SpectrogramDisplay from './SpectrogramDisplay';
+import WaveformDisplay from './WaveformDisplay';
 
 
 export default {
-  Bpf,
+  BpfDisplay,
   Logger,
-  Signal,
-  Waveform,
+  MarkerDisplay,
+  SignalDisplay,
+  SpectrogramDisplay,
+  WaveformDisplay,
 };
