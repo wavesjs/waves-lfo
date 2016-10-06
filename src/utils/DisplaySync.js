@@ -1,4 +1,3 @@
-
 /**
  * Synchronize several display sinks to a common time.
  *
@@ -79,10 +78,10 @@ class DisplaySync {
   }
 
   /** @private */
-  shiftSiblings(iShift, view) {
+  shiftSiblings(iShift, time, view) {
     this.views.forEach(function(display) {
       if (display !== view)
-        display.shiftCanvas(iShift);
+        display.shiftCanvas(iShift, time);
     });
   }
 }
