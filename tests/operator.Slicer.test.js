@@ -213,3 +213,8 @@ tape('Slicer (frameSize < hopSize)', (t) => {
 
   t.end();
 });
+
+console.log('-------------------------------------------');
+console.log('@TODO create test for frameSize > blockSize');
+console.log('-------------------------------------------');
+

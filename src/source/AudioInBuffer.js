@@ -1,8 +1,6 @@
 import BaseLfo from '../core/BaseLfo';
 import parameters from 'parameters';
 
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-
 const workerCode = `
 self.addEventListener('message', function process(e) {
   var blockSize = e.data.blockSize;
@@ -103,8 +101,8 @@ const definitions = {
 };
 
 /**
- * Slice AudioBuffer into blocks and propagate the resulting frames through
- * the graph.
+ * Slice an `AudioBuffer` into signal blocks and propagate the resulting frames
+ * through the graph.
  *
  * @param {Object} options - Override parameter' default values.
  * @param {AudioBuffer} audioBuffer - Audio buffer to process.
@@ -114,6 +112,24 @@ const definitions = {
  *  slicing of the audio buffer, otherwise use a WebWorker.
  *
  * @memberof module:source
+ *
+ * @example
+ * import * as lfo from 'waves-lfo';
+ *
+ * const audioInBuffer = new lfo.source.AudioInBuffer({
+ *   audioBuffer: audioBuffer,
+ *   frameSize: 512,
+ * });
+ *
+ * const waveform = new lfo.sink.Waveform({
+ *   canvas: '#waveform',
+ *   duration: 1,
+ *   color: 'steelblue',
+ *   rms: true,
+ * });
+ *
+ * audioInBuffer.connect(waveform);
+ * audioInBuffer.start();
  */
 class AudioInBuffer extends BaseLfo {
   constructor(options = {}) {
@@ -122,7 +138,8 @@ class AudioInBuffer extends BaseLfo {
     this.params = parameters(definitions, options);
 
     const audioBuffer = this.params.get('audioBuffer');
-    if (!audioBuffer || !(audioBuffer instanceof AudioBuffer))
+
+    if (!audioBuffer)
       throw new Error('Invalid `audioBuffer` parameter');
 
     this.endTime = 0;
@@ -168,7 +185,7 @@ class AudioInBuffer extends BaseLfo {
   }
 
   /**
-   * Stop the whole graph, and finalize the strem. When `stop` is called, the
+   * Stop the whole graph, and finalize the stream. When `stop` is called, the
    * slicing of the given `audioBuffer` stops immediately.
    *
    * @see {@link module:core.BaseLfo#finalizeStream}

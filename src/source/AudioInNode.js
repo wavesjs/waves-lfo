@@ -58,7 +58,7 @@ const definitions = {
  * sine.start();
  * audioInNode.start();
  */
-export default class AudioInNode extends BaseLfo {
+class AudioInNode extends BaseLfo {
   constructor(options = {}) {
     super();
 
@@ -139,3 +139,5 @@ export default class AudioInNode extends BaseLfo {
     this.frame.time += this._blockDuration;
   }
 }
+
+export default AudioInNode;

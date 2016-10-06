@@ -81,6 +81,8 @@ const definitions = {
  * @todo - Add a `logicalTime` parameter to tag frame acoording to frame rate.
  * @todo - Define if it makes sens to define a `frameRate` if time is defined
  *  on the fly.
+ * @todo - For vector frame type use `options.frameRate` instead of
+ *  `options.sampleRate`.
  *
  * @example
  * import * as lfo from 'waves-lfo';
@@ -134,13 +136,13 @@ class EventIn extends BaseLfo {
    * @see {@link module:core.BaseLfo#resetStream}
    * @see {@link module:source.EventIn#stop}
    */
-  start() {
+  start(startTime = null) {
     this.processStreamParams();
     this.resetStream();
 
+    this._startTime = startTime;
     this._isStarted = true;
     // values set in the first `process` call
-    this._startTime = null;
     this._systemTime = null;
   }
 
@@ -220,6 +222,8 @@ class EventIn extends BaseLfo {
   /** @private */
   processFunction(frame) {
     const currentTime = this._getTime();
+    const inData = frame.data.length ? frame.data : [frame.data];
+    const outData = this.frame.data;
     // if no time provided, use system time
     let time = Number.isFinite(frame.time) ? frame.time : currentTime;
 
@@ -229,15 +233,8 @@ class EventIn extends BaseLfo {
     if (this._absoluteTime === false)
       time = time - this._startTime;
 
-    if (this.streamParams.frameType === 'scalar') {
-      this.frame.data = frame.data;
-    } else { // 'vector' or 'signal'
-      const inData = frame.data;
-      const outData = this.frame.data;
-
-      for (let i = 0, l = this.streamParams.frameSize; i < l; i++)
-        outData[i] = inData[i];
-    }
+    for (let i = 0, l = this.streamParams.frameSize; i < l; i++)
+      outData[i] = inData[i];
 
     this.frame.time = time;
     this.frame.metadata = frame.metadata;
