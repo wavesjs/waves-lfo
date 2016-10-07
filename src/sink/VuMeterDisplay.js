@@ -12,17 +12,17 @@ const definitions = {
   },
   min: {
     type: 'float',
-    default: -70,
+    default: -80,
     metas: { kind: 'dynamic' },
   },
   max: {
     type: 'float',
-    default: 5,
+    default: 6,
     metas: { kind: 'dynamic' },
   },
   width: {
     type: 'integer',
-    default: 10,
+    default: 6,
     metas: { kind: 'dynamic' },
   }
 }
@@ -40,6 +40,14 @@ class VuMeterDisplay extends BaseDisplay {
     super(definitions, options, false);
 
     this.rmsOperator = new RMS();
+
+    this.lastDB = 0;
+    this.peak = {
+      value: 0,
+      time: 0,
+    }
+
+    this.peakLifetime = 1; // sec
   }
 
   processStreamParams(prevStreamParams) {
@@ -52,58 +60,64 @@ class VuMeterDisplay extends BaseDisplay {
   }
 
   processSignal(frame) {
+    const now = new Date().getTime() / 1000; // sec
     const offset = this.params.get('offset'); // offset zero of the vu meter
     const height = this.canvasHeight;
     const width = this.canvasWidth;
     const ctx = this.ctx;
 
+    const lastDB = this.lastDB;
+    const peak = this.peak;
+
     const red = '#ff2121';
     const yellow = '#ffff1f';
     const green = '#00ff00';
 
-    const lastDB = this.lastDB;
+    // handle current db value
     const rms = this.rmsOperator.inputSignal(frame.data);
     let dB = 20 * log10(rms) - offset;
 
-    // try to do on the rms instead...
+    // slow release (maybe could be improved)
     if (lastDB > dB)
       dB = lastDB - 6;
 
-    // offset of 14 dB
-    const y = this.getYPosition(dB);
+    // handle peak
+    if (dB > peak.value) {
+      peak.value = dB;
+      peak.time = now;
+    } else {
+      if (now - peak.time > this.peakLifetime) {
+        peak.value = dB;
+        peak.time = now;
+      }
+    }
+
     const y0 = this.getYPosition(0);
-    const y3 = this.getYPosition(3);
+    const y = this.getYPosition(dB);
+    const yPeak = this.getYPosition(peak.value);
 
     ctx.save();
 
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, width, height);
 
-    if (dB < 0) {
-      ctx.fillStyle = green;
-      ctx.fillRect(0, y, width, height - y);
-    } else if (dB < 3) {
-      ctx.fillStyle = green;
-      ctx.fillRect(0, y0, width, height - y0);
+    const gradient = ctx.createLinearGradient(0, height, 0, 0);
+    gradient.addColorStop(0, green);
+    gradient.addColorStop((height - y0) / height, yellow);
+    gradient.addColorStop(1, red);
 
-      const rest = y0 - y;
-      ctx.fillStyle = yellow;
-      ctx.fillRect(0, y, width, rest);
-    } else {
-      ctx.fillStyle = green;
-      ctx.fillRect(0, y0, width, height - y0);
+    // current dB
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, y, width, height - y);
 
-      ctx.fillStyle = yellow;
-      ctx.fillRect(0, y3, width, y0 - y3);
+    // marker at 0dB
+    ctx.fillStyle = '#dcdcdc';
+    ctx.fillRect(0, y0, width, 2);
 
-      const rest = y - y3;
-      ctx.fillStyle = red;
-      ctx.fillRect(0, y3, width, rest);
-    }
+    // peak
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, yPeak, width, 2);
 
-    // draw line at 0dB
-    ctx.fillStyle = 'grey';
-    ctx.fillRect(0, y0, width, 1);
 
     ctx.restore();
 
