@@ -5,31 +5,51 @@
 ## Usage
 
 ```sh
-$ npm install wavesjs/waves-lfo [--save]
+$ npm install [--save] wavesjs/waves-lfo
 ```
 
 ```js
-// @todo - create a working example that does something more funny...
 import * as lfo from 'waves-lfo';
 
-const source = new lfo.source.EventIn({ frameSize: 1 });
-const max = new lfo.operator.Max({ order: 5 });
-const logger = new lfo.sinks.Logger({ streamParams: false, metadata: false });
+const eventIn = new lfo.source.EventIn({ frameSize: 3, frameType: 'vector' });
+const rms = new lfo.operator.RMS();
+const logger = new lfo.sinks.Logger({ data: true });
 
-source.connect(max);
-max.connect(sink);
+eventIn.connect(rms);
+rms.connect(sink);
 
-source.start();
-source.process(null, [0, 1]);
+eventIn.start();
+eventIn.process([2, 1, 3]);
+// > [2.16024689947]
 ```
+
+## Terminology
+
+__Scalar__ - Single value, can be considered as a `vector` as well as a `signal`
+
+__Vector__ - Array of values in different dimensions, each dimension is 
+bound to a specific index in each frame
+
+__Signal__ - Array of values in time domain, fragment of a signal
+
+__Data__ - Generic term to designate a `vector` a `signal` or a `scalar`
+
+__Frame__ - Object associating a time tag, data, and optionnal metadatas.
+
+__Stream__ - Succession of frames, the state of the stream is defined in the `streamParams` attribute in each node by the following values:
+- `frameSize`: number of values in the frame at the output of the node
+- `frameRate`: number of frame per seconds at the output of the node (if `0`, no frame rate)
+- `frameType`: define if the output of the node should be considered as a `signal`, a `vector` or a `scalar`
+- `sourceSampleRate`: number of frame per seconds as defined by the source of the graph
+- `description`: array describing the output dimensions when `frameType` is `vector` (or `scalar`)
 
 ## Structure of a graph
 
 Nodes of a `lfo` graph are divided in 3 categories:
 
-- **`sources`** are responsible for acquering a signal and its properties (frameRate, frameSize, etc.)
-- **`sinks`** are endpoints of the graph, such nodes can be recorders, visualizers, etc.
-- **`operators`** are use to make computation on the input signal and forward the results below in the graph.
+- **`sources`** are responsible for acquering signals and their properties (frameRate, frameSize, etc.)
+- **`sinks`** are endpoints of the graph. Such nodes can be recorders, visualizers, etc.
+- **`operators`** make computation on the input stream and forward results to the next(s) operator(s).
 
 A graph should then contain at least a `source` node, a `sink` and one or several `operator` nodes in between:
 
@@ -37,26 +57,10 @@ A graph should then contain at least a `source` node, a `sink` and one or severa
 ![](https://dl.dropboxusercontent.com/u/606131/lfo.png)
 
 
-## Definitions
-
-__Vector__ - Array of values of different dimensionnalities, each dimension is 
-bound to an specific index in each frame
-
-__Block__ - Array of values in time domain, fragment of a signal
-
-__Frame__ - generic term to designate a `vector` or a `block`
-
-__Stream__ - flux a frames, the state of the stream is defined in the `streamParams` attribute in each node by the following values:
-- `frameSize`: number of values in the frame at the output of the node
-- `framRate`: number of frame per seconds at the output of the node
-- `sourceSampleRate`: number of frame per seconds as defined by the source of the graph
-- `type`: define if the output of the node should be considered as a `block` or
-a `vector`
-
-
-## Implement a new `lfo` operator
+## Implementation of a new `lfo` operator
 
 ```js
+// @todo - update
 class Multiplier extends BaseLfo {
   constructor(options) {
     // define the default value for the `factor` parameter, and allow to 
