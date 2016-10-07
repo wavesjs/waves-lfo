@@ -77,19 +77,14 @@ class VuMeterDisplay extends BaseDisplay {
     const rms = this.rmsOperator.inputSignal(frame.data);
     let dB = 20 * log10(rms) - offset;
 
-    // slow release (maybe could be improved)
+    // slow release (could probably be improved)
     if (lastDB > dB)
       dB = lastDB - 6;
 
     // handle peak
-    if (dB > peak.value) {
+    if (dB > peak.value || (now - peak.time) > this.peakLifetime) {
       peak.value = dB;
       peak.time = now;
-    } else {
-      if (now - peak.time > this.peakLifetime) {
-        peak.value = dB;
-        peak.time = now;
-      }
     }
 
     const y0 = this.getYPosition(0);
@@ -106,11 +101,11 @@ class VuMeterDisplay extends BaseDisplay {
     gradient.addColorStop((height - y0) / height, yellow);
     gradient.addColorStop(1, red);
 
-    // current dB
+    // dB
     ctx.fillStyle = gradient;
     ctx.fillRect(0, y, width, height - y);
 
-    // marker at 0dB
+    // 0 dB marker
     ctx.fillStyle = '#dcdcdc';
     ctx.fillRect(0, y0, width, 2);
 
