@@ -29,13 +29,17 @@ const definitions = {
 
 
 /**
+ * Display a spectrogram on an incomming signal.
+ * @todo - Expose more configuration for the `fft` and eventually add a `slicer`
  *
- *
- *
+ * @param {Number} [scale=1] - Scale display of the spectrogram.
+ * @param {String} [color=null] - Color of the spectrogram.
+ * @param {Number} [min=-60] - Minimum displayed value (in dB).
+ * @param {Number} [max=6] - Maximum displayed value (in dB).
  */
 class SpectrogramDisplay extends BaseDisplay {
   constructor(options) {
-    super(definitions, options);
+    super(definitions, options, false);
 
     if (this.params.get('color') === null)
       this.params.set('color', getRandomColor());
@@ -44,17 +48,16 @@ class SpectrogramDisplay extends BaseDisplay {
   processStreamParams(prevStreamParams) {
     super.processStreamParams(prevStreamParams);
 
-    this.fft = new FFT({ fftSize: this.streamParams.frameSize });
+    this.fft = new FFT({
+      size: this.streamParams.frameSize,
+      window: 'hann',
+    });
+
     this.fft.processStreamParams(this.streamParams);
     this.fft.resetStream();
   }
 
-  // no need to scroll or anything
-  executeDraw(frame, frameWidth, pixelsSinceLastFrame) {
-    this.processFunction(frame, frameWidth, pixelsSinceLastFrame);
-  }
-
-  processSignal(frame, frameWidth, pixelsSinceLastFrame) {
+  processSignal(frame) {
     const bins = this.fft.inputSignal(frame.data);
     const nbrBins = bins.length;
 
@@ -66,7 +69,6 @@ class SpectrogramDisplay extends BaseDisplay {
     const ctx = this.ctx;
 
     ctx.fillStyle = this.params.get('color');
-    ctx.clearRect(0, 0, width, height);
 
     // error handling needs review...
     let error = 0;

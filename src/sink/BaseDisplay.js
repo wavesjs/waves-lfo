@@ -3,13 +3,6 @@ import parameters from 'parameters';
 
 
 const commonDefinitions = {
-  duration: {
-    type: 'float',
-    min: 0,
-    max: +Infinity,
-    default: 1,
-    metas: { kind: 'dynamic' },
-  },
   min: {
     type: 'float',
     default: -1,
@@ -44,8 +37,16 @@ const commonDefinitions = {
     type: 'float',
     default: 0,
     constant: true,
-  }
-}
+  },
+};
+
+const durationDefinition = {
+  type: 'float',
+  min: 0,
+  max: +Infinity,
+  default: 1,
+  metas: { kind: 'dynamic' },
+};
 
 /**
  * Base class to extend in order to create graphical sinks.
@@ -75,9 +76,13 @@ const commonDefinitions = {
  * @see {@link module:utils.DisplaySync}
  */
 class BaseDisplay extends BaseLfo {
-  constructor(defs, options) {
+  constructor(defs, options = {}, hasDuration = true) {
     super();
 
+    if (hasDuration)
+      commonDefinitions.duration = durationDefinition;
+
+    console.log(options);
     const definitions = Object.assign({}, commonDefinitions, defs);
     this.params = parameters(definitions, options);
     this.params.addListener(this.onParamUpdate.bind(this));
@@ -87,6 +92,7 @@ class BaseDisplay extends BaseLfo {
 
     const canvasParam = this.params.get('canvas');
     const containerParam = this.params.get('container');
+
     // prepare canvas
     if (canvasParam) {
       if (typeof canvasParam === 'string')
@@ -259,8 +265,15 @@ class BaseDisplay extends BaseLfo {
   }
 
   renderStack() {
-    for (let i = 0, l = this._stack.length; i < l; i++)
-      this.executeDraw(this._stack[i]);
+    if (this.params.has('duration')) {
+      // render all frame since last `renderStack` call
+      for (let i = 0, l = this._stack.length; i < l; i++)
+        this.executeDraw(this._stack[i]);
+    } else {
+      // only render last received frame if any
+      if (this._stack.length > 0)
+        this.executeDraw(this._stack[this._stack.length - 1]);
+    }
 
     // reinit stack for next call
     this._stack.length = 0;
@@ -268,7 +281,12 @@ class BaseDisplay extends BaseLfo {
   }
 
   executeDraw(frame) {
-    this.scrollModeDraw(frame);
+    if (this.params.has('duration')) {
+      this.scrollModeDraw(frame);
+    } else {
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      this.processFunction(frame);
+    }
   }
 
   scrollModeDraw(frame) {
