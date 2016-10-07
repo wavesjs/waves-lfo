@@ -2,7 +2,7 @@ import BaseLfo from '../core/BaseLfo';
 import parameters from 'parameters';
 
 
-definitions = {
+const definitions = {
   state: {
     type: 'enum',
     default: 'on',
@@ -13,7 +13,7 @@ definitions = {
 
 
 /**
- * The Switch operator allows to stop the propagation of the stream in the
+ * The Toggle operator allows to stop the propagation of the stream in the
  * subgraph. When "on", frames are propagated, when "off" the propagation is
  * stopped.
  * The `streamParams` propagation is never bypassed so the subsequent subgraph
@@ -27,7 +27,7 @@ definitions = {
  * @example
  * // todo
  */
-class Switch extends BaseLfo {
+class Toggle extends BaseLfo {
   constructor(options) {
     super();
 
@@ -42,11 +42,16 @@ class Switch extends BaseLfo {
    *  and `'off'`.
    */
   setState(state) {
-    if (definition.state.list.indexOf(state) === -1)
+    if (definitions.state.list.indexOf(state) === -1)
       throw new Error(`Invalid switch state value "${state}" [valid values: "on"/"off"]`);
 
     this.state = state;
   }
+
+  // define all possible stream API
+  processScalar() {}
+  processVector() {}
+  processSignal() {}
 
   /** @private */
   processFrame(frame) {
@@ -62,4 +67,4 @@ class Switch extends BaseLfo {
   }
 }
 
-export default Switch;
+export default Toggle;
