@@ -7,6 +7,7 @@ import Logger from './Logger';
 import MarkerDisplay from './MarkerDisplay';
 import SignalDisplay from './SignalDisplay';
 import SpectrogramDisplay from './SpectrogramDisplay';
+import VuMeterDisplay from './VuMeterDisplay';
 import WaveformDisplay from './WaveformDisplay';
 
 
@@ -16,5 +17,6 @@ export default {
   MarkerDisplay,
   SignalDisplay,
   SpectrogramDisplay,
+  VuMeterDisplay,
   WaveformDisplay,
 };
