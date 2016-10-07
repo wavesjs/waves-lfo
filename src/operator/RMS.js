@@ -9,18 +9,18 @@ const sqrt = Math.sqrt;
  * @memberof module:operator
  */
 class RMS extends BaseLfo {
+  constructor() {
+    super();
+  }
+
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
+
     this.streamParams.frameSize = 1;
     this.streamParams.frameType = 'scalar';
     this.streamParams.description = ['rms'];
+
     this.propagateStreamParams();
-  }
-
-  /** @private */
-  processSignal(frame) {
-    this.frame.data[0] = this.inputSignal(frame.data);
-
   }
 
   /**
@@ -43,6 +43,11 @@ class RMS extends BaseLfo {
     rms = sqrt(rms);
 
     return rms;
+  }
+
+  /** @private */
+  processSignal(frame) {
+    this.frame.data[0] = this.inputSignal(frame.data);
   }
 }
 
