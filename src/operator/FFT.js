@@ -239,7 +239,10 @@ class FFT extends BaseLfo {
     const fftSize = this.params.get('size');
     const mode = this.params.get('mode');
     const norm = this.params.get('norm');
-    const windowName = this.params.get('window');
+    let windowName = this.params.get('window');
+    // window `none` and `rectangle` are aliases
+    if (windowName === 'none')
+      windowName = 'rectangle';
 
     this.streamParams.frameSize = fftSize / 2 + 1;
     this.streamParams.frameType = 'vector';
@@ -251,16 +254,12 @@ class FFT extends BaseLfo {
     this.normalizeCoefs = { linear: 0, power: 0 };
     this.window = new Float32Array(this.windowSize);
 
-    if (windowName !== 'none') {
-      initWindow(
-        windowName, // name of the window
-        this.window, // buffer populated with the window signal
-        this.windowSize, // size of the window
-        this.normalizeCoefs // object populated with the normalization coefs
-      );
-    } else {
-      this.window.fill(1);
-    }
+    initWindow(
+      windowName,         // name of the window
+      this.window,        // buffer populated with the window signal
+      this.windowSize,    // size of the window
+      this.normalizeCoefs // object populated with the normalization coefs
+    );
 
     const { linear, power } = this.normalizeCoefs;
 
@@ -282,9 +281,6 @@ class FFT extends BaseLfo {
           this.windowNorm = linear;
         else if (mode === 'power')
           this.windowNorm = power;
-        else
-          this.windowNorm = 1;
-
         break;
     }
 
@@ -295,7 +291,9 @@ class FFT extends BaseLfo {
     this.propagateStreamParams();
   }
 
-  /** @private */
+  /**
+   * @todo
+   */
   inputSignal(signal) {
     const mode = this.params.get('mode');
     const windowSize = this.windowSize;
