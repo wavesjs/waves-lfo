@@ -12,6 +12,7 @@ import MovingMedian from './MovingMedian';
 import RMS from './RMS';
 import Select from './Select';
 import Slicer from './Slicer';
+import Switch from './Switch';
 // import Segmenter from './segmenter';
 
 export default {
@@ -25,4 +26,5 @@ export default {
   RMS,
   Select,
   Slicer,
+  Switch,
 };
