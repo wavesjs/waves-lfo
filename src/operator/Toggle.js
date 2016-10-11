@@ -1,7 +1,6 @@
 import BaseLfo from '../core/BaseLfo';
 import parameters from 'parameters';
 
-
 const definitions = {
   state: {
     type: 'enum',
@@ -10,7 +9,6 @@ const definitions = {
     metas: { kind: 'dynamic' },
   },
 };
-
 
 /**
  * The Toggle operator allows to stop the propagation of the stream in the

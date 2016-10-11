@@ -292,7 +292,7 @@ class FFT extends BaseLfo {
   }
 
   /**
-   * @todo
+   * @todo - doc
    */
   inputSignal(signal) {
     const mode = this.params.get('mode');

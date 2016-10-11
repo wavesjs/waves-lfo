@@ -4,21 +4,31 @@
       "README.md",
       "src/core/BaseLfo.js",
 
+      "src/operator/Biquad.js",
+      "src/operator/DCT.js",
+      "src/operator/FFT.js",
       "src/operator/Magnitude.js",
+      "src/operator/MeanStddev.js",
+      "src/operator/Mel.js",
       "src/operator/MinMax.js",
       "src/operator/MovingAverage.js",
       "src/operator/MovingMedian.js",
       "src/operator/RMS.js",
+      "src/operator/Select.js",
       "src/operator/Slicer.js",
+      "src/operator/Toggle.js",
+
+      "src/sink/BpfDisplay.js",
+      "src/sink/Logger.js",
+      "src/sink/MarkerDisplay.js",
+      "src/sink/SignalDisplay.js",
+      "src/sink/SpectrumDisplay.js",
+      "src/sink/VuMeterDisplay.js",
+      "src/sink/WaveformDisplay.js",
 
       "src/source/AudioInBuffer.js",
       "src/source/AudioInNode.js",
       "src/source/EventIn.js",
-
-      "src/sink/BpfDisplay.js",
-      "src/sink/Logger.js",
-      "src/sink/SignalDisplay.js",
-      "src/sink/WaveformDisplay.js",
 
       "src/utils/DisplaySync.js"
     ]

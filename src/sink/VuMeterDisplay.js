@@ -30,10 +30,42 @@ const definitions = {
 /**
  * Simple VU-Meter
  *
+ * @memberof module:sink
+ *
+ * @param {Object} options - Override defaults parameters.
+ * @param {Number} [options.offset=-14] - dB offset applied to the signal.
+ * @param {Number} [options.min=-80] - Minimum displayed value (in dB).
+ * @param {Number} [options.max=6] - Maximum displayed value (in dB).
+ * @param {Number} [options.width=6] - Width of the display (in pixels).
+ *
  * @todo - define if possible to embed it's own slicer.
- * @todo - add a peak (max style)
  * @todo - draw a scale on the left.
  *
+ * @example
+ * import * as lfo from 'waves-lfo';
+ *
+ * navigator.mediaDevices
+ *   .getUserMedia({ audio: true })
+ *   .then(init)
+ *   .catch((err) => console.error(err.stack));
+ *
+ * const audioContext = new AudioContext();
+ *
+ * function init(stream) {
+ *   const source = audioContext.createMediaStreamSource(stream);
+ *
+ *   const audioInNode = new lfo.source.AudioInNode({
+ *     audioContext: audioContext,
+ *     sourceNode: source,
+ *   });
+ *
+ *   const vuMeter = new lfo.sink.VuMeterDisplay({
+ *     canvas: '#vu-meter',
+ *   });
+ *
+ *   audioInNode.connect(vuMeter);
+ *   audioInNode.start();
+ * }
  */
 class VuMeterDisplay extends BaseDisplay {
   constructor(options = {}) {

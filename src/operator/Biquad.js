@@ -2,10 +2,11 @@
  * @author Jean-Philippe.Lambert@ircam.fr, Norbert.Schnell@ircam.fr, victor.saiz@ircam.fr
  *
  * @brief  Biquad filter and coefficients calculator
- * @private
  *
  * Based on the "Cookbook formulae for audio EQ biquad filter
  * coefficients" by Robert Bristow-Johnson
+ *
+ * @private
  */
 
 // y(n) = b0 x(n) + b1 x(n-1) + b2 x(n-2)
@@ -349,7 +350,7 @@ const definitions = {
  * @example
  * // todo
  */
-export default class Biquad extends BaseLfo {
+class Biquad extends BaseLfo {
   constructor(options) {
     super();
 
@@ -399,3 +400,5 @@ export default class Biquad extends BaseLfo {
     biquadArrayDf1(this.coefs, this.state, frame.data, this.frame.data, frameSize);
   }
 }
+
+export default Biquad;

@@ -2,14 +2,14 @@ import BaseLfo from '../core/BaseLfo';
 import parameters from 'parameters';
 
 const sqrt = Math.sqrt;
-// const definitions = {};
 
 /**
- * Compute the mean est the standard deviation of a given signal.
+ * Compute mean and standard deviation of a given signal.
  *
  * @memberof module:operator
  *
  * @example
+ * // todo
  */
 class MeanStddev extends BaseLfo {
   constructor(options) {

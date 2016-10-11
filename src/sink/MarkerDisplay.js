@@ -24,12 +24,39 @@ const definitions = {
 /**
  * Display a marker according to the input frame.
  *
+ * @memberof module:sink
+ *
  * @param {String} color - Color of the marker.
  * @param {Number} thresholdIndex - Index of the incomming frame data to compare
  *  against the threshold. _Should be used in conjonction with `threshold`_.
  * @param {Number} threshold - Minimum value the incomming value should have to
  *  trigger the display of a marker. _Should be used in conjonction with
  *  `thresholdIndex`_.
+ *
+ * @example
+ * import * as lfo from 'waves-lfo';
+ *
+ * const eventIn = new lfo.source.EventIn({
+ *   frameType: 'scalar',
+ *   frameSize: 1,
+ * });
+ *
+ * const marker = new lfo.sink.MarkerDisplay({
+ *   canvas: '#marker',
+ * });
+ *
+ * eventIn.connect(marker);
+ * eventIn.start();
+ *
+ * let time = 0;
+ * const period = 1;
+ *
+ * (function generateData() {
+ *   eventIn.process(time, 0);
+ *
+ *   time += period;
+ *   setTimeout(generateData, period * 1000);
+ * }());
  */
 class MarkerDisplay extends BaseDisplay {
   constructor(options) {

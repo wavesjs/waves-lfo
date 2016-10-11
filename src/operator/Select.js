@@ -31,9 +31,8 @@ const definitions = {
  * import * as lfo from 'waves-lfo';
  *
  * const eventIn = new lfo.source.EventIn({
- *   frameSize: 3,
  *   frameType: 'vector',
- *   sampleRate: 1,
+ *   frameSize: 3,
  * });
  *
  * const select = new lfo.operator.Select({
@@ -69,7 +68,10 @@ class Select extends BaseLfo {
 
     this.select = (indices !== null) ? indices : [index];
 
-    // @todo - deal with description properly
+    // steal description() from parent
+    this.select.forEach((val, index) => {
+      this.streamParams.description[index] = prevStreamParams.description[val];
+    });
 
     this.propagateStreamParams();
   }
