@@ -23,7 +23,7 @@ var watchOptions = {
   ignoreDotFiles: true,
   ignoreUnreadableDir: true,
   ignoreNotPermitted: true,
-  interval: 2000, // watch internally use `fs.watchFile`
+  interval: 0.1, // watch internally use `fs.watchFile`
 };
 
 /**
