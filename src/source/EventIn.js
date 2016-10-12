@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 /**
  * Create a function that returns time in seconds according to the current
@@ -34,6 +33,12 @@ const definitions = {
     default: false,
     constant: true,
   },
+  audioContext: {
+    type: 'any',
+    default: null,
+    constant: true,
+    nullable: true,
+  },
   frameType: {
     type: 'enum',
     list: ['signal', 'vector', 'scalar'],
@@ -49,9 +54,18 @@ const definitions = {
   },
   sampleRate: {
     type: 'float',
-    default: 0,
+    default: null,
     min: 0,
     max: +Infinity, // same here
+    nullable: true,
+    metas: { kind: 'static' },
+  },
+  frameRate: {
+    type: 'float',
+    default: null,
+    min: 0,
+    max: +Infinity, // same here
+    nullable: true,
     metas: { kind: 'static' },
   },
   description: {
@@ -63,13 +77,16 @@ const definitions = {
 
 /**
  * The `EventIn` operator allows to manually create a stream of data or to feed
- * a stream from another source (e.g. accelerometers) into a processing graph.
+ * a stream from another source (e.g. sensors) into a processing graph.
  *
  * @param {Object} options - Override parameters' default values.
  * @param {String} [options.frameType='signal'] - Type of the input - allowed
  * values: `signal`,  `vector` or `scalar`.
  * @param {Number} [options.frameSize=1] - Size of the output frame.
- * @param {Number} [options.sampleRate=0] - Rate of the source stream.
+ * @param {Number} [options.sampleRate=null] - Sample rate of the source stream,
+ *  if of type `signal`.
+ * @param {Number} [options.frameRate=null] - Rate of the source stream, if of
+ *  type `vector`.
  * @param {Array|String} [options.description] - Optionnal description
  *  describing the dimensions of the output frame
  * @param {Boolean} [options.absoluteTime=false] - Define if time should be used
@@ -78,11 +95,7 @@ const definitions = {
  *
  * @memberof module:source
  *
- * @todo - Add a `logicalTime` parameter to tag frame acoording to frame rate.
- * @todo - Define if it makes sens to define a `frameRate` if time is defined
- *  on the fly.
- * @todo - For vector frame type use `options.frameRate` instead of
- *  `options.sampleRate`.
+ * @todo - Add a `logicalTime` parameter to tag frame according to frame rate.
  *
  * @example
  * import * as lfo from 'waves-lfo';
@@ -91,12 +104,12 @@ const definitions = {
  *   frameType: 'vector',
  *   frameSize: 3,
  *   frameRate: 1 / 50,
- *   description: ['alpha', 'beta', 'gamma']
+ *   description: ['alpha', 'beta', 'gamma'],
  * });
  *
  * // connect source to operators and sink(s)
  *
- * // initialize the whole graph
+ * // initialize and start the graph
  * eventIn.start();
  *
  * // feed `deviceorientation` data into the graph
@@ -105,32 +118,28 @@ const definitions = {
  *     time: new Date().getTime(),
  *     data: [e.alpha, e.beta, e.gamma],
  *   };
- *   // by setting `time` to null, we let the node create
- *   // a relative time tag internally
+ *
  *   eventIn.processFrame(frame);
  * }, false);
  */
 class EventIn extends BaseLfo {
   constructor(options = {}) {
-    super();
+    super(definitions, options);
 
-    // audioContext is not a real parameter so cache it and remove from options
-    const audioContext = options.audioContext;
-    delete options.audioContext;
-
-    this.params = parameters(definitions, options);
-    this.params.addListener(this.onParamUpdate);
-
+    const audioContext = this.params.get('audioContext');
     this._getTime = getTimeFunction(audioContext);
     this._isStarted = false;
     this._startTime = null;
     this._systemTime = null;
     this._absoluteTime = this.params.get('absoluteTime');
+
+    this.initialize();
   }
 
   /**
-   * Start the whole graph, propagate the `streamParams` in the graph. Any call
-   * to `process` or `processFrame` before `start` will be ignored.
+   * Propagate the `streamParams` in the graph and allow to input frames into
+   * the graph. Any call to `process` or `processFrame` before `start` will be
+   * ignored.
    *
    * @see {@link module:core.BaseLfo#processStreamParams}
    * @see {@link module:core.BaseLfo#resetStream}
@@ -147,8 +156,8 @@ class EventIn extends BaseLfo {
   }
 
   /**
-   * Stop the whole graph, and finalize the strem. Any call to `process` after
-   * `stop` will be ignored.
+   * Finalize the stream and stop the whole graph. Any call to `process` or
+   * `processFrame` after `stop` will be ignored.
    *
    * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:source.EventIn#start}
@@ -172,34 +181,46 @@ class EventIn extends BaseLfo {
     // init operator's stream params
     this.streamParams.frameSize = frameSize;
     this.streamParams.frameType = frameType;
-    this.streamParams.sourceSampleRate = sampleRate;
     this.streamParams.description = description;
 
-    if (frameType === 'signal')
+    if (frameType === 'signal') {
+      if (sampleRate === null)
+        throw new Error('Undefined "sampleRate" for "signal" stream');
+
+      this.streamParams.sourceSampleRate = sampleRate;
       this.streamParams.frameRate = sampleRate / frameSize;
-    else // `vector` or `scalar`
-      this.streamParams.frameRate = sampleRate;
+    } else { // `vector` or `scalar`
+      if (sampleRate === null)
+        throw new Error('Undefined "frameRate" for "vector" stream');
+
+      this.streamParams.frameRate = frameRate;
+      this.streamParams.sampleRate = frameRate;
+    }
 
     this.propagateStreamParams();
   }
 
-  /**
-   * Propagate a frame object in the graph.
-   *
-   * @param {Object} frame - Input frame.
-   * @param {Number} frame.time - Frame time.
-   * @param {Float32Array|Array} frame.data - Frame data.
-   * @param {Object} [frame.metadata=undefined] - Optionnal frame metadata.
-   *
-   * @example
-   * eventIn.processFrame({ time: 1, data: [0, 1, 2] });
-   */
-  processFrame(frame) {
-    if (!this._isStarted) return;
+  /** @private */
+  processFunction(frame) {
+    const currentTime = this._getTime();
+    const inData = frame.data.length ? frame.data : [frame.data];
+    const outData = this.frame.data;
+    // if no time provided, use system time
+    let time = Number.isFinite(frame.time) ? frame.time : currentTime;
 
-    this.prepareFrame();
-    this.processFunction(frame);
-    this.propagateFrame();
+    if (this._startTime === null)
+      this._startTime = time;
+
+    if (this._absoluteTime === false)
+      time = time - this._startTime;
+
+    for (let i = 0, l = this.streamParams.frameSize; i < l; i++)
+      outData[i] = inData[i];
+
+    this.frame.time = time;
+    this.frame.metadata = frame.metadata;
+    // store current time to compute `endTime` on stop
+    this._systemTime = currentTime;
   }
 
   /**
@@ -219,27 +240,23 @@ class EventIn extends BaseLfo {
     this.processFrame({ time, data, metadata });
   }
 
-  /** @private */
-  processFunction(frame) {
-    const currentTime = this._getTime();
-    const inData = frame.data.length ? frame.data : [frame.data];
-    const outData = this.frame.data;
-    // if no time provided, use system time
-    let time = Number.isFinite(frame.time) ? frame.time : currentTime;
+  /**
+   * Propagate a frame object in the graph.
+   *
+   * @param {Object} frame - Input frame.
+   * @param {Number} frame.time - Frame time.
+   * @param {Float32Array|Array} frame.data - Frame data.
+   * @param {Object} [frame.metadata=undefined] - Optionnal frame metadata.
+   *
+   * @example
+   * eventIn.processFrame({ time: 1, data: [0, 1, 2] });
+   */
+  processFrame(frame) {
+    if (!this._isStarted) return;
 
-    if (this._startTime = null)
-      this._startTime = time;
-
-    if (this._absoluteTime === false)
-      time = time - this._startTime;
-
-    for (let i = 0, l = this.streamParams.frameSize; i < l; i++)
-      outData[i] = inData[i];
-
-    this.frame.time = time;
-    this.frame.metadata = frame.metadata;
-    // store current time to compute `endTime` on stop
-    this._systemTime = currentTime;
+    this.prepareFrame();
+    this.processFunction(frame);
+    this.propagateFrame();
   }
 }
 
