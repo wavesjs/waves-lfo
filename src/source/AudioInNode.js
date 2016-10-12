@@ -25,13 +25,15 @@ const definitions = {
 };
 
 /**
- * Use a WebAudio node as source.
+ * Use a WebAudio node as a source for the graph.
  *
  * @param {Object} options - Override parameter' default values.
- * @param {AudioNode} sourceNode - Audio node to process.
- * @param {AudioContext} audioContext - Audio context used to create the audio
- *  node.
- * @param {Number} [options.frameSize=512] - Size of the output blocks.
+ * @param {AudioNode} [options.sourceNode=null] - Audio node to process
+ *  (mandatory).
+ * @param {AudioContext} [options.audioContext=null] - Audio context used to
+ *  create the audio node (mandatory).
+ * @param {Number} [options.frameSize=512] - Size of the output blocks, define
+ *  the `frameSize` in the `streamParams`.
  * @param {Number} [channel=0] - Number of the channel to process.
  *
  * @memberof module:source
@@ -55,14 +57,13 @@ const definitions = {
  *
  * audioInNode.connect(signalDisplay);
  *
+ * // start the sine oscillator node and the lfo graph
  * sine.start();
  * audioInNode.start();
  */
 class AudioInNode extends BaseLfo {
   constructor(options = {}) {
-    super();
-
-    this.params = parameters(definitions, options);
+    super(definitions, options);
 
     const audioContext = this.params.get('audioContext');
     const sourceNode = this.params.get('sourceNode');
@@ -78,9 +79,8 @@ class AudioInNode extends BaseLfo {
   }
 
   /**
-   * Start the whole graph, propagate the `streamParams` in the graph. When the
-   * method in called, blocks from the signal produced by the given audio node
-   * are propagated into the graph immediately.
+   * Propagate the `streamParams` in the graph and start to propagate signal
+   * blocks produced by the audio node into the graph.
    *
    * @see {@link module:core.BaseLfo#processStreamParams}
    * @see {@link module:core.BaseLfo#resetStream}
@@ -96,7 +96,7 @@ class AudioInNode extends BaseLfo {
   }
 
   /**
-   * Stop the whole graph and finalize the stream.
+   * Finalize the stream and stop the whole graph.
    *
    * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:source.AudioInNode#start}

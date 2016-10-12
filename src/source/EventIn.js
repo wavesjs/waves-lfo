@@ -132,12 +132,10 @@ class EventIn extends BaseLfo {
     this._startTime = null;
     this._systemTime = null;
     this._absoluteTime = this.params.get('absoluteTime');
-
-    this.initialize();
   }
 
   /**
-   * Propagate the `streamParams` in the graph and allow to input frames into
+   * Propagate the `streamParams` in the graph and allow to push frames into
    * the graph. Any call to `process` or `processFrame` before `start` will be
    * ignored.
    *

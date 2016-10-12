@@ -113,6 +113,8 @@ const definitions = {
  *
  * @memberof module:source
  *
+ * @todo - Allow to pass raw buffer and sampleRate (simplified use server-side)
+ *
  * @example
  * import * as lfo from 'waves-lfo';
  *
@@ -133,14 +135,12 @@ const definitions = {
  */
 class AudioInBuffer extends BaseLfo {
   constructor(options = {}) {
-    super();
-
-    this.params = parameters(definitions, options);
+    super(definitions, options);
 
     const audioBuffer = this.params.get('audioBuffer');
 
     if (!audioBuffer)
-      throw new Error('Invalid `audioBuffer` parameter');
+      throw new Error('Invalid "audioBuffer" parameter');
 
     this.endTime = 0;
     this.worker = null;
@@ -149,9 +149,9 @@ class AudioInBuffer extends BaseLfo {
   }
 
   /**
-   * Start the whole graph, propagate the `streamParams` in the graph. When this
-   * method is called, the slicing of the given `audioBuffer` starts immediately
-   * and each resulting frame is propagated in graph.
+   * Propagate the `streamParams` in the graph and start propagating frames.
+   * When called, the slicing of the given `audioBuffer` starts immediately and
+   * each resulting frame is propagated in graph.
    *
    * @see {@link module:core.BaseLfo#processStreamParams}
    * @see {@link module:core.BaseLfo#resetStream}
@@ -185,8 +185,8 @@ class AudioInBuffer extends BaseLfo {
   }
 
   /**
-   * Stop the whole graph, and finalize the stream. When `stop` is called, the
-   * slicing of the given `audioBuffer` stops immediately.
+   * Finalize the stream and stop the whole graph. When `stop` is called, the
+   * slicing of the `audioBuffer` stops immediately.
    *
    * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:source.EventIn#start}
