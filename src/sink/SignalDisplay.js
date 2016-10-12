@@ -33,10 +33,10 @@ const definitions = {
 
 
 /**
- * Draw a stream of type `signal` on a canvas.
+ * Display a stream of type `signal` on a canvas.
  *
  * @param {Object} options - Override default parameters.
- * @param {Number} options.duration - Duration (in seconds) represented in
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
  *  the canvas. _dynamic parameter_
  * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
  *  _dynamic parameter_
@@ -100,7 +100,8 @@ class SignalDisplay extends BaseDisplay {
     let posX = 0;
     let lastY = this.lastPosY;
 
-    ctx.strokeStyle = this.params.get('color');
+    ctx.strokeStyle = color;
+    ctx.beginPath();
 
     for (let i = 0; i < data.length; i++) {
       const posY = this.getYPosition(data[i]);
@@ -119,6 +120,7 @@ class SignalDisplay extends BaseDisplay {
     }
 
     ctx.stroke();
+    ctx.closePath();
 
     this.lastPosY = lastY;
   }
