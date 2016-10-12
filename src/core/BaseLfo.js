@@ -1,3 +1,5 @@
+import parameters from 'parameters';
+
 let id = 0;
 
 /**
@@ -15,15 +17,19 @@ let id = 0;
  * - the **`constructor`** to define the parameters of the new lfo node.
  * - the **`processStreamParams`** method to define how the node modify the
  *   stream attributes (e.g. by changing the frame size)
- * - the **`processFrame`** method to define the operations that the node apply
- *   on the stream.
+ * - the **`process{FrameType}`** method to define the operations that the
+ *   node apply on the stream. The type of input a node can handle is define
+ *   by its implemented interface, if it implements `processSignal` a stream
+ *   with `frameType === 'signal'` can be processed, `processVector` to handle
+ *   an input of type `vector`.
  *
- * <span class="warning">_This class should be considered abstract._</span>
+ * <span class="warning">_This class should be considered abstract and only
+ * be used to be extended._</span>
  *
  * @memberof module:core
  */
 class BaseLfo {
-  constructor() {
+  constructor(definitions = {}, options = {}) {
     this.cid = id++;
 
     /**
@@ -34,34 +40,12 @@ class BaseLfo {
      * @instance
      * @memberof module:core.BaseLfo
      */
-    this.params = null;
+    this.params = parameters(definitions, options);
+    // listen for param updates
+    this.params.addListener(this.onParamUpdate.bind(this));
 
     /**
-     * List of nodes connected to the ouput of the node (lower in the graph).
-     * At each frame, the node forward its `time`, `frameData` and `metadata` to
-     * to all its nextOps.
-     *
-     * @type {Array<BaseLfo>}
-     * @name nextOps
-     * @instance
-     * @memberof module:core.BaseLfo
-     */
-    this.nextOps = [];
-
-    /**
-     * The node at which the current node is connected (upper in the graph) and
-     * from which it receives frames to process at each cycle.
-     * For `source`, this attribute is `null`.
-     *
-     * @type {BaseLfo}
-     * @name prevOp
-     * @instance
-     * @memberof module:core.BaseLfo
-     */
-    this.prevOp = null;
-
-    /**
-     * Parameters of the stream from the point of vue of the current node.
+     * Description of the stream output of the node.
      * Set to `null` when the node is destroyed.
      *
      * @type {Object}
@@ -86,7 +70,8 @@ class BaseLfo {
     };
 
     /**
-     * Current frame of the operator.
+     * Current frame. This object and its data are updated at each incomming
+     * frame without reallocating memory.
      *
      * @type {Object}
      * @name frame
@@ -103,22 +88,57 @@ class BaseLfo {
     };
 
     /**
+     * List of nodes connected to the ouput of the node (lower in the graph).
+     * At each frame, the node forward its `frame` to to all its `nextOps`.
+     *
+     * @type {Array<BaseLfo>}
+     * @name nextOps
+     * @instance
+     * @memberof module:core.BaseLfo
+     * @see {@link module:core.BaseLfo#connect}
+     * @see {@link module:core.BaseLfo#disconnect}
+     */
+    this.nextOps = [];
+
+    /**
+     * The node from which the node receive the frames (upper in the graph).
+     *
+     * @type {BaseLfo}
+     * @name prevOp
+     * @instance
+     * @memberof module:core.BaseLfo
+     * @see {@link module:core.BaseLfo#connect}
+     * @see {@link module:core.BaseLfo#disconnect}
+     */
+    this.prevOp = null;
+
+    /**
      * When set to `true` the sub-graph starting at the current node is
-     * reinitialized on the next process call. This attribute is typically
-     * set to `true` when a dynamic parameter is updated.
+     * reinitialized on the next incomming frame. This attribute is set to
+     * `true` when a static parameter is updated.
      *
      * @type {Boolean}
-     * @name reinit
+     * @name _reinit
      * @instance
      * @memberof module:core.BaseLfo
      * @private
      */
-    this.reinit = false;
+    this._reinit = false;
   }
 
   /**
-   * Function called when a param is updated. By default set the `reinit`
-   * flag to `true` if the param is `static` one.
+   * Returns an object describing each available parameter of the node.
+   *
+   * @return {Object}
+   */
+  getParamDefinitions() {
+    return this.params.getDefinitions();
+  }
+
+  /**
+   * Function called when a param is updated. By default set the `_reinit`
+   * flag to `true` if the param is `static` one. This method should be
+   * extended to handle particular logic bound to a specific parameter.
    *
    * @param {String} name - Name of the parameter.
    * @param {Mixed} value - Value of the parameter.
@@ -126,13 +146,13 @@ class BaseLfo {
    */
   onParamUpdate(name, value, metas = {}) {
     if (metas.kind === 'static')
-      this.reinit = true;
+      this._reinit = true;
   }
 
   /**
-   * Connect the current node (the `prevOp`) to another node (the `nextOp`).
-   * A given node can be connected to several operators to which the stream
-   * is forwarded on each `processFrame` call.
+   * Connect the current node (`prevOp`) to another node (`nextOp`).
+   * A given node can be connected to several operators and propagate the
+   * stream to each of them.
    *
    * @param {BaseLfo} next - Next operator in the graph.
    * @see {@link module:core.BaseLfo#process}
@@ -156,7 +176,7 @@ class BaseLfo {
    * Remove the given operator from its previous operators' `nextOps`.
    *
    * @param {BaseLfo} [next=null] - The operator to disconnect from the current
-   *  operator. If `null` disconnect all the next nodes.
+   *  operator. If `null` disconnect all the next operators.
    */
   disconnect(next = null) {
     if (next === null) {
@@ -191,11 +211,9 @@ class BaseLfo {
   }
 
   /**
-   * Reset the `frameData` buffer by setting all its values to 0.
-   * This method first propagate to all the next operators of the node
-   * (graph resets from bottom to top).
-   * The method is also automatically called when a source is started, just
-   * after the call of `processStreamParams`.
+   * Reset the `frame.data` buffer by setting all its values to 0.
+   * A source operator should call `processStreamParams` and `resetStream` when
+   * started, each of these method propagate through the graph automaticaly.
    *
    * @see {@link module:core.BaseLfo#processStreamParams}
    */
@@ -210,8 +228,8 @@ class BaseLfo {
   }
 
   /**
-   * Finalize the stream. Is automatically called when a source is
-   * stopped.
+   * Finalize the stream. A source node should call this method when stopped,
+   * `finalizeStream` is automatically propagated throught the graph.
    *
    * @param {Number} endTime - Logical time at which the graph is stopped.
    */
@@ -221,20 +239,21 @@ class BaseLfo {
   }
 
   /**
-   * Initialize or update the operator's `streamParams` accroding to the
+   * Initialize or update the operator's `streamParams` according to the
    * previous operators `streamParams` values.
-   * This method should also create the `frameData` Float32Array accroding to
-   * the operator's `frameSize`. If additionnal buffers has to be created
-   * (e.g. ring buffers to keep track of past states of the node), they should
-   * also be created here.
-   * Finally, the method should call `outputStreamParams` to propagate
-   * operator's `streamParams` to its next operators.
+   *
+   * When implementing a new operator this method should:
+   * 1. call `this.prepareStreamParams` with the given `prevStreamParams`
+   * 2. optionnally change values to `this.streamParams` according to the
+   *    logic performed by the operator.
+   * 3. optionnally allocate memory for ring buffers, etc.
+   * 4. call `this.propagateStreamParams` to trigger the method on the next
+   *    operators in the graph.
    *
    * @param {Object} prevStreamParams - `streamParams` of the previous operator.
    *
    * @see {@link module:core.BaseLfo#prepareStreamParams}
    * @see {@link module:core.BaseLfo#propagateStreamParams}
-   * @see {@link module:core.BaseLfo#processFrame}
    */
   processStreamParams(prevStreamParams = {}) {
     this.prepareStreamParams(prevStreamParams);
@@ -242,11 +261,21 @@ class BaseLfo {
   }
 
   /**
-   * Common logic to do at the beginning of the `processStreamParam`.
-   * This method should be called at the beginning of the `processStreamParam`
-   * method.
+   * Common logic to do at the beginning of the `processStreamParam`, must be
+   * called at the beginning of any `processStreamParam` implementation.
+   *
+   * The method mainly check if the current node implement the interface to
+   * handle the type of frame propagated by it's parent:
+   * - to handle a `vector` frame type, the class must implement `processVector`
+   * - to handle a `signal` frame type, the class must implement `processSignal`
+   * - in case of a 'scalar' frame type, the class can implement any of the
+   * following by order of preference: `processScalar`, `processVector`,
+   * `processSignal`.
    *
    * @param {Object} prevStreamParams - `streamParams` of the previous operator.
+   *
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#propagateStreamParams}
    */
   prepareStreamParams(prevStreamParams = {}) {
     Object.assign(this.streamParams, prevStreamParams);
@@ -283,10 +312,11 @@ class BaseLfo {
 
   /**
    * Create the `this.frame.data` buffer and forward the operator's `streamParam`
-   * to all its next operators. This method must be called at the end of the
-   * `processStreamParams` method.
+   * to all its next operators, must be called at the end of any
+   * `processStreamParams` implementation.
    *
    * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#prepareStreamParams}
    */
   propagateStreamParams() {
     this.frame.data = new Float32Array(this.streamParams.frameSize);
@@ -297,33 +327,12 @@ class BaseLfo {
 
   /**
    * Define the particular logic the operator applies to the stream.
-   * The implementation **must** update `this.frame.time`, `this.frame.data` and
-   * `this.frame.metadata` according to the frame forwarded by the previous
-   * operator.
-   * If the operator is not a `sink` operator, the implemention **must** also
-   * end the process with a call to `this.ouputFrame` to forward the current
-   * values to all the nextOps of the operator.
+   * According to the frame type of the previous node, the method calls one
+   * of the following method `processVector`, `processSignal` or `processScalar`
    *
    * @param {Object} frame - Frame (time, data, and metadata) as given by the
-   *  previous operator. The incomming reference should never be modified by
+   *  previous operator. The incomming frame should never be modified by
    *  the operator.
-   *
-   * @example
-   * // definition of a wonderfull `DivideByTwo` operator
-   * processFrame(frame) {
-   *   this.prepareFrame();
-   *
-   *   const data = this.frame.data;
-   *   const frameSize = this.streamParams.frameSize;
-   *
-   *   for (let i = 0; i < frameSize; i++)
-   *     data[i] = frameData[i] / 2;
-   *
-   *   this.frame.time = frame.time;
-   *   this.frame.metadata = frame.metadata;
-   *
-   *   this.propagateFrame();
-   * }
    *
    * @see {@link module:core.BaseLfo#prepareFrame}
    * @see {@link module:core.BaseLfo#propagateFrame}
@@ -341,34 +350,33 @@ class BaseLfo {
   }
 
   /**
-   * Pointer to function to be called in `processFrame` according to the
-   * `streamParams.frameType`. Is dynamically assigned in `prepareStreamParams`.
+   * Pointer to the method called in `processFrame` according to the
+   * frame type of the previous operator. Is dynamically assigned in
+   * `prepareStreamParams`.
    *
-   * @see {@link module:core.BaseLfo#processFrame}
    * @see {@link module:core.BaseLfo#prepareStreamParams}
+   * @see {@link module:core.BaseLfo#processFrame}
    */
   processFunction(frame) {
     this.frame = frame;
   }
 
   /**
-   * Common logic to do at the beginning of the `processFrame`.
-   * This method should be called at the beginning of the `processFrame` method.
+   * Common logic to perform at the beginning of the `processFrame`.
    *
    * @see {@link module:core.BaseLfo#processFrame}
    */
   prepareFrame() {
-    if (this.reinit === true) {
+    if (this._reinit === true) {
       this.processStreamParams();
-      this.reset();
-      this.reinit = false;
+      this.resetStream();
+      this._reinit = false;
     }
   }
 
   /**
-   * Forward the current `frameTime`, `frameData` and `frameMetadata` to the
-   * next operators. This method should be called at the end of the
-   * `processFrame` method.
+   * Forward the current `frame` to the next operators, is called at the end of
+   * `processFrame`.
    *
    * @see {@link module:core.BaseLfo#processFrame}
    */
