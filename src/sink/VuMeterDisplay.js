@@ -37,19 +37,21 @@ const definitions = {
  * @param {Number} [options.min=-80] - Minimum displayed value (in dB).
  * @param {Number} [options.max=6] - Maximum displayed value (in dB).
  * @param {Number} [options.width=6] - Width of the display (in pixels).
- *
- * @todo - define if possible to embed it's own slicer.
- * @todo - draw a scale on the left.
+ * @param {Number} [options.height=150] - Height of the canvas.
+ * @param {Element|CSSSelector} [options.container=null] - Container element
+ *  in which to insert the canvas.
+ * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
+ *  in which to draw.
  *
  * @example
  * import * as lfo from 'waves-lfo';
+ *
+ * const audioContext = new window.AudioContext();
  *
  * navigator.mediaDevices
  *   .getUserMedia({ audio: true })
  *   .then(init)
  *   .catch((err) => console.error(err.stack));
- *
- * const audioContext = new AudioContext();
  *
  * function init(stream) {
  *   const source = audioContext.createMediaStreamSource(stream);
@@ -80,8 +82,13 @@ class VuMeterDisplay extends BaseDisplay {
     }
 
     this.peakLifetime = 1; // sec
+
+    // @todo - check doesn't work...
+    // this.ctx.fillStyle = '#000000';
+    // this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     super.processStreamParams(prevStreamParams);
 
@@ -91,6 +98,7 @@ class VuMeterDisplay extends BaseDisplay {
     super.propagateStreamParams();
   }
 
+  /** @private */
   processSignal(frame) {
     const now = new Date().getTime() / 1000; // sec
     const offset = this.params.get('offset'); // offset zero of the vu meter
@@ -144,7 +152,6 @@ class VuMeterDisplay extends BaseDisplay {
     // peak
     ctx.fillStyle = gradient;
     ctx.fillRect(0, yPeak, width, 2);
-
 
     ctx.restore();
 

@@ -49,13 +49,14 @@ const definitions = {
  * @example
  * import * as lfo from 'waves-lfo';
  *
+ * const audioContext = new window.AudioContext();
+ *
  * navigator.mediaDevices
  *   .getUserMedia({ audio: true })
  *   .then(init)
  *   .catch((err) => console.error(err.stack));
  *
  * function init(stream) {
- *
  *   const audioIn = audioContext.createMediaStreamSource(stream);
  *
  *   const audioInNode = new lfo.source.AudioInNode({
