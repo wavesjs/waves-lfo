@@ -8,10 +8,12 @@ const definitions = {
   colors: {
     type: 'any',
     default: getColors('waveform'),
+    metas: { kind: 'dyanmic' },
   },
   rms: {
     type: 'boolean',
     default: false,
+    metas: { kind: 'dyanmic' },
   }
 };
 
@@ -21,24 +23,56 @@ const definitions = {
  * @param {Object} options - Override default parameters.
  * @param {Array<String>} [options.colors=['waveform', 'rms']] - Array
  *  containing the color codes for the waveform (index 0) and rms (index 1).
+ *  _dynamic parameter_
  * @param {Boolean} [options.rms=false] - Set to `true` to display the rms.
+ *  _dynamic parameter_
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
+ *  the canvas. _dynamic parameter_
+ * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.max=1] - Maximum value represented in the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.width=300] - Width of the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.height=150] - Height of the canvas.
+ *  _dynamic parameter_
+ * @param {Element|CSSSelector} [options.container=null] - Container element
+ *  in which to insert the canvas. _constant parameter_
+ * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
+ *  in which to draw. _constant parameter_
+ * @param {Number} [options.referenceTime=null] - Optionnal reference time the
+ *  display should considerer as the origin. Is only usefull when synchronizing
+ *  several display using the `DisplaySync` class.
  *
  * @memberof module:sink
  *
  * @example
- * // assuming some `audioBuffer`
- * const eventIn = new lfo.source.AudioInBuffer({
- *   audioBuffer: audioBuffer,
- *   frameSize: 512,
- * });
+ * import * as lfo from 'waves-lfo';
  *
- * const signal = new lfo.sink.Waveform({
- *   canvas: '#canvas',
- *   rms: true,
- * });
+ * navigator.mediaDevices
+ *   .getUserMedia({ audio: true })
+ *   .then(init)
+ *   .catch((err) => console.error(err.stack));
  *
- * eventIn.connect(signal);
- * eventIn.start();
+ * function init(stream) {
+ *
+ *   const audioIn = audioContext.createMediaStreamSource(stream);
+ *
+ *   const audioInNode = new lfo.source.AudioInNode({
+ *     audioContext: audioContext,
+ *     sourceNode: audioIn,
+ *     frameSize: 512,
+ *   });
+ *
+ *   const waveformDisplay = new lfo.sink.WaveformDisplay({
+ *     canvas: '#waveform',
+ *     duration: 3.5,
+ *     rms: true,
+ *   });
+ *
+ *   audioInNode.connect(waveformDisplay);
+ *   audioInNode.start();
+ * });
  */
 class WaveformDisplay extends BaseDisplay {
   constructor(options) {
