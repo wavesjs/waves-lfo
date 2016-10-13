@@ -131,8 +131,15 @@ class BaseLfo {
    *
    * @return {Object}
    */
-  getParamDefinitions() {
+  getParamsDescription() {
     return this.params.getDefinitions();
+  }
+
+  /**
+   * Reset all parameters to their initial value (as defined on instantication)
+   */
+  resetParams() {
+    this.params.reset();
   }
 
   /**
