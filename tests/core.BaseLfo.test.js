@@ -132,22 +132,25 @@ tape('BaseLfo', (t) => {
   t.comment('processFrame');
 
   const oldProcessStreamParams = parent.processStreamParams;
-  const oldReset = parent.reset;
+  const oldResetStream = parent.resetStream;
 
-  parent.processStreamParams = () => { parent.processStreamParamsCalled = true; }
-  parent.reset = () => { parent.resetCalled = true; }
+  let processStreamParamsCalled = null;
+  let resetCalled = null;
 
-  parent.reinit = true;
+  parent.processStreamParams = () => { processStreamParamsCalled = true; }
+  parent.resetStream = () => { resetCalled = true; }
+  parent._reinit = true;
+
   parent.processFrame({});
 
-  t.deepEqual(parent.processStreamParamsCalled, true, 'should call `initialize` if a dynamic param changed');
-  t.deepEqual(parent.resetCalled, true, 'should call `reset` if a dynamic param changed');
-  t.deepEqual(parent.reinit, false, 'should reset `reinit` to false');
+  t.deepEqual(processStreamParamsCalled, true, 'should call `initialize` if a dynamic param changed');
+  t.deepEqual(resetCalled, true, 'should call `resetStream` if a dynamic param changed');
+  t.deepEqual(parent._reinit, false, 'should reset `_reinit` to false');
 
 
   // restore object state
   parent.processStreamParams = oldProcessStreamParams;
-  parent.reset = oldReset;
+  parent.resetStream = oldResetStream;
 
   // --------------------------------------------------
   t.comment('destroy');

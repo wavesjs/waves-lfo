@@ -1,5 +1,5 @@
 import BaseLfo from '../src/core/BaseLfo';
-import EventIn from '../src/sources/EventIn';
+import EventIn from '../src/source/EventIn';
 import tape from 'tape';
 
 
@@ -68,18 +68,18 @@ tape('EventIn', (t) => {
 
   b.processFrame(frame);
 
-  t.equal(b.frame.time, frame.time, 'should have proper frameTime');
-  t.looseEqual(b.frame.data, frame.data, 'should have proper frameData');
-  t.equal(b.frame.metadata, frame.metadata, 'should have proper frameMetadata');
+  t.equal(b.frame.time, frame.time, 'should have proper frame.time');
+  t.looseEqual(b.frame.data, frame.data, 'should have proper frame.data');
+  t.equal(b.frame.metadata, frame.metadata, 'should have proper frame.metadata');
 
-  t.equal(c.frame.time, frame.time, 'should have propagated frameTime');
-  t.looseEqual(c.frame.data, frame.data, 'should have propagated frameData');
-  t.looseEqual(c.frame.data instanceof Float32Array, true, 'should have propagated frameData');
-  t.equal(c.frame.metadata, frame.metadata, 'should have propagated frameMetadata');
+  t.equal(c.frame.time, frame.time, 'should have propagated frame.time');
+  t.looseEqual(c.frame.data, frame.data, 'should have propagated frame.data');
+  t.looseEqual(c.frame.data instanceof Float32Array, true, 'frame.data should be a Float32Array');
+  t.equal(c.frame.metadata, frame.metadata, 'should have propagated frame.metadata');
 
   b.stop();
 
-  t.fail('test that output is how it should be')
+
 
   t.end();
 });
