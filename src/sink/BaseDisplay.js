@@ -49,14 +49,15 @@ const durationDefinition = {
 };
 
 /**
- * Base class to extend in order to create graphical sinks.
+ * Base class to extend in order to create graphic sinks.
  *
  * @todo - propagate float rounding errors
  *
  * @memberof module:sink
  * @param {Object} options - Override default parameters.
- * @param {Number} options.duration - Duration (in seconds) represented in
- *  the canvas. _dynamic parameter_
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
+ *  the canvas. This parameter only exists for operators that display several
+ *  consecutive frames on the canvas. _dynamic parameter_
  * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
  *  _dynamic parameter_
  * @param {Number} [options.max=1] - Maximum value represented in the canvas.
@@ -82,7 +83,6 @@ class BaseDisplay extends BaseLfo {
     if (hasDuration)
       commonDefinitions.duration = durationDefinition;
 
-    console.log(options);
     const definitions = Object.assign({}, commonDefinitions, defs);
     this.params = parameters(definitions, options);
     this.params.addListener(this.onParamUpdate.bind(this));
@@ -116,9 +116,6 @@ class BaseDisplay extends BaseLfo {
     this.cachedCtx = this.cachedCanvas.getContext('2d');
 
     this.previousFrame = null;
-    // this.lastShiftError = 0;
-    // this.currentPartialShift = 0;
-
     this.currentTime = this.params.get('referenceTime');
 
     /**
@@ -133,26 +130,12 @@ class BaseDisplay extends BaseLfo {
 
     this.renderStack = this.renderStack.bind(this);
 
+
+    //
     this.shiftError = 0;
-    this.frameWidthError = 0;
 
+    // initialize canvas size and y scale transfert function
     this._resize();
-  }
-
-
-  /**
-   * Create the transfert function used to map values to pixel in the y axis
-   * @private
-   */
-  _setYScale() {
-    const min = this.params.get('min');
-    const max = this.params.get('max');
-    const height = this.canvasHeight;
-
-    const a = (0 - height) / (max - min);
-    const b = height - (a * min);
-
-    this.getYPosition = (x) => a * x + b;
   }
 
   /** @private */
@@ -198,6 +181,21 @@ class BaseDisplay extends BaseLfo {
   }
 
   /**
+   * Create the transfert function used to map values to pixel in the y axis
+   * @private
+   */
+  _setYScale() {
+    const min = this.params.get('min');
+    const max = this.params.get('max');
+    const height = this.canvasHeight;
+
+    const a = (0 - height) / (max - min);
+    const b = height - (a * min);
+
+    this.getYPosition = (x) => a * x + b;
+  }
+
+  /**
    * Returns the width in pixel a `vector` frame needs to be drawn.
    * @private
    */
@@ -205,7 +203,14 @@ class BaseDisplay extends BaseLfo {
     return 1; // need one pixel to draw the line
   }
 
-  /** @private */
+  /**
+   * Callback function executed when a parameter is updated.
+   *
+   * @param {String} name - Parameter name.
+   * @param {Mixed} value - Parameter value.
+   * @param {Object} metas - Metadatas of the parameter.
+   * @private
+   */
   onParamUpdate(name, value, metas) {
     super.onParamUpdate(name, value, metas);
 
@@ -221,6 +226,7 @@ class BaseDisplay extends BaseLfo {
     }
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
@@ -228,6 +234,7 @@ class BaseDisplay extends BaseLfo {
     this._rafId = requestAnimationFrame(this.renderStack);
   }
 
+  /** @private */
   resetStream() {
     super.resetStream();
 
@@ -238,14 +245,16 @@ class BaseDisplay extends BaseLfo {
     this.cachedCtx.clearRect(0, 0, width, height);
   }
 
+  /** @private */
   finalizeStream(endTime) {
+    this.currentTime = null;
     super.finalizeStream(endTime);
     cancelAnimationFrame(this._rafId);
   }
 
   /**
    * Add the current frame to the frames to draw. Should not be overriden.
-   * @inheritdoc
+   * @private
    */
   processFrame(frame) {
     const frameSize = this.streamParams.frameSize;
@@ -264,15 +273,22 @@ class BaseDisplay extends BaseLfo {
     });
   }
 
+  /**
+   * Render the accumulated frames. Method called in `requestAnimationFrame`.
+   * @private
+   */
   renderStack() {
     if (this.params.has('duration')) {
       // render all frame since last `renderStack` call
       for (let i = 0, l = this._stack.length; i < l; i++)
-        this.executeDraw(this._stack[i]);
+        this.scrollModeDraw(this._stack[i]);
     } else {
       // only render last received frame if any
-      if (this._stack.length > 0)
-        this.executeDraw(this._stack[this._stack.length - 1]);
+      if (this._stack.length > 0) {
+        const frame = this._stack[this._stack.length - 1];
+        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+        this.processFunction(frame);
+      }
     }
 
     // reinit stack for next call
@@ -280,15 +296,12 @@ class BaseDisplay extends BaseLfo {
     this._rafId = requestAnimationFrame(this.renderStack);
   }
 
-  executeDraw(frame) {
-    if (this.params.has('duration')) {
-      this.scrollModeDraw(frame);
-    } else {
-      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      this.processFunction(frame);
-    }
-  }
-
+  /**
+   * Draw data from right to left with scrolling
+   * @private
+   * @todo - check possibility of maintaining all values from one place to
+   *         minimize float error tracking.
+   */
   scrollModeDraw(frame) {
     const frameType = this.streamParams.frameType;
     const frameRate = this.streamParams.frameRate;
@@ -302,7 +315,8 @@ class BaseDisplay extends BaseLfo {
 
     const previousFrame = this.previousFrame;
 
-    const currentTime = this.currentTime; // current time at the left of the canvas
+    // current time at the left of the canvas
+    const currentTime = (this.currentTime !== null) ? this.currentTime : frame.time;
     const frameStartTime = frame.time;
     const lastFrameTime = previousFrame ? previousFrame.time : 0;
     const lastFrameDuration = this.lastFrameDuration ? this.lastFrameDuration : 0;
@@ -320,9 +334,6 @@ class BaseDisplay extends BaseLfo {
     // define if we need to shift the canvas
     const shiftTime = frameEndTime - currentTime;
 
-    // if (frameType === 'scalar')
-    //   console.log(shiftTime);
-
     // if the canvas is not synced, should never go to `else`
     if (shiftTime > 0) {
       // shift the canvas of shiftTime in pixels
@@ -333,15 +344,10 @@ class BaseDisplay extends BaseLfo {
       const currentTime = frameStartTime + frameDuration;
       this.shiftCanvas(iShift, currentTime);
 
-      // @todo - propagate to siblings (nbr of pixels and `frameEnd` (new currentTime))
+      // if siblings, share the information
       if (this.displaySync)
         this.displaySync.shiftSiblings(iShift, currentTime, this);
-    } else {
-      // @todo - all the frame can be drawn inside the currently displayed canvas
     }
-
-    // @todo - check possibility of maintaining these values only from shift
-    //  to maintain error tracking at only one place ?
 
     // width of the frame in pixels
     const fFrameWidth = (frameDuration / canvasDuration) * canvasWidth;
@@ -366,9 +372,9 @@ class BaseDisplay extends BaseLfo {
     this.processFunction(frame, frameWidth, pixelsSinceLastFrame);
     ctx.restore();
 
-    // copy canvas into cached canvas
-    this.cachedCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.cachedCtx.drawImage(this.canvas, 0, 0, this.canvasWidth, this.canvasHeight);
+    // save current canvas state into cached canvas
+    this.cachedCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+    this.cachedCtx.drawImage(this.canvas, 0, 0, canvasWidth, canvasHeight);
 
     // update lastFrameDuration, lastFrameWidth
     this.lastFrameDuration = frameDuration;
@@ -376,160 +382,25 @@ class BaseDisplay extends BaseLfo {
     this.previousFrame = frame;
   }
 
+  /**
+   * Shift canvas, also called from `DisplaySync`
+   * @private
+   */
   shiftCanvas(iShift, time) {
     const ctx = this.ctx;
     const cache = this.cachedCanvas;
+    const cachedCtx = this.cachedCtx;
     const width = this.canvasWidth;
     const height = this.canvasHeight;
-
-    ctx.clearRect(0, 0, width, height);
     const croppedWidth = width - iShift;
-
     this.currentTime = time;
 
-    ctx.drawImage(this.cachedCanvas, iShift, 0, croppedWidth, height, 0, 0, croppedWidth, height);
-
-    this.cachedCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.cachedCtx.drawImage(this.canvas, 0, 0, this.canvasWidth, this.canvasHeight);
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(cache, iShift, 0, croppedWidth, height, 0, 0, croppedWidth, height);
+    // save current canvas state into cached canvas
+    cachedCtx.clearRect(0, 0, width, height);
+    cachedCtx.drawImage(this.canvas, 0, 0, width, height);
   }
-
-  // /**
-  //  * Default draw mode. Draw from right to left, pushing old content as new
-  //  * content arrive.
-  //  *
-  //  * @param {Object} frame
-  //  */
-  // scrollModeDraw(frame) {
-  //   const frameType = this.streamParams.frameType;
-  //   const frameRate = this.streamParams.frameRate;
-  //   const frameSize = this.streamParams.frameSize;
-  //   const sourceSampleRate = this.streamParams.sourceSampleRate;
-
-  //   const canvasDuration = this.params.get('duration');
-  //   const ctx = this.ctx;
-  //   const canvasWidth = this.canvasWidth;
-  //   const canvasHeight = this.canvasHeight;
-
-  //   // shift canvas according to first frame time and reference time
-  //   if (!this.previousFrame) {
-  //     // return;
-  //     // // `lastTime` is set to `referenceTime`
-  //     // const firstHopDuration = frame.time - this.lastTime;
-  //     // // no shift error so far...
-  //     // const fShift = (firstHopDuration / canvasDuration) * canvasWidth;
-  //     // const iShift = Math.floor(fShift + 0.5);
-  //     // const error = iShift - fShift;
-
-  //     // this.shiftCanvas(iShift);
-  //     // this.lastShiftError = error;
-  //     // this.lastTime = frame.time;
-  //   }
-
-  //   // duration of the frame
-  //   let frameDisplayDuration = 0;
-
-  //   if (
-  //     this.streamParams.frameType === 'scalar' ||
-  //     this.streamParams.frameType === 'vector'
-  //   ) {
-  //     const frameWidth = this.getMinimumFrameWidth();
-  //     const pixelDuration = canvasDuration / canvasWidth;
-  //     frameDisplayDuration = pixelDuration * frameWidth;
-
-  //     if (this.previousFrame)
-  //       frameDisplayDuration += frame.time - this.lastTime;
-
-  //     console.log(frame.time, this.lastTime);
-
-  //   } else if (this.streamParams.frameType === 'signal') {
-  //     // don't deal with hopsizes for now
-  //     frameDisplayDuration = frameSize / sourceSampleRate;
-  //   }
-
-  //   const fShift = (frameDisplayDuration / canvasDuration) * canvasWidth - this.lastShiftError;
-  //   const iShift = Math.floor(fShift + 0.5);
-  //   this.lastShiftError = iShift - fShift;
-
-  //   console.log(this.constructor.name + '.iShift', iShift);
-  //   console.log(this.constructor.name + '.currentPartialShift', this.currentPartialShift);
-
-  //   const shift = iShift - this.currentPartialShift;
-
-  //   console.log(this.constructor.name + '.shift', shift);
-
-  //   this.lastTime += frameDisplayDuration;
-  //   this.previousFrame = frame;
-
-  //   if (shift > 0) {
-  //     this.shiftCanvas(shift, this.lastTime);
-
-  //     if (this.displaySync)
-  //       this.displaySync.shiftSiblings(shift, this.lastTime, this);
-
-  //     // remove the added partial shift for the crop
-  //     this.currentPartialShift -= shift;
-  //   }
-
-  //   // console.log(this.constructor.name + '.currentPartialShift', this.currentPartialShift);
-
-
-  //   if (shift < 0) {
-  //     this.writeHead += shift;
-  //     this.currentPartialShift += shift;
-  //   }
-
-
-
-  //   // console.log(this.constructor.name + '.writeHead', writeHead);
-  //   // translate to the current frame and draw a new polygon
-  //   ctx.save();
-  //   ctx.translate(this.writeHead, 0);
-  //   console.log(this.constructor.name + '.writeHead', this.writeHead);
-
-  //   this.processFunction(frame, this.previousFrame, iShift);
-
-  //   ctx.restore();
-
-  //   // save current state into buffering canvas
-  //   this.cachedCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-  //   this.cachedCtx.drawImage(this.canvas, 0, 0, canvasWidth, canvasHeight);
-  // }
-
-  // shiftCanvas(shift, time) {
-  //   const ctx = this.ctx;
-  //   const width = this.canvasWidth;
-  //   const height = this.canvasHeight;
-
-  //   // if (fromSibling)
-  //   this.currentPartialShift += shift;
-
-  //   if (time > this.lastTime)
-  //     this.lastTime = time;
-
-  //   ctx.clearRect(0, 0, width, height);
-  //   ctx.save();
-
-  //   const croppedWidth = width - this.currentPartialShift;
-
-  //   ctx.drawImage(this.cachedCanvas,
-  //     this.currentPartialShift, 0, croppedWidth, height,
-  //     0, 0, croppedWidth, height
-  //   );
-
-  //   ctx.restore();
-  // }
-
-  /**
-   * Interface method to implement in order to define how to draw the shape
-   * between the previous and the current frame, assuming the canvas context
-   * is centered on the current frame.
-   *
-   * @param {Object} frame - Current frame.
-   * @param {Object} prevFrame - Previous frame.
-   * @param {Number} iShift - Number of pixels between the last and the current
-   *  frame.
-   */
-
 
   // @todo - Fix trigger mode
   // allow to witch easily between the 2 modes
@@ -541,13 +412,6 @@ class BaseDisplay extends BaseLfo {
   //   // reset _currentXPosition
   //   this._currentXPosition = 0;
   //   this.lastShiftError = 0;
-  // }
-
-  // executeDraw(frame) {
-  //   // if (this.params.trigger)
-  //   //   this.triggerModeDraw(time, frame);
-  //   // else
-  //   this.scrollModeDraw(frame);
   // }
 
   // /**
