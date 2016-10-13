@@ -185,8 +185,8 @@ class AudioInBuffer extends BaseLfo {
   }
 
   /**
-   * Finalize the stream and stop the whole graph. When `stop` is called, the
-   * slicing of the `audioBuffer` stops immediately.
+   * Finalize the stream and stop the whole graph. When called, the slicing of
+   * the `audioBuffer` stops immediately.
    *
    * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:source.EventIn#start}
