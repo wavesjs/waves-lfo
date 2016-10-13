@@ -1,14 +1,13 @@
 import BaseDisplay from './BaseDisplay';
 import MinMax from '../operator/MinMax';
 import RMS from '../operator/RMS';
-import { getRandomColor } from '../utils/display-utils';
+import { getColors } from '../utils/display-utils';
 
 
 const definitions = {
-  color: {
-    type: 'string',
-    default: null,
-    nullable: true,
+  colors: {
+    type: 'any',
+    default: getColors('waveform'),
   },
   rms: {
     type: 'boolean',
@@ -17,55 +16,39 @@ const definitions = {
 };
 
 /**
- * Draw a stream of type `signal` on a canvas.
+ * Display a waveform (with optionnal RMS) in a canvas.
  *
  * @param {Object} options - Override default parameters.
- * @param {Number} options.duration - Duration (in seconds) represented in
- *  the canvas. _dynamic parameter_
- * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
- *  _dynamic parameter_
- * @param {Number} [options.max=1] - Maximum value represented in the canvas.
- *  _dynamic parameter_
- * @param {Number} [options.width=300] - Width of the canvas.
- *  _dynamic parameter_
- * @param {Number} [options.height=150] - Height of the canvas.
- *  _dynamic parameter_
- * @param {Element|CSSSelector} [options.container=null] - Container element
- *  in which to insert the canvas. _constant parameter_
- * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
- *  in which to draw. _constant parameter_
- * @param {String} [options.color=null] - Color of the signal. Defaults to
- *  random color. _dynamic parameter_
+ * @param {Array<String>} [options.colors=['waveform', 'rms']] - Array
+ *  containing the color codes for the waveform (index 0) and rms (index 1).
+ * @param {Boolean} [options.rms=false] - Set to `true` to display the rms.
  *
  * @memberof module:sink
  *
  * @example
+ * // assuming some `audioBuffer`
  * const eventIn = new lfo.source.AudioInBuffer({
- *   audioBuffer: someAudioBuffer,
- *   sampleSize: 512,
+ *   audioBuffer: audioBuffer,
+ *   frameSize: 512,
  * });
  *
  * const signal = new lfo.sink.Waveform({
- *   color: '#242424',
- *   canvas: '#my-canvas-element',
- *   duration: 1,
+ *   canvas: '#canvas',
+ *   rms: true,
  * });
  *
  * eventIn.connect(signal);
  * eventIn.start();
- *
- * // should draw a triangle signal
- * eventIn.process(0, [0, 0.5, 1, 0.5]);
- * eventIn.process(0.5, [0, -0.5, -1, -0.5]);
  */
 class WaveformDisplay extends BaseDisplay {
   constructor(options) {
-    super(definitions, options);
+    super(definitions, options, true);
 
     this.minMaxOperator = new MinMax();
     this.rmsOperator = new RMS();
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     super.processStreamParams(prevStreamParams);
 
@@ -78,10 +61,10 @@ class WaveformDisplay extends BaseDisplay {
 
   /** @private */
   processSignal(frame, frameWidth, pixelsSinceLastFrame) {
-    // keep track of these frames, or ignoring is ok ?
+    // drop frames that cannot be displayed
     if (frameWidth < 1) return;
 
-    const color = this.params.get('color');
+    const colors = this.params.get('colors');
     const showRms = this.params.get('rms');
     const ctx = this.ctx;
     const data = frame.data;
@@ -91,25 +74,24 @@ class WaveformDisplay extends BaseDisplay {
       const start = index * iSamplesPerPixels;
       const end = index === frameWidth - 1 ? undefined : start + iSamplesPerPixels;
       const slice = data.subarray(start, end);
-      // signal
+
       const minMax = this.minMaxOperator.inputSignal(slice);
       const minY = this.getYPosition(minMax[0]);
       const maxY = this.getYPosition(minMax[1]);
 
-      ctx.strokeStyle = color;
+      ctx.strokeStyle = colors[0];
       ctx.beginPath();
       ctx.moveTo(index, minY);
       ctx.lineTo(index, maxY);
       ctx.closePath();
       ctx.stroke();
 
-      // rms
       if (showRms) {
         const rms = this.rmsOperator.inputSignal(slice);
-        const rmsMaxY = this.getYPosition(rms[0]);
-        const rmsMinY = this.getYPosition(-rms[0]);
+        const rmsMaxY = this.getYPosition(rms);
+        const rmsMinY = this.getYPosition(-rms);
 
-        ctx.strokeStyle = 'orange';
+        ctx.strokeStyle = colors[1];
         ctx.beginPath();
         ctx.moveTo(index, rmsMinY);
         ctx.lineTo(index, rmsMaxY);
