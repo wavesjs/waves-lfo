@@ -33,10 +33,10 @@ const definitions = {
  *
  * @memberof module:sink
  *
- * @param {Number} [scale=1] - Scale display of the spectrogram.
- * @param {String} [color=null] - Color of the spectrogram.
- * @param {Number} [min=-80] - Minimum displayed value (in dB).
- * @param {Number} [max=6] - Maximum displayed value (in dB).
+ * @param {Number} [options.scale=1] - Scale display of the spectrogram.
+ * @param {String} [options.color=null] - Color of the spectrogram.
+ * @param {Number} [options.min=-80] - Minimum displayed value (in dB).
+ * @param {Number} [options.max=6] - Maximum displayed value (in dB).
  * @param {Number} [options.width=300] - Width of the canvas.
  *  _dynamic parameter_
  * @param {Number} [options.height=150] - Height of the canvas.
