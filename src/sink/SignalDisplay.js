@@ -1,5 +1,5 @@
 import BaseDisplay from './BaseDisplay';
-import { getRandomColor } from '../utils/display-utils';
+import { getColors } from '../utils/display-utils';
 
 const floor = Math.floor;
 const ceil = Math.ceil;
@@ -26,11 +26,10 @@ function downSample(data, targetLength) {
 const definitions = {
   color: {
     type: 'string',
-    default: null,
+    default: getColors('signal'),
     nullable: true,
   },
 };
-
 
 /**
  * Display a stream of type `signal` on a canvas.
@@ -62,25 +61,20 @@ const definitions = {
  *   frameSize: 4,
  * });
  *
- * const signal = new lfo.sink.Signal({
- *   color: '#242424',
- *   canvas: '#my-canvas-element',
- *   duration: 1,
+ * const signalDisplay = new lfo.sink.SignalDisplay({
+ *   canvas: '#signal-canvas',
  * });
  *
- * eventIn.connect(signal);
+ * eventIn.connect(signalDisplay);
  * eventIn.start();
  *
- * // should draw a triangle signal
+ * // push triangle signal in the graph
  * eventIn.process(0, [0, 0.5, 1, 0.5]);
  * eventIn.process(0.5, [0, -0.5, -1, -0.5]);
  */
 class SignalDisplay extends BaseDisplay {
   constructor(options) {
-    super(definitions, options);
-
-    if (this.params.get('color') === null)
-      this.params.set('color', getRandomColor());
+    super(definitions, options, true);
 
     this.lastPosY = null;
   }
