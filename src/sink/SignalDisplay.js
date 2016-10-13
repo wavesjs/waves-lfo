@@ -35,8 +35,7 @@ const definitions = {
  * Display a stream of type `signal` on a canvas.
  *
  * @param {Object} options - Override default parameters.
- * @param {Number} [options.duration=1] - Duration (in seconds) represented in
- *  the canvas. _dynamic parameter_
+ * @param {String} [options.color='#00e600'] - Color of the signal.
  * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
  *  _dynamic parameter_
  * @param {Number} [options.max=1] - Maximum value represented in the canvas.
@@ -49,8 +48,13 @@ const definitions = {
  *  in which to insert the canvas. _constant parameter_
  * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
  *  in which to draw. _constant parameter_
- * @param {String} [options.color=null] - Color of the signal. Defaults to
- *  random color. _dynamic parameter_
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
+ *  the canvas. This parameter only exists for operators that display several
+ *  consecutive frames on the canvas. _dynamic parameter_
+ * @param {Number} [options.referenceTime=null] - Optionnal reference time the
+ *  display should considerer as the origin. Is only usefull when synchronizing
+ *  several display using the `DisplaySync` class. This parameter only exists
+ *  for operators that display several consecutive frames on the canvas.
  *
  * @memberof module:sink
  *
@@ -71,6 +75,7 @@ const definitions = {
  * // push triangle signal in the graph
  * eventIn.process(0, [0, 0.5, 1, 0.5]);
  * eventIn.process(0.5, [0, -0.5, -1, -0.5]);
+ * // ...
  */
 class SignalDisplay extends BaseDisplay {
   constructor(options) {
