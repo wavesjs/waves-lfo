@@ -33,6 +33,16 @@ const commonDefinitions = {
     default: null,
     constant: true,
   },
+};
+
+const hasDurationDefinitions = {
+  duration: {
+    type: 'float',
+    min: 0,
+    max: +Infinity,
+    default: 1,
+    metas: { kind: 'dynamic' },
+  },
   referenceTime: {
     type: 'float',
     default: 0,
@@ -40,24 +50,13 @@ const commonDefinitions = {
   },
 };
 
-const durationDefinition = {
-  type: 'float',
-  min: 0,
-  max: +Infinity,
-  default: 1,
-  metas: { kind: 'dynamic' },
-};
-
 /**
  * Base class to extend in order to create graphic sinks.
  *
- * @todo - propagate float rounding errors
+ * @todo - fix float rounding errors (produce decays in sync draws)
  *
  * @memberof module:sink
  * @param {Object} options - Override default parameters.
- * @param {Number} [options.duration=1] - Duration (in seconds) represented in
- *  the canvas. This parameter only exists for operators that display several
- *  consecutive frames on the canvas. _dynamic parameter_
  * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
  *  _dynamic parameter_
  * @param {Number} [options.max=1] - Maximum value represented in the canvas.
@@ -70,9 +69,14 @@ const durationDefinition = {
  *  in which to insert the canvas. _constant parameter_
  * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
  *  in which to draw. _constant parameter_
+ *
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
+ *  the canvas. This parameter only exists for operators that display several
+ *  consecutive frames on the canvas. _dynamic parameter_
  * @param {Number} [options.referenceTime=null] - Optionnal reference time the
  *  display should considerer as the origin. Is only usefull when synchronizing
- *  several display using the `DisplaySync` class.
+ *  several display using the `DisplaySync` class. This parameter only exists
+ *  for operators that display several consecutive frames on the canvas.
  *
  * @see {@link module:utils.DisplaySync}
  */
@@ -80,8 +84,12 @@ class BaseDisplay extends BaseLfo {
   constructor(defs, options = {}, hasDuration = true) {
     super();
 
+    let commonDefs;
+
     if (hasDuration)
-      commonDefinitions.duration = durationDefinition;
+      commonDefs = Object.assign({}, commonDefinitions, hasDurationDefinitions);
+    else
+      commonDefs = commonDefinitions
 
     const definitions = Object.assign({}, commonDefinitions, defs);
     this.params = parameters(definitions, options);
@@ -116,7 +124,7 @@ class BaseDisplay extends BaseLfo {
     this.cachedCtx = this.cachedCanvas.getContext('2d');
 
     this.previousFrame = null;
-    this.currentTime = this.params.get('referenceTime');
+    this.currentTime = hasDuration ? this.params.get('referenceTime') : null;
 
     /**
      * Instance of the `DisplaySync` used to synchronize the different displays
