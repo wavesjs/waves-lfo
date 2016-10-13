@@ -91,7 +91,7 @@ class BaseDisplay extends BaseLfo {
     else
       commonDefs = commonDefinitions
 
-    const definitions = Object.assign({}, commonDefinitions, defs);
+    const definitions = Object.assign({}, commonDefs, defs);
     this.params = parameters(definitions, options);
     this.params.addListener(this.onParamUpdate.bind(this));
 
