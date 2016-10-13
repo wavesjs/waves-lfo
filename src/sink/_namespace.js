@@ -3,20 +3,22 @@
 // import DataRecorder from './data-recorder';
 // import Trace from './trace';
 import BpfDisplay from './BpfDisplay';
+import Bridge from './Bridge';
 import Logger from './Logger';
 import MarkerDisplay from './MarkerDisplay';
 import SignalDisplay from './SignalDisplay';
-import SpectrogramDisplay from './SpectrogramDisplay';
+import SpectrumDisplay from './SpectrumDisplay';
 import VuMeterDisplay from './VuMeterDisplay';
 import WaveformDisplay from './WaveformDisplay';
 
 
 export default {
   BpfDisplay,
+  Bridge,
   Logger,
   MarkerDisplay,
   SignalDisplay,
-  SpectrogramDisplay,
+  SpectrumDisplay,
   VuMeterDisplay,
   WaveformDisplay,
 };

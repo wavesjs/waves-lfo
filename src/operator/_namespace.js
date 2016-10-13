@@ -1,24 +1,28 @@
-// import Biquad from './biquad';
+import Biquad from './Biquad';
 import DCT from './DCT';
 import FFT from './FFT';
-// import Framer from './framer';
 import Magnitude from './Magnitude';
+import MeanStddev from './MeanStddev';
 import Mel from './Mel';
 import MinMax from './MinMax';
 import MovingAverage from './MovingAverage';
 import MovingMedian from './MovingMedian';
-// import Noop from './noop';
-// import Operator from './operator';
 import RMS from './RMS';
 import Select from './Select';
 import Slicer from './Slicer';
 import Toggle from './Toggle';
+import Yin from './Yin';
+
+// import Noop from './noop';
 // import Segmenter from './segmenter';
+// import ZeroCrossing from './segmenter';
 
 export default {
+  Biquad,
   DCT,
   FFT,
   Magnitude,
+  MeanStddev,
   Mel,
   MinMax,
   MovingAverage,
@@ -27,4 +31,5 @@ export default {
   Select,
   Slicer,
   Toggle,
+  Yin,
 };
