@@ -1,7 +1,7 @@
 import BaseDisplay from './BaseDisplay';
 import BpfDisplay from './BpfDisplay';
 import Bridge from './Bridge';
-// import DataRecorder from './data-recorder';
+import DataRecorder from './DataRecorder';
 import Logger from './Logger';
 import MarkerDisplay from './MarkerDisplay';
 import SignalRecorder from './SignalRecorder';
@@ -15,6 +15,7 @@ export default {
   BaseDisplay,
   BpfDisplay,
   Bridge,
+  DataRecorder,
   Logger,
   MarkerDisplay,
   SignalDisplay,
