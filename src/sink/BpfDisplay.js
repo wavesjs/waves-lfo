@@ -1,5 +1,5 @@
 import BaseDisplay from './BaseDisplay';
-import { getRandomColor } from '../utils/display-utils';
+import { getColors } from '../utils/display-utils';
 
 const definitions = {
   radius: {
@@ -21,11 +21,16 @@ const definitions = {
 
 
 /**
- * Draw a stream of type `vector` on a canvas.
+ * Break Point Function, display a stream of type `vector`.
  *
  * @param {Object} options - Override default parameters.
- * @param {Number} options.duration - Duration (in seconds) represented in
- *  the canvas. _dynamic parameter_
+ * @param {String} [options.colors=null] - Array of colors for each index of the
+ *  vector. _dynamic parameter_
+ * @param {String} [options.radius=0] - Radius of the dot at each value.
+ *  _dynamic parameter_
+ * @param {String} [options.line=true] - Display a line between each consecutive
+ *  values of the vector. _dynamic parameter_
+ * @param {Object} options - Override default parameters.
  * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
  *  _dynamic parameter_
  * @param {Number} [options.max=1] - Maximum value represented in the canvas.
@@ -38,42 +43,46 @@ const definitions = {
  *  in which to insert the canvas. _constant parameter_
  * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
  *  in which to draw. _constant parameter_
- * @param {String} [options.colors=null] - Array of colors for each index of the
- *  vector. _dynamic parameter_
- * @param {String} [options.radius=0] - Radius of the dot at each value.
- *  _dynamic parameter_
- * @param {String} [options.line=true] - Display a line between each consecutive
- *  values of the vector. _dynamic parameter_
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
+ *  the canvas. _dynamic parameter_
+ * @param {Number} [options.referenceTime=null] - Optionnal reference time the
+ *  display should considerer as the origin. Is only usefull when synchronizing
+ *  several display using the `DisplaySync` class.
  *
  * @memberof module:sink
  *
  * @example
+ * import * as lfo from 'waves-lfo';
+ *
  * const eventIn = new lfo.source.EventIn({
- *   frameType: 'vector',
- *   sampleRate: 4,
  *   frameSize: 2,
+ *   frameRate: 0.1,
+ *   frameType: 'vector'
  * });
  *
- * const bpf = new lfo.sink.Bpf({
- *   colors: ['#242424', 'red', 'steelblue'],
- *   canvas: '#my-canvas-element',
- *   duration: 1,
+ * const bpf = new lfo.sink.BpfDisplay({
+ *   canvas: '#bpf',
+ *   duration: 10,
  * });
  *
  * eventIn.connect(bpf);
  * eventIn.start();
  *
- * // generate random data
- * (function generateVector() {
- *   eventIn.process(null, [Math.random(), Math.random()]);
- *   setTimeout(generateVector, 250);
+ * let time = 0;
+ * const dt = 0.1;
+ *
+ * (function generateData() {
+ *   eventIn.process(time, [Math.random() * 2 - 1, Math.random() * 2 - 1]);
+ *   time += dt;
+ *
+ *   setTimeout(generateData, dt * 1000);
  * }());
  */
 class BpfDisplay extends BaseDisplay {
   constructor(options) {
     super(definitions, options);
 
-    this.lastFrame = null;
+    this.prevFrame = null;
   }
 
   getMinimumFrameWidth() {
@@ -83,16 +92,8 @@ class BpfDisplay extends BaseDisplay {
   processStreamParams(prevStreamParams) {
     super.processStreamParams(prevStreamParams);
 
-    console.log(this.streamParams.frameSize);
-    if (this.params.get('colors') === null) {
-      const colors = [];
-
-      for (let i = 0, l = this.streamParams.frameSize; i < l; i++)
-        colors.push(getRandomColor());
-
-      console.log(colors);
-      this.params.set('colors', colors);
-    }
+    if (this.params.get('colors') === null)
+      this.params.set('colors', getColors('bpf', this.streamParams.frameSize));
   }
 
   /** @private */
@@ -125,7 +126,7 @@ class BpfDisplay extends BaseDisplay {
 
       if (radius > 0) {
         ctx.beginPath();
-        ctx.arc(-radius, posY, radius, 0, Math.PI * 2, false);
+        ctx.arc(0, posY, radius, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.closePath();
       }
@@ -139,4 +140,3 @@ class BpfDisplay extends BaseDisplay {
 }
 
 export default BpfDisplay;
-
