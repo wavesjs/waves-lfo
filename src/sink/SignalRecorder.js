@@ -175,6 +175,16 @@ class SignalRecorder extends BaseLfo {
   constructor(options = {}) {
     super(definitions, options);
 
+    /**
+     * Define is the node is currently recording or not.
+     *
+     * @type {Boolean}
+     * @name isRecording
+     * @instance
+     * @memberof module:sink.SignalRecorder
+     */
+    this.isRecording = false;
+
     const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
     let audioContext = this.params.get('audioContext');
     // needed to retrieve an AudioBuffer
@@ -182,8 +192,6 @@ class SignalRecorder extends BaseLfo {
       audioContext = new AudioContext();
 
     this.audioContext = audioContext;
-
-    this._isStarted = false;
     this._ignoreZeros = false;
 
     const blob = new Blob([worker], { type: 'text/javascript' });
@@ -208,7 +216,7 @@ class SignalRecorder extends BaseLfo {
    * Start recording.
    */
   start() {
-    this._isStarted = true;
+    this.isRecording = true;
     this._ignoreZeros = this.params.get('ignoreLeadingZeros');
   }
 
@@ -216,9 +224,9 @@ class SignalRecorder extends BaseLfo {
    * Stop recording.
    */
   stop() {
-    if (this._isStarted) {
+    if (this.isRecording) {
       this.worker.postMessage({ command: 'stop' });
-      this._isStarted = false;
+      this.isRecording = false;
     }
   }
 
@@ -229,8 +237,8 @@ class SignalRecorder extends BaseLfo {
 
   /** @private */
   processSignal(frame) {
-    // console.log(frame, this._isStarted);
-    if (!this._isStarted)
+    // console.log(frame, this.isRecording);
+    if (!this.isRecording)
       return;
 
     // `sendFrame` must be recreated each time because
@@ -263,8 +271,9 @@ class SignalRecorder extends BaseLfo {
   }
 
   /**
-   * Retrieve the `AudioBuffer` when the stream is stopped or when the buffer
-   * is full according to params duration.
+   * Retrieve the `Float32Array` or the `AudioBuffer` when the stream is
+   * stopped or when the buffer is full according to the duration defined in
+   * parameters.
    *
    * @return {Promise<AudioBuffer>}
    */
@@ -273,7 +282,7 @@ class SignalRecorder extends BaseLfo {
       const callback = (e) => {
         const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
         // if called when buffer is full, stop the recorder too
-        this._isStarted = false;
+        this.isRecording = false;
 
         this.worker.removeEventListener('message', callback, false);
         // create an audio buffer from the data
