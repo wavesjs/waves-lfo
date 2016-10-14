@@ -84,8 +84,6 @@ self.addEventListener('message', function(e) {
   }
 }, false)`;
 
-let audioContext;
-
 const definitions = {
   duration: {
     type: 'float',
@@ -98,11 +96,16 @@ const definitions = {
     default: true,
     metas: { kind: 'static' },
   },
+  retrieveAudioBuffer: {
+    type: 'boolean',
+    default: false,
+    constant: true,
+  },
   audioContext: {
     type: 'any',
     default: null,
     nullable: true,
-  }
+  },
 };
 
 /**
@@ -117,8 +120,11 @@ const definitions = {
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.duration=10] - Maximum duration of the recording.
- * @param {AudioContext} [options.audioContext=null] - Audio context to be used
- *  in order to create the retrived audio buffer.
+ * @param {Boolean} [options.retrieveAudioBuffer=false] - Define if an `AudioBuffer`
+ *  should be retrived or only the raw Float32Array of data.
+ * @param {AudioContext} [options.audioContext=null] - If
+ *  `retrieveAudioBuffer` is set to `true`, audio context to be used
+ *  in order to create the final audio buffer.
  * @param {Object} [options.ignoreLeadingZeros=true] - Start the effective
  *  recording on the first non-zero value.
  *
@@ -142,8 +148,9 @@ const definitions = {
  *     audioContext: audioContext,
  *   });
  *
- *   const audioRecorder = new lfo.sink.AudioRecorder({
+ *   const audioRecorder = new lfo.sink.SignalRecorder({
  *     duration: 2,
+ *     retrieveAudioBuffer: true,
  *     audioContext: audioContext,
  *   });
  *
@@ -164,13 +171,14 @@ const definitions = {
  *   audioRecorder.start();
  * }
  */
-class AudioRecorder extends BaseLfo {
+class SignalRecorder extends BaseLfo {
   constructor(options = {}) {
     super(definitions, options);
 
+    const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
     let audioContext = this.params.get('audioContext');
     // needed to retrieve an AudioBuffer
-    if (audioContext === null)
+    if (retrieveAudioBuffer && audioContext === null)
       audioContext = new AudioContext();
 
     this.audioContext = audioContext;
@@ -197,7 +205,7 @@ class AudioRecorder extends BaseLfo {
   }
 
   /**
-   * Start recording
+   * Start recording.
    */
   start() {
     this._isStarted = true;
@@ -205,7 +213,7 @@ class AudioRecorder extends BaseLfo {
   }
 
   /**
-   * Stop recording
+   * Stop recording.
    */
   stop() {
     if (this._isStarted) {
@@ -263,20 +271,26 @@ class AudioRecorder extends BaseLfo {
   retrieve() {
     return new Promise((resolve, reject) => {
       const callback = (e) => {
+        const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
         // if called when buffer is full, stop the recorder too
         this._isStarted = false;
 
         this.worker.removeEventListener('message', callback, false);
         // create an audio buffer from the data
         const buffer = new Float32Array(e.data.buffer);
-        const length = buffer.length;
-        const sampleRate = this.streamParams.sourceSampleRate;
 
-        const audioBuffer = this.audioContext.createBuffer(1, length, sampleRate);
-        const channelData = audioBuffer.getChannelData(0);
-        channelData.set(buffer, 0);
+        if (retrieveAudioBuffer) {
+          const length = buffer.length;
+          const sampleRate = this.streamParams.sourceSampleRate;
 
-        resolve(audioBuffer);
+          const audioBuffer = this.audioContext.createBuffer(1, length, sampleRate);
+          const channelData = audioBuffer.getChannelData(0);
+          channelData.set(buffer, 0);
+
+          resolve(audioBuffer);
+        } else {
+          resolve(buffer);
+        }
       };
 
       this.worker.addEventListener('message', callback, false);
@@ -284,5 +298,5 @@ class AudioRecorder extends BaseLfo {
   }
 }
 
-export default AudioRecorder;
+export default SignalRecorder;
 
