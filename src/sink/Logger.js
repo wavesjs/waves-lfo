@@ -23,28 +23,35 @@ const definitions = {
     default: false,
     metas: { kind: 'dynamic' }
   },
+  frameIndex: {
+    type: 'boolean',
+    default: false,
+    metas: { kind: 'dynamic' }
+  },
 }
 
 /**
- * Utility sink to log `frame.time`, `frame.data`, `frame.metadata` and/or
+ * Log `frame.time`, `frame.data`, `frame.metadata` and/or
  * `streamAttributes` of any node.
  *
- * @param {Object} options - Override parameters' default values.
- * @param {Boolean} [options.time=false] - If set to true, log all
- *  incomming `frame.time`
- * @param {Boolean} [options.data=false] - If set to true, log all
- *  incomming `frame.data`
- * @param {Boolean} [options.metadata=false] - If set to true, log all
- *  incomming `frame.metadata`
- * @param {Boolean} [options.streamParams=false] - If set to true, log
- *  `streamParams` of the previous operator when the graph is started.
- *
- * @todo - should extends LfoSink
+ * @param {Object} options - Override parameters default values.
+ * @param {Boolean} [options.time=false] - Log incomming `frame.time` if `true`.
+ * @param {Boolean} [options.data=false] - Log incomming `frame.data` if `true`.
+ * @param {Boolean} [options.metadata=false] - Log incomming `frame.metadata`
+ *  if `true`.
+ * @param {Boolean} [options.streamParams=false] - Log `streamParams` of the
+ *  previous node when graph is started.
+ * @param {Boolean} [options.frameIndex=false] - Log index of the incomming
+ *  `frame`.
  *
  * @memberof module:sink
  *
+ * @todo - Log in a file (for server-side use).
+ *
  * @example
- * const logger = new Logger({ data: true });
+ * import * as lfo from 'waves-lfo';
+ *
+ * const logger = new lfo.sink.Logger({ data: true });
  * whateverOperator.connect(logger);
  */
 class Logger extends BaseLfo {
@@ -59,12 +66,13 @@ class Logger extends BaseLfo {
     if (this.params.get('streamParams') === true)
       console.log(prevStreamParams);
 
-    this.index = 0;
+    this.frameIndex = 0;
   }
 
   /** @private */
   processFunction(frame) {
-    console.log(this.index++);
+    if (this.params.get('frameIndex') === true)
+      console.log(this.frameIndex++);
 
     if (this.params.get('time') === true)
       console.log(frame.time);
