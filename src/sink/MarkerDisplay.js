@@ -33,6 +33,22 @@ const definitions = {
  * @param {Number} [options.threshold=null] - Minimum value the incomming value
  *  must have to trigger the display of a marker. If null each incomming event
  *  triggers a marker. _Should be used in conjonction with `thresholdIndex`_.
+ * @param {Object} options - Override default parameters.
+ * @param {Number} [options.width=300] - Width of the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.height=150] - Height of the canvas.
+ *  _dynamic parameter_
+ * @param {Element|CSSSelector} [options.container=null] - Container element
+ *  in which to insert the canvas. _constant parameter_
+ * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
+ *  in which to draw. _constant parameter_
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
+ *  the canvas. This parameter only exists for operators that display several
+ *  consecutive frames on the canvas. _dynamic parameter_
+ * @param {Number} [options.referenceTime=null] - Optionnal reference time the
+ *  display should considerer as the origin. Is only usefull when synchronizing
+ *  several display using the `DisplaySync` class. This parameter only exists
+ *  for operators that display several consecutive frames on the canvas.
  *
  * @example
  * import * as lfo from 'waves-lfo';
@@ -43,6 +59,7 @@ const definitions = {
  *
  * const marker = new lfo.sink.MarkerDisplay({
  *   canvas: '#marker',
+ *   threshold: 0.5,
  * });
  *
  * eventIn.connect(marker);
