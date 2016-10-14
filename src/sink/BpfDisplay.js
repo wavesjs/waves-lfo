@@ -85,10 +85,12 @@ class BpfDisplay extends BaseDisplay {
     this.prevFrame = null;
   }
 
+  /** @private */
   getMinimumFrameWidth() {
     return this.params.get('radius');
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     super.processStreamParams(prevStreamParams);
 
