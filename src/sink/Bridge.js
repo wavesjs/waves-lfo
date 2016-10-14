@@ -10,13 +10,13 @@ const definitions = {
 };
 
 /**
- * Create a bridge between the graph and application logic. Can handle `push`
+ * Create a bridge between the graph and application logic. Handle `push`
  * and `pull` paradigms.
  *
  * @memberof module:sink
  *
  * @param {Object} options - Override default parameters.
- * @param {Function} [options.callback=null] - Optionnal callback to be called
+ * @param {Function} [options.callback=null] - Callback to be executed
  *  on each frame.
  *
  * @example
@@ -52,17 +52,19 @@ class Bridge extends BaseLfo {
 
   processFrame(frame) {
     this.prepareFrame();
-    // pull interface (copy data while we don't know what could
+
+    const callback = this.params.get('callback');
+    const output = this.frame;
+    // pull interface (we copy data since we don't know what could
     // be done outside the graph)
     for (let i = 0; i < this.streamParams.frameSize; i++)
-      this.frame.data[i] = frame[i];
+      output.data[i] = frame.data[i];
 
-    this.frame.time = frame.time;
-    this.frame.metadata = frame.metadata;
+    output.time = frame.time;
+    output.metadata = frame.metadata;
 
     // `push` interface
-    const callback = this.params.get('callback');
-    callback(frame);
+    callback(output);
   }
 }
 
