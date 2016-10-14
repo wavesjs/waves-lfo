@@ -64,17 +64,27 @@ const definitions = {
  * @example
  * import * as lfo from 'waves-lfo';
  *
- * const eventIn = new EventIn({
- *   frameType: 'vector',
- *   frameSize: 2,
- *   frameRate: 0,
+ * const eventIn = new lfo.source.EventIn({
+ *  frameType: 'vector',
+ *  frameSize: 2,
+ *  frameRate: 0,
  * });
  *
- * const recorder = new DataRecorder();
+ * const recorder = new lfo.sink.DataRecorder();
  *
  * eventIn.connect(recorder);
  * eventIn.start();
  * recorder.start();
+ *
+ * recorder.retrieve()
+ *  .then((result) => console.log(result))
+ *  .catch((err) => console.error(err.stack));
+ *
+ * eventIn.process(0, [0, 1]);
+ * eventIn.process(1, [1, 2]);
+ *
+ * recorder.stop();
+ * > [{ time: 0, data: [0, 1] }, { time: 1, data: [1, 2] }];
  */
 class DataRecorder extends BaseLfo {
   constructor(options = {}) {
