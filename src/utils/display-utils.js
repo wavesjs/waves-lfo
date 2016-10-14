@@ -1,4 +1,32 @@
-const colors = ['steelblue', 'red', 'orange', 'green', 'purple'];
+const colors = ['steelblue', 'orange', '#00e600', '#ff0000', 'purple', '#224153'];
+
+export const getColors = function(type, nbr) {
+  switch (type) {
+    case 'signal':
+      return colors[0]; // steelblue
+      break;
+    case 'bpf':
+      if (nbr <= colors.length) {
+        return colors.slice(0, nbr);
+      } else {
+        const _colors = colors.slice(0);
+        while (_colors.length < nbr)
+          _colors.push(getRandomColor());
+
+        return _colors;
+      }
+      break;
+    case 'waveform':
+      return [colors[0], colors[5]]; // steelblue / darkblue
+      break;
+    case 'marker':
+      return colors[3]; // red
+      break;
+    case 'spectrum':
+      return colors[2]; // green
+      break;
+  }
+};
 
 // http://stackoverflow.com/questions/1484506/random-color-generator-in-javascript
 export const getRandomColor = function() {
