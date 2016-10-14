@@ -92,10 +92,12 @@ class BpfDisplay extends BaseDisplay {
 
   /** @private */
   processStreamParams(prevStreamParams) {
-    super.processStreamParams(prevStreamParams);
+    this.prepareStreamParams(prevStreamParams);
 
     if (this.params.get('colors') === null)
       this.params.set('colors', getColors('bpf', this.streamParams.frameSize));
+
+    this.propagateStreamParams();
   }
 
   /** @private */
