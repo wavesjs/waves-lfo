@@ -90,12 +90,12 @@ class VuMeterDisplay extends BaseDisplay {
 
   /** @private */
   processStreamParams(prevStreamParams) {
-    super.processStreamParams(prevStreamParams);
+    this.prepareStreamParams(prevStreamParams);
 
     this.rmsOperator.processStreamParams(prevStreamParams);
     this.rmsOperator.resetStream();
 
-    super.propagateStreamParams();
+    this.propagateStreamParams();
   }
 
   /** @private */

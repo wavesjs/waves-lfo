@@ -82,7 +82,7 @@ class SpectrumDisplay extends BaseDisplay {
 
   /** @private */
   processStreamParams(prevStreamParams) {
-    super.processStreamParams(prevStreamParams);
+    this.prepareStreamParams(prevStreamParams);
 
     this.fft = new FFT({
       size: this.streamParams.frameSize,
@@ -92,6 +92,8 @@ class SpectrumDisplay extends BaseDisplay {
 
     this.fft.processStreamParams(this.streamParams);
     this.fft.resetStream();
+
+    this.propagateStreamParams();
   }
 
   /** @private */

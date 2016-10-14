@@ -235,8 +235,8 @@ class BaseDisplay extends BaseLfo {
   }
 
   /** @private */
-  processStreamParams(prevStreamParams) {
-    this.prepareStreamParams(prevStreamParams);
+  propagateStreamParams() {
+    super.propagateStreamParams();
 
     this._stack = [];
     this._rafId = requestAnimationFrame(this.renderStack);
