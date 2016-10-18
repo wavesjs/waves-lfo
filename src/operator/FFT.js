@@ -134,8 +134,6 @@ function FFTNayuki(n) {
 }
 
 
-
-
 const sqrt = Math.sqrt;
 
 const isPowerOfTwo = function(number) {
@@ -170,14 +168,16 @@ const definitions = {
 }
 
 /**
- * Perfom a Fast Fourier Transform on the incomming signal.
- * This node is based on the [FFT implementation by Nayuki](https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js)
+ * Perfom a Fast Fourier Transform on the incomming signal, [FFT implementation
+ * by Nayuki](https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js).
+ *
+ * _This node only accepts `signal` inputs_
  *
  * @memberof module:operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.size=1024] - Size of the fft, should be a power of
- *  2. If the the frame size of the incomming signal is lower than this value,
+ *  2. If the frame size of the incomming signal is lower than this value,
  *  it is zero padded to match the fft size.
  * @param {String} [options.window='none'] - Name of the window applied on the
  *  incomming signal. Available windows are: 'none', 'hann', 'hanning',
@@ -292,7 +292,16 @@ class FFT extends BaseLfo {
   }
 
   /**
-   * @todo - doc
+   * Use the FFT operator outside of a graph (i.e. `standalone` mode).
+   *
+   * @param {Array} signal - Input values.
+   * @return {Array} - FFT of the input signal.
+   *
+   * @example
+   * const fft = new lfo.operator.FFT({ size: 512, window: 'hann' });
+   * // mandatory for use in standalone mode
+   * fft.initStream({ frameSize: 256, frameType: 'signal' });
+   * fft.inputSignal(signal);
    */
   inputSignal(signal) {
     const mode = this.params.get('mode');
