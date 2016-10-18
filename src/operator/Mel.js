@@ -1,8 +1,6 @@
 import BaseLfo from '../core/BaseLfo';
 import parameters from 'parameters';
 
-
-
 const min = Math.min;
 const max = Math.max;
 const pow = Math.pow;
@@ -17,7 +15,7 @@ function melToHertzHtk(freqMel) {
 }
 
 /**
- * Returns a description of the weights to be apply on the fft bins for each
+ * Returns a description of the weights to apply on the fft bins for each
  * Mel band filter.
  * @note - adapted from imtr-tools/rta
  *
@@ -28,6 +26,8 @@ function melToHertzHtk(freqMel) {
  * @param {Number} maxFreq - Maximum frequency to consider.
  * @return {Array<Object>} - Description of the weights to apply on the bins for
  *  each mel filter.
+ *
+ * @private
  */
 function getMelBandWeights(nbrBins, nbrFilters, sampleRate, minFreq, maxFreq, type = 'htk') {
 
@@ -37,8 +37,8 @@ function getMelBandWeights(nbrBins, nbrFilters, sampleRate, minFreq, maxFreq, ty
   let maxMel;
 
   if (type === 'htk') {
-    const hertzToMel = hertzToMelHtk;
-    const melToHertz = melToHertzHtk;
+    hertzToMel = hertzToMelHtk;
+    melToHertz = melToHertzHtk;
     minMel = hertzToMel(minFreq);
     maxMel = hertzToMel(maxFreq);
   } else {
@@ -140,17 +140,21 @@ const definitions = {
 
 
 /**
- * Compute the mel bands from a given spectrum.
+ * Compute the mel bands spectrum from a given spectrum (`vector` type).
  * _Use the `htk` mel band style._
  *
  * @memberof module:operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Boolean} [options.log=false] - Apply a logarithmic scale on the output.
- * @param {Number} [options.nbrFilters=24] - Number of filters defining the mel bands.
- * @param {Number} [options.minFreq=0] - Minimum frequency to be taken in account.
- * @param {Number} [options.maxFreq=null] - Maximum frequency to be taken in account.
+ * @param {Number} [options.nbrFilters=24] - Number of filters defining the mel
+ *  bands.
+ * @param {Number} [options.minFreq=0] - Minimum frequency.
+ * @param {Number} [options.maxFreq=null] - Maximum frequency, if null `maxFreq`
+ *  is set to Nyquist frequency.
  * @param {Number} [options.power=1] - Apply a power scaling on each mel band.
+ *
+ * @todo - implement Slaney style mel bands
  *
  * @example
  * // todo
@@ -162,6 +166,7 @@ class Mel extends BaseLfo {
     this.params = parameters(definitions, options);
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
@@ -184,6 +189,10 @@ class Mel extends BaseLfo {
     this.propagateStreamParams();
   }
 
+  // @todo
+  // inputVector() {}
+
+  /** @private */
   processVector(frame) {
     const power = this.params.get('power');
     const log = this.params.get('log');
