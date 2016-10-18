@@ -52,10 +52,10 @@ const definitions = {
  * eventIn.start();
  *
  * eventIn.process(0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
- * // > { time: 0, data: [0, 1, 2, 3] }
- * // > { time: 1, data: [2, 3, 4, 5] }
- * // > { time: 2, data: [4, 5, 6, 7] }
- * // > { time: 3, data: [6, 7, 8, 9] }
+ * > { time: 0, data: [0, 1, 2, 3] }
+ * > { time: 1, data: [2, 3, 4, 5] }
+ * > { time: 2, data: [4, 5, 6, 7] }
+ * > { time: 3, data: [6, 7, 8, 9] }
  */
 class Slicer extends BaseLfo {
   constructor(options = {}) {
