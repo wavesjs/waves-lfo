@@ -218,6 +218,19 @@ class BaseLfo {
   }
 
   /**
+   * Helper to initialize the stream in standalone mode.
+   *
+   * @param {Object} [streamParams={}] - Stream parameters to be used.
+   *
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
+   */
+  initStream(streamParams = {}) {
+    this.processStreamParams(streamParams);
+    this.resetStream();
+  }
+
+  /**
    * Reset the `frame.data` buffer by setting all its values to 0.
    * A source operator should call `processStreamParams` and `resetStream` when
    * started, each of these method propagate through the graph automaticaly.
