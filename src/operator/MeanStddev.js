@@ -4,7 +4,7 @@ import parameters from 'parameters';
 const sqrt = Math.sqrt;
 
 /**
- * Compute mean and standard deviation of a given signal.
+ * Compute mean and standard deviation of a given `signal`.
  *
  * @memberof module:operator
  *
@@ -38,10 +38,12 @@ const sqrt = Math.sqrt;
  * }
  */
 class MeanStddev extends BaseLfo {
-  constructor(options) {
-    super();
+  constructor(options = {}) {
+    // no options available, just throw an error if some param try to be set.
+    super({}, options);
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
