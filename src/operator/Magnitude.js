@@ -19,6 +19,8 @@ const definitions = {
 /**
  * Compute the magnitude of a `vector` input.
  *
+ * _support `standalone` usage_
+ *
  * @param {Object} options - Override default parameters.
  * @param {Boolean} [options.normalize=true] - Normalize output according to
  *  the vector size.

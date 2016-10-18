@@ -168,10 +168,10 @@ const definitions = {
 }
 
 /**
- * Perfom a Fast Fourier Transform on the incomming signal, [FFT implementation
+ * Perfom a Fast Fourier Transform on an incomming `signal`, [FFT implementation
  * by Nayuki](https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js).
  *
- * _This node only accepts `signal` inputs_
+ * _support `standalone` usage_
  *
  * @memberof module:operator
  *

@@ -32,10 +32,10 @@ const definitions = {
 };
 
 /**
- * Compute the Discrete Cosine Transform of an input signal.
+ * Compute the Discrete Cosine Transform of an input `signal` or `vector`.
  * (HTK style weighting).
  *
- * This operator can handle `signal` as well as `vector` inputs.
+ * _support `standalone` usage_
  *
  * @memberof module:operator
  *
