@@ -34,6 +34,8 @@ const definitions = {
  * Log `frame.time`, `frame.data`, `frame.metadata` and/or
  * `streamAttributes` of any node.
  *
+ * This sink can handle any type if input (`signal`, `vector`, `scalar`)
+ *
  * @param {Object} options - Override parameters default values.
  * @param {Boolean} [options.time=false] - Log incomming `frame.time` if `true`.
  * @param {Boolean} [options.data=false] - Log incomming `frame.data` if `true`.

@@ -28,7 +28,7 @@ const definitions = {
 }
 
 /**
- * Simple VU-Meter
+ * Simple VU-Meter to used on a `signal` stream.
  *
  * @memberof module:sink
  *

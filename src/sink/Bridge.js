@@ -13,6 +13,8 @@ const definitions = {
  * Create a bridge between the graph and application logic. Handle `push`
  * and `pull` paradigms.
  *
+ * This sink can handle any type of input (`signal`, `vector`, `scalar`)
+ *
  * @memberof module:sink
  *
  * @param {Object} options - Override default parameters.
@@ -20,7 +22,35 @@ const definitions = {
  *  on each frame.
  *
  * @example
- * // todo - both pull and push paradigms
+ * import * as lfo from 'waves-lfo';
+ *
+ * const frames = [
+ *  { time: 0, data: [0, 1] },
+ *  { time: 1, data: [1, 2] },
+ * ];
+ *
+ * const eventIn = new EventIn({
+ *   frameType: 'vector',
+ *   frameSize: 2,
+ *   frameRate: 1,
+ * });
+ *
+ * const bridge = new Bridge({
+ *   callback: (frame) => console.log(frame),
+ * });
+ *
+ * eventIn.connect(bridge);
+ * eventIn.start();
+ *
+ * // callback executed on each frame
+ * eventIn.processFrame(frame[0]);
+ * > { time: 0, data: [0, 1] }
+ * eventIn.processFrame(frame[1]);
+ * > { time: 1, data: [1, 2] }
+ *
+ * // pull current frame when needed
+ * console.log(bridge.frame);
+ * > { time: 1, data: [1, 2] }
  */
 class Bridge extends BaseLfo {
   constructor(options = {}) {
@@ -64,7 +94,8 @@ class Bridge extends BaseLfo {
     output.metadata = frame.metadata;
 
     // `push` interface
-    callback(output);
+    if (callback !== null)
+      callback(output);
   }
 }
 

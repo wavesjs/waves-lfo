@@ -18,7 +18,8 @@ const definitions = {
 };
 
 /**
- * Display a waveform (with optionnal RMS) in a canvas.
+ * Display a waveform (along with optionnal RMS) of a given `signal` input in
+ * a canvas.
  *
  * @param {Object} options - Override default parameters.
  * @param {Array<String>} [options.colors=['waveform', 'rms']] - Array

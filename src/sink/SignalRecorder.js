@@ -109,8 +109,9 @@ const definitions = {
 };
 
 /**
- * Record an audio stream of arbitrary duration and retrieve an `AudioBuffer`
- * when done.
+ * Record an `signal` input stream of arbitrary duration and retrieve it
+ * when done (as a raw `Float32Array` or an `AudioBuffer` occording to the
+ * given configuration).
  * When recording is stopped (either when the `stop` method is called or the
  * defined duration has been recorded), the `Promise` returned by the `retrieve`
  * method is fullfilled with the `AudioBuffer` containing the recorded audio.
@@ -121,7 +122,7 @@ const definitions = {
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.duration=10] - Maximum duration of the recording.
  * @param {Boolean} [options.retrieveAudioBuffer=false] - Define if an `AudioBuffer`
- *  should be retrived or only the raw Float32Array of data.
+ *  should be retrieved or only the raw Float32Array of data.
  * @param {AudioContext} [options.audioContext=null] - If
  *  `retrieveAudioBuffer` is set to `true`, audio context to be used
  *  in order to create the final audio buffer.

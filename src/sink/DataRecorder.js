@@ -52,12 +52,12 @@ const definitions = {
 /**
  * Record arbitrary data from a graph.
  *
+ * This sink can handle `signal` and `vector` inputs.
+ *
  * @param {Object} options - Override default parameters.
  * @param {Boolean} [options.separateArrays] - Format of the retrieved values:
  *  - when `false`, format is [{ time, data }, { time, data }, ...]
  *  - when `true`, format is { time: [...], data: [...] }
- *
- * @todo - handle WebWorker to be node compliant.
  *
  * @memberof module:sink
  *

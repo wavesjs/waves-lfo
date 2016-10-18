@@ -23,6 +23,7 @@ const definitions = {
 
 /**
  * Display a marker according to the input frame.
+ * This sink can handle input of type `vector`.
  *
  * @memberof module:sink
  *

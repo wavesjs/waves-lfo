@@ -19,6 +19,8 @@ const definitions = {
  * Display a mean value and a range value aroune this mean (for example mean
  * and standart deviation).
  *
+ * This sink can handle input of type `vector` of frameSize >= 2.
+ *
  * @param {Object} options - Override default parameters.
  * @param {String} [options.color='orange'] - Color.
  * @param {String} [options.colorScheme='none'] - If a third value is available
