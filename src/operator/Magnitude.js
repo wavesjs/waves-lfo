@@ -17,17 +17,16 @@ const definitions = {
 }
 
 /**
- * Compute the magnitude of a vector.
+ * Compute the magnitude of a `vector` input.
  *
  * @param {Object} options - Override default parameters.
- * @param {Boolean} [options.normalize=true] - Normalize output accroding to
+ * @param {Boolean} [options.normalize=true] - Normalize output according to
  *  the vector size.
  * @param {Boolean} [options.power=false] - If true, returns the squared
  *  magnitude (power).
  *
- * @todo - Define if output should be a `vector` or a `scalar`
- *
  * @memberof module:operator
+ *
  * @example
  * import * as lfo from 'waves-lfo';
  *
@@ -39,11 +38,11 @@ const definitions = {
  * magnitude.connect(logger);
  * eventIn.start();
  *
- * eventIn.processFrame(null, [1, 1]);
+ * eventIn.process(null, [1, 1]);
  * > [1]
- * eventIn.processFrame(null, [2, 2]);
+ * eventIn.process(null, [2, 2]);
  * > [2.82842712475]
- * eventIn.processFrame(null, [3, 3]);
+ * eventIn.process(null, [3, 3]);
  * > [4.24264068712]
  */
 class Magnitude extends BaseLfo {
@@ -80,11 +79,6 @@ class Magnitude extends BaseLfo {
     this.propagateStreamParams();
   }
 
-  /** @private */
-  processVector(frame) {
-    this.frame.data[0] = this.inputVector(frame.data);
-  }
-
   /**
    * Allows for the use of a `Magnitude` outside a graph (e.g. inside another
    * node), in this case `processStreamParams` and `resetStream` sould be
@@ -92,6 +86,14 @@ class Magnitude extends BaseLfo {
    *
    * @param {Array|Float32Array} values - Values to process.
    * @return {Number} - Magnitude value.
+   *
+   * @example
+   * import * as lfo from 'waves-lfo';
+   *
+   * const magnitude = new lfo.operator.Magnitude({ power: true });
+   * magnitude.initStream({ frameType: 'vector', frameSize: 3 });
+   * magnitude.inputVector([3, 3]);
+   * > 4.24264068712
    */
   inputVector(values) {
     const length = values.length;
@@ -109,6 +111,11 @@ class Magnitude extends BaseLfo {
       mag = sqrt(mag);
 
     return mag;
+  }
+
+  /** @private */
+  processVector(frame) {
+    this.frame.data[0] = this.inputVector(frame.data);
   }
 }
 
