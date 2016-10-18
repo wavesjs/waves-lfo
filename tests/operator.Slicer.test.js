@@ -1,7 +1,7 @@
 import Slicer from '../src/operator/Slicer';
 import EventIn from '../src/source/EventIn';
 import Logger from '../src/sink/Logger';
-import Asserter from './Asserter';
+import Asserter from './utils/Asserter';
 import tape from 'tape';
 
 tape('Slicer (frameSize === hopSize)', (t) => {
@@ -21,20 +21,20 @@ tape('Slicer (frameSize === hopSize)', (t) => {
     sampleRate: 2,
   });
 
-  const framer = new Slicer({
+  // as hopSize is not defined stream is reinitialized on first frame
+  const slicer = new Slicer({
     frameSize: 2,
+    // hopSize: 2,
   });
 
-  const logger = new Logger({
-    time: true,
-  });
+  const logger = new Logger({ data: true });
 
   const asserter = new Asserter(t);
   asserter.setExpectedFrames(expectedFrames);
 
-  eventIn.connect(framer);
-  // framer.connect(logger);
-  framer.connect(asserter);
+  eventIn.connect(slicer);
+  // eventIn.connect(logger);
+  slicer.connect(asserter);
 
   eventIn.start();
   eventIn.process(0, signal);
@@ -58,7 +58,7 @@ tape('Slicer (frameSize > hopSize)', (t) => {
     sampleRate: 2,
   });
 
-  const framer = new Slicer({
+  const slicer = new Slicer({
     frameSize: 4,
     hopSize: 2
   });
@@ -66,8 +66,8 @@ tape('Slicer (frameSize > hopSize)', (t) => {
   const asserter = new Asserter(t);
   asserter.setExpectedFrames(expectedFrames);
 
-  eventIn.connect(framer);
-  framer.connect(asserter);
+  eventIn.connect(slicer);
+  slicer.connect(asserter);
 
   eventIn.start();
   eventIn.process(0, signal);
@@ -92,7 +92,7 @@ tape('Slicer (frameSize < hopSize)', (t) => {
     sampleRate: 2,
   });
 
-  const framer = new Slicer({
+  const slicer = new Slicer({
     frameSize: 1,
     hopSize: 2
   });
@@ -100,8 +100,8 @@ tape('Slicer (frameSize < hopSize)', (t) => {
   const asserter = new Asserter(t);
   asserter.setExpectedFrames(expectedFrames);
 
-  eventIn.connect(framer);
-  framer.connect(asserter);
+  eventIn.connect(slicer);
+  slicer.connect(asserter);
 
   eventIn.start();
   eventIn.process(0, signal);
@@ -126,7 +126,7 @@ tape('Slicer (frameSize > hopSize)', (t) => {
     sampleRate: 5,
   });
 
-  const framer = new Slicer({
+  const slicer = new Slicer({
     frameSize: 4,
     hopSize: 2,
   });
@@ -134,8 +134,8 @@ tape('Slicer (frameSize > hopSize)', (t) => {
   const asserter = new Asserter(t);
   asserter.setExpectedFrames(expectedFrames);
 
-  eventIn.connect(framer);
-  framer.connect(asserter);
+  eventIn.connect(slicer);
+  slicer.connect(asserter);
 
   eventIn.start();
   blocks.forEach((signal, index) => eventIn.process(index, signal));
@@ -161,7 +161,7 @@ tape('Slicer (frameSize < hopSize)', (t) => {
     sampleRate: 5,
   });
 
-  const framer = new Slicer({
+  const slicer = new Slicer({
     frameSize: 1,
     hopSize: 2,
   });
@@ -169,8 +169,8 @@ tape('Slicer (frameSize < hopSize)', (t) => {
   const asserter = new Asserter(t);
   asserter.setExpectedFrames(expectedFrames);
 
-  eventIn.connect(framer);
-  framer.connect(asserter);
+  eventIn.connect(slicer);
+  slicer.connect(asserter);
 
   eventIn.start();
   blocks.forEach((signal, index) => eventIn.process(index, signal));
@@ -197,7 +197,7 @@ tape('Slicer (frameSize < hopSize)', (t) => {
     sampleRate: 6,
   });
 
-  const framer = new Slicer({
+  const slicer = new Slicer({
     frameSize: 1,
     hopSize: 2,
   });
@@ -205,8 +205,8 @@ tape('Slicer (frameSize < hopSize)', (t) => {
   const asserter = new Asserter(t);
   asserter.setExpectedFrames(expectedFrames);
 
-  eventIn.connect(framer);
-  framer.connect(asserter);
+  eventIn.connect(slicer);
+  slicer.connect(asserter);
 
   eventIn.start();
   blocks.forEach((signal, index) => eventIn.process(index, signal));
@@ -214,7 +214,7 @@ tape('Slicer (frameSize < hopSize)', (t) => {
   t.end();
 });
 
-console.log('-------------------------------------------');
-console.log('@TODO create test for frameSize > blockSize');
-console.log('-------------------------------------------');
+console.log('----------------------------------------------------------');
+console.log('@todo - create test for output framesize > input frameSize');
+console.log('----------------------------------------------------------');
 

@@ -19,8 +19,9 @@ const definitions = {
 }
 
 /**
- * Change the frameSize and hopSize of the signal according to the given options.
- * This operator can update the `frameRate` of the stream parameters.
+ * Change the `frameSize` and `hopSize` of a `signal` input according to
+ * the given options.
+ * This operator updates the stream parameters according to its configuration.
  *
  * @memberof module:operator
  *
@@ -39,19 +40,22 @@ const definitions = {
  *   sampleRate: 2,
  * });
  *
- * const framer = new Slicer({
+ * const slicer = new lfo.operator.Slicer({
  *   frameSize: 4,
  *   hopSize: 2
  * });
  *
- * eventIn.connect(framer);
+ * const logger = new lfo.sink.Logger({ time: true, data: true });
+ *
+ * eventIn.connect(slicer);
+ * slicer.connect(logger);
  * eventIn.start();
  *
  * eventIn.process(0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
- * > { time: 0, data: [0, 1, 2, 3] }
- * > { time: 1, data: [2, 3, 4, 5] }
- * > { time: 2, data: [4, 5, 6, 7] }
- * > { time: 3, data: [6, 7, 8, 9] }
+ * // > { time: 0, data: [0, 1, 2, 3] }
+ * // > { time: 1, data: [2, 3, 4, 5] }
+ * // > { time: 2, data: [4, 5, 6, 7] }
+ * // > { time: 3, data: [6, 7, 8, 9] }
  */
 class Slicer extends BaseLfo {
   constructor(options = {}) {
@@ -101,7 +105,6 @@ class Slicer extends BaseLfo {
   processFrame(frame) {
     this.prepareFrame();
     this.processFunction(frame);
-    // don't call `propagateFrame` as it is call in the `processSignal`
   }
 
   /** @private */
