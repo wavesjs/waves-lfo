@@ -24,7 +24,6 @@
 // a1 is a[0] and a2 is a[1]
 
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 var sin = Math.sin;
 var cos = Math.cos;
@@ -354,11 +353,8 @@ const definitions = {
  * // todo
  */
 class Biquad extends BaseLfo {
-  constructor(options) {
-    super();
-
-    this.params = parameters(definitions, options);
-    this.params.addListener(this.onParamUpdate.bind(this));
+  constructor(options = {}) {
+    super(definitions, options);
   }
 
   /** @private */

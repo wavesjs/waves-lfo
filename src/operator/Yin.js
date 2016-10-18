@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 const ceil = Math.ceil;
 const sqrt = Math.sqrt;
@@ -89,10 +88,8 @@ const definitions = {
  * source.start();
  */
 class Yin extends BaseLfo {
-  constructor(options) {
-    super();
-
-    this.params = parameters(definitions, options);
+  constructor(options = {}) {
+    super(definitions, options);
 
     this.probability = 0;
     this.pitch = -1;

@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 const definitions = {
   state: {
@@ -26,10 +25,9 @@ const definitions = {
  * // todo
  */
 class Toggle extends BaseLfo {
-  constructor(options) {
-    super();
+  constructor(options = {}) {
+    super(definitions, options);
 
-    this.params = parameters(definitions, options);
     this.state = this.params.get('state');
   }
 

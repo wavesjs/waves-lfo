@@ -1,6 +1,5 @@
 import BaseLfo from '../core/BaseLfo';
 import initWindow from '../utils/windows';
-import parameters from 'parameters';
 
 // https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js
 /*
@@ -215,10 +214,8 @@ const definitions = {
  * @todo - check default values for all params.
  */
 class FFT extends BaseLfo {
-  constructor(options) {
-    super();
-
-    this.params = parameters(definitions, options);
+  constructor(options = {}) {
+    super(definitions, options);
 
     this.windowSize = null;
     this.normalizeCoefs = null;

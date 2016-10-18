@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 const sqrt = Math.sqrt;
 const cos = Math.cos;
@@ -69,7 +68,7 @@ const definitions = {
  * source.start();
  */
 class DCT extends BaseLfo {
-  constructor(options) {
+  constructor(options = {}) {
     super(definitions, options);
   }
 

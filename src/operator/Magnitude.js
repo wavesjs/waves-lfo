@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 const sqrt = Math.sqrt;
 
@@ -48,11 +47,8 @@ const definitions = {
  * > [4.24264068712]
  */
 class Magnitude extends BaseLfo {
-  constructor(options) {
-    super();
-
-    this.params = parameters(definitions, options);
-    this.params.addListener(this.onParamUpdate.bind(this));
+  constructor(options = {}) {
+    super(definitions, options);
 
     this._normalize = this.params.get('normalize');
     this._power = this.params.get('power');

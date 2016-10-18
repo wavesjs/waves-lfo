@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 const min = Math.min;
 const max = Math.max;
@@ -160,10 +159,8 @@ const definitions = {
  * // todo
  */
 class Mel extends BaseLfo {
-  constructor(options) {
-    super();
-
-    this.params = parameters(definitions, options);
+  constructor(options = {}) {
+    super(definitions, options);
   }
 
   /** @private */

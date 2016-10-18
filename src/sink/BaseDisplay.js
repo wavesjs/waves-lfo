@@ -1,6 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
-
 
 const commonDefinitions = {
   min: {
@@ -82,8 +80,6 @@ const hasDurationDefinitions = {
  */
 class BaseDisplay extends BaseLfo {
   constructor(defs, options = {}, hasDuration = true) {
-    super();
-
     let commonDefs;
 
     if (hasDuration)
@@ -92,8 +88,8 @@ class BaseDisplay extends BaseLfo {
       commonDefs = commonDefinitions
 
     const definitions = Object.assign({}, commonDefs, defs);
-    this.params = parameters(definitions, options);
-    this.params.addListener(this.onParamUpdate.bind(this));
+
+    super(definitions, options);
 
     if (this.params.get('canvas') === null && this.params.get('container') === null)
       throw new Error('Invalid parameter: `canvas` or `container` not defined');

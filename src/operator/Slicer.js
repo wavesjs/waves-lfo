@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 const definitions = {
   frameSize: {
@@ -55,10 +54,8 @@ const definitions = {
  * > { time: 3, data: [6, 7, 8, 9] }
  */
 class Slicer extends BaseLfo {
-  constructor(options) {
-    super();
-
-    this.params = parameters(definitions, options);
+  constructor(options = {}) {
+    super(definitions, options);
 
     const hopSize = this.params.get('hopSize');
     const frameSize = this.params.get('frameSize');

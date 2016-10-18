@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 const workerCode = `
 self.addEventListener('message', function process(e) {

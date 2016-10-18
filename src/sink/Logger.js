@@ -1,6 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
-
 
 const definitions = {
   time: {
@@ -58,9 +56,7 @@ const definitions = {
  */
 class Logger extends BaseLfo {
   constructor(options) {
-    super();
-
-    this.params = parameters(definitions, options);
+    super(definitions, options);
   }
 
   /** @private */

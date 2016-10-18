@@ -1,6 +1,5 @@
 import BaseDisplay from './BaseDisplay';
 import RMS from '../operator/RMS';
-import parameters from 'parameters';
 
 const log10 = Math.log10;
 
