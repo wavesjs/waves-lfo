@@ -1,8 +1,7 @@
-import Asserter from './Asserter';
+import Asserter from './utils/Asserter';
 import MinMax from '../src/operator/MinMax';
 import EventIn from '../src/source/EventIn';
 import tape from 'tape';
-
 
 tape('MinMax', (t) => {
 
@@ -12,6 +11,7 @@ tape('MinMax', (t) => {
     frameSize: 512,
     frameType: 'signal',
     sampleRate: 0,
+    absoluteTime: true,
   });
 
   const minMax = new MinMax();
@@ -38,7 +38,7 @@ tape('MinMax', (t) => {
     metadata: frame.metadata,
   };
 
-  asserter.setExpectedFrame(expected);
+  asserter.setExpectedFrames([expected]);
 
   eventIn.start();
   eventIn.processFrame(frame);

@@ -1,23 +1,30 @@
 import BaseLfo from '../core/BaseLfo';
 
 /**
- * Find the minimun and maximum values of a given signal at each frame.
+ * Find minimun and maximum values of a given `signal`.
+ *
+ * _support `standalone` usage_
  *
  * @memberof module:operator
  *
  * @example
- *  const eventIn = new EventIn({
+ * import * as lfo from 'waves-lfo';
+ *
+ * const eventIn = new lfo.source.EventIn({
  *   frameSize: 512,
  *   frameType: 'signal',
  *   sampleRate: 0,
  * });
  *
- * const minMax = new MinMax();
+ * const minMax = new lfo.operator.MinMax();
+ *
+ * const logger = new lfo.sink.Logger({ data: true });
  *
  * eventIn.connect(minMax);
+ * minMax.connect(logger);
  * eventIn.start()
  *
- * // create a signal frame
+ * // create a frame
  * const signal = new Float32Array(512);
  * for (let i = 0; i < 512; i++)
  *   signal[i] = i + 1;
@@ -26,6 +33,11 @@ import BaseLfo from '../core/BaseLfo';
  * > [1, 512];
  */
 class MinMax extends BaseLfo {
+  constructor(options = {}) {
+    // throw errors if options are given
+    super({}, options);
+  }
+
   /** @private */
   processStreamParams(prevStreamParams= {}) {
     this.prepareStreamParams(prevStreamParams);
@@ -38,25 +50,17 @@ class MinMax extends BaseLfo {
   }
 
   /**
-   * Allows for the use of a `minMax` outside a graph (e.g. inside
-   * another node), in this case `processStreamParams` and `resetStream`
-   * should be called manually on the node.
+   * Use the `MinMax` operator in `standalone` mode (i.e. outside of a graph).
    *
-   * @param {Float32Array|Array} data - Signal to feed the operator with.
-   * @return {Array} - Array containing the min and max values.
+   * @param {Float32Array|Array} data - Input signal.
+   * @return {Array} - Min and max values.
    *
    * @example
    * const minMax = new MinMax();
-   * // the input frame size must be defined manually as it is not
-   * // forwarded by a parent node
-   * minMax.processStreamParams({ frameSize: 10 });
-   * minMax.resetStream();
+   * minMax.initStream({ frameType: 'signal', frameSize: 10 });
    *
    * minMax.inputSignal([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
    * > [0, 5]
-   *
-   * @see {@link module:core.BaseLfo#processStreamParams}
-   * @see {@link module:core.BaseLfo#resetStream}
    */
   inputSignal(data) {
     const outData = this.frame.data;
