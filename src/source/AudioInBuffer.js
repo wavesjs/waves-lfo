@@ -158,8 +158,7 @@ class AudioInBuffer extends BaseLfo {
    * @see {@link module:source.AudioInBuffer#stop}
    */
   start() {
-    this.processStreamParams();
-    this.resetStream();
+    this.initStream();
 
     if (this.params.useWorker) {
       const blob = new Blob([workerCode], { type: "text/javascript" });

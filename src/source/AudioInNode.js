@@ -87,8 +87,7 @@ class AudioInNode extends BaseLfo {
    * @see {@link module:source.AudioInNode#stop}
    */
   start() {
-    this.processStreamParams();
-    this.resetStream();
+    this.initStream();
 
     const audioContext = this.params.get('audioContext');
     this.frame.time = 0;

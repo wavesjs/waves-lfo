@@ -144,8 +144,7 @@ class EventIn extends BaseLfo {
    * @see {@link module:source.EventIn#stop}
    */
   start(startTime = null) {
-    this.processStreamParams();
-    this.resetStream();
+    this.initStream();
 
     this._startTime = startTime;
     this._isStarted = true;
