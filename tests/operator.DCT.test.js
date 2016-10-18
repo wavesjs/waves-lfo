@@ -1,7 +1,5 @@
 import av from 'av';
 import path from 'path';
-import fs from 'fs';
-import util from 'util';
 import tape from 'tape';
 import * as utils from './utils/utils';
 
@@ -12,6 +10,7 @@ import RMSE from './utils/RMSE';
 
 tape('DCT', (t) => {
   t.comment('compare against "./data/pipo-dct.txt"');
+  t.comment('cf max patch "./data/pipo-dct.maxpat"');
   t.comment('with file "./audio/sine-172.265625-44.1kHz-1sec.wav"');
   t.comment('configuration:');
   t.comment('- slice.size: 512');
@@ -22,13 +21,9 @@ tape('DCT', (t) => {
   t.comment('- dct.weighting: htk');
 
   const compareFile = './data/pipo-dct.txt';
-  const files = [
-    './audio/sine-172.265625-44.1kHz-1sec.wav',
-    // './audio/cosine-172.265625-44.1kHz-1sec.wav',
-    // './audio/sine-344.53125-44.1kHz-1sec.wav',
-  ];
+  const audioFile = './audio/sine-172.265625-44.1kHz-1sec.wav';
 
-  const asset = av.Asset.fromFile(path.join(__dirname, files[0]));
+  const asset = av.Asset.fromFile(path.join(__dirname, audioFile));
   asset.on('error', (err) => console.log(err.stack));
 
   asset.decodeToBuffer((buffer) => {

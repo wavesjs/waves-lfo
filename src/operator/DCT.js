@@ -33,8 +33,9 @@ const definitions = {
 
 /**
  * Compute the Discrete Cosine Transform of an input signal.
- * (HTK style weighting). This operator can handle `signal` as well as `vector`
- * inputs.
+ * (HTK style weighting).
+ *
+ * This operator can handle `signal` as well as `vector` inputs.
  *
  * @memberof module:operator
  *
@@ -89,7 +90,7 @@ class DCT extends BaseLfo {
   }
 
   /**
-   * Use the DCT operator outside of a graph (`standalone` mode).
+   * Use the DCT operator outside of a graph (i.e. `standalone` mode).
    *
    * @param {Array} values - Input values.
    * @return {Array} - DCT of the input array.
@@ -97,7 +98,7 @@ class DCT extends BaseLfo {
    * @example
    * const dct = new lfo.operator.DCT({ order: 12 });
    * // mandatory for use in standalone mode
-   * dct.initStream({ frameSize: 512 });
+   * dct.initStream({ frameSize: 512, frameType: 'signal' });
    * dct.inputSignal(data);
    */
   inputSignal(values) {
