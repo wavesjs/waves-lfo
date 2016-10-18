@@ -1,4 +1,4 @@
-import MovingMedian from '../src/operators/MovingMedian';
+import MovingMedian from '../src/operator/MovingMedian';
 import tape from 'tape';
 
 tape('MovingMedian', (t) => {

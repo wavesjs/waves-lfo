@@ -22,7 +22,7 @@ const definitions = {
  * Compute a moving average operation on the incomming frames (`scalar` or
  * `vector` type). If the input is of type vector, the moving average is
  * computed for each dimension in parallel. If the source sample rate is defined
- * frame time is shifted in the middle of the window defined by the order.
+ * frame time is shifted to the middle of the window defined by the order.
  *
  * _support `standalone` usage_
  *
@@ -32,7 +32,7 @@ const definitions = {
  * @param {Number} [options.order=10] - Number of successive values on which
  *  the average is computed.
  * @param {Number} [options.fill=0] - Value to fill the ring buffer with before
- *  the firsts input frames.
+ *  the first input frame.
  *
  * @todo - Implement `processSignal` ?
  *

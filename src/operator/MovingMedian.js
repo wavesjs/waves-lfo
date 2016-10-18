@@ -19,27 +19,39 @@ const definitions = {
 };
 
 /**
- * Compute a moving median operation on the incomming value(s).
- *
- * @todo - Implement `processSignal`
+ * Compute a moving median operation on the incomming frames (`scalar` or
+ * `vector` type). If the input is of type vector, the moving median is
+ * computed for each dimension in parallel. If the source sample rate is defined
+ * frame time is shifted to the middle of the window defined by the order.
  *
  * @memberof module:operator
  *
  * @param {Object} options - Override default parameters.
- * @param {Number} [options.order=9] - Number of successive values on which
- *  the median is searched. This value should be odd. _dynamic parameter_
+ * @param {Number} [options.order=9] - Number of successive values in which
+ *  the median is searched. This value must be odd. _dynamic parameter_
  * @param {Number} [options.fill=0] - Value to fill the ring buffer with before
- *  the firsts input frames. _dynamic parameter_
+ *  the first input frame. _dynamic parameter_
+ *
+ * @todo - Implement `processSignal`
  *
  * @example
  * import * as lfo from 'waves-lfo';
  *
- * const eventIn = new lfo.source.EventIn({ frameSize: 2, frameType: 'vector' });
- * const movingMedian = new lfo.operator.MovingMedian({ order: 5, fill: 0 });
- * const logger = new lfo.sink.Logger({ outFrame: true });
+ * const eventIn = new lfo.source.EventIn({
+ *   frameSize: 2,
+ *   frameType: 'vector',
+ * });
+ *
+ * const movingMedian = new lfo.operator.MovingMedian({
+ *   order: 5,
+ *   fill: 0,
+ * });
+ *
+ * const logger = new lfo.sink.Logger({ data: true });
  *
  * eventIn.connect(movingMedian);
  * movingMedian.connect(logger);
+ *
  * eventIn.start();
  *
  * eventIn.processFrame(null, [1, 1]);
@@ -129,10 +141,10 @@ class MovingMedian extends BaseLfo {
    * @return {Number} - Median value.
    *
    * @example
-   * const movingMedian = new MovingMedian({ order: 5, fill: 0 });
-   * // the frame size must be defined manually as it is not forwarded by a parent node
-   * movingMedian.processStreamParams({ frameSize: 1 });
-   * movingMedian.resetStream();
+   * import * as lfo from 'waves-lfo';
+   *
+   * const movingMedian = new MovingMedian({ order: 5 });
+   * movingMedian.initStream({ frameSize: 1, frameType: 'scalar' });
    *
    * movingMedian.inputScalar(1);
    * > 0
@@ -142,9 +154,6 @@ class MovingMedian extends BaseLfo {
    * > 1
    * movingMedian.inputScalar(4);
    * > 2
-   *
-   * @see {@link module:core.BaseLfo#processStreamParams}
-   * @see {@link module:core.BaseLfo#resetStream}
    */
   inputScalar(value) {
     const ringIndex = this.ringIndex;
@@ -198,10 +207,10 @@ class MovingMedian extends BaseLfo {
    * @return {Float32Array} - Median values for each dimension.
    *
    * @example
-   * const movingMedian = new MovingMedian({ order: 5, fill: 0 });
-   * // the frame size must be defined manually as it is not forwarded by a parent node
-   * movingMedian.processStreamParams({ frameSize: 3 });
-   * movingMedian.resetStream();
+   * import * as lfo from 'waves-lfo';
+   *
+   * const movingMedian = new MovingMedian({ order: 3, fill: 0 });
+   * movingMedian.initStream({ frameSize: 3, frameType: 'vector' });
    *
    * movingMedian.inputArray([1, 1]);
    * > [0, 0]
@@ -209,9 +218,6 @@ class MovingMedian extends BaseLfo {
    * > [1, 1]
    * movingMedian.inputArray([3, 3]);
    * > [2, 2]
-   *
-   * @see {@link module:core.BaseLfo#processStreamParams}
-   * @see {@link module:core.BaseLfo#resetStream}
    */
   inputVector(values) {
     const order = this.params.get('order');
@@ -266,6 +272,7 @@ class MovingMedian extends BaseLfo {
     return this.frame.data;
   }
 
+  /** @private */
   processFrame(frame) {
     this.preprocessFrame();
     this.processFunction(frame);
