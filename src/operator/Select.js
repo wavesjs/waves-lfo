@@ -1,5 +1,4 @@
 import BaseLfo from '../core/BaseLfo';
-import parameters from 'parameters';
 
 const definitions = {
   index: {
@@ -16,7 +15,7 @@ const definitions = {
 };
 
 /**
- * Select one or several indices from a input vector. If only one index is
+ * Select one or several indices from a `vector` input. If only one index is
  * selected, the output will be of type `scalar`, otherwise the output will
  * be a vector containing the selected indices.
  *
@@ -46,12 +45,11 @@ const definitions = {
  * > 4
  */
 class Select extends BaseLfo {
-  constructor(options) {
-    super(options);
-
-    this.params = parameters(definitions, options);
+  constructor(options = {}) {
+    super(definitions, options);
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
@@ -69,13 +67,16 @@ class Select extends BaseLfo {
     this.select = (indices !== null) ? indices : [index];
 
     // steal description() from parent
-    this.select.forEach((val, index) => {
-      this.streamParams.description[index] = prevStreamParams.description[val];
-    });
+    if (prevStreamParams.description) {
+      this.select.forEach((val, index) => {
+        this.streamParams.description[index] = prevStreamParams.description[val];
+      });
+    }
 
     this.propagateStreamParams();
   }
 
+  /** @private */
   processVector(frame) {
     const data = frame.data;
     const outData = this.frame.data;
