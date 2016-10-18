@@ -88,11 +88,8 @@ class WaveformDisplay extends BaseDisplay {
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
-    this.minMaxOperator.processStreamParams();
-    this.minMaxOperator.resetStream();
-
-    this.rmsOperator.processStreamParams();
-    this.rmsOperator.resetStream();
+    this.minMaxOperator.initStream(this.streamParams);
+    this.rmsOperator.initStream(this.streamParams);
 
     this.propagateStreamParams();
   }

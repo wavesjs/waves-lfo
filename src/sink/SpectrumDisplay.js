@@ -90,8 +90,7 @@ class SpectrumDisplay extends BaseDisplay {
       norm: 'linear',
     });
 
-    this.fft.processStreamParams(this.streamParams);
-    this.fft.resetStream();
+    this.fft.initStream(this.streamParams);
 
     this.propagateStreamParams();
   }
