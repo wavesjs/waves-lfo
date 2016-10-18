@@ -18,7 +18,7 @@ const files = [
   './assets/cherokee.wav',
 ];
 
-const asset = av.Asset.fromFile(path.join(__dirname, files[5]));
+const asset = av.Asset.fromFile(path.join(__dirname, files[0]));
 asset.on('error', (err) => console.log(err.stack));
 
 asset.decodeToBuffer((buffer) => {

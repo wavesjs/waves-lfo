@@ -42,7 +42,7 @@ const definitions = {
 
 
 /**
- * @todo - First "naive" implementation.
+ * First "naive" implementation.
  */
 class Yin extends BaseLfo {
   constructor(options) {

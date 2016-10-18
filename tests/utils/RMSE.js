@@ -23,11 +23,18 @@ class RMSE extends BaseLfo {
 
     this.expectedFrames = this.params.get('expectedFrames');
     this.frameIndex = 0;
+
+    this.rmseBoundaries = [+Infinity, -Infinity];
   }
 
   finalizeStream() {
     super.finalizeStream();
     const t = this.params.get('asserter');
+
+    // log boundaries
+    const [min, max] = this.rmseBoundaries;
+    t.comment(`RSME comprised between ${min} and ${max}`);
+
     t.end();
   }
 
@@ -64,7 +71,13 @@ class RMSE extends BaseLfo {
     const mean = sum / len;
     const rmse = sqrt(mean);
 
-    t.equal(rmse <= tolerance, true, `rmse (${rmse}) should lower than tolerance (${tolerance})`);
+    t.equal(rmse <= tolerance, true, `rmse (${rmse}) should be lower than tolerance (${tolerance})`);
+
+    if (rmse < this.rmseBoundaries[0])
+      this.rmseBoundaries[0] = rmse;
+
+    if (rmse > this.rmseBoundaries[1])
+      this.rmseBoundaries[1] = rmse;
 
     this.frameIndex += 1;
   }

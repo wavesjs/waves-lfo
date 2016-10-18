@@ -316,11 +316,14 @@ const definitions = {
   gain: {
     type: 'float',
     default: 1,
+    min: 0,
     metas: { kind: 'static' },
   },
   q: {
     type: 'float',
     default: 1,
+    min: 0.001, // PIPO_BIQUAD_MIN_Q
+    // max: 1,
     metas: { kind: 'static' },
   },
   bandwidth: {
@@ -362,19 +365,19 @@ class Biquad extends BaseLfo {
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
-    const frameRate = this.streamParams.frameRate;
+    const sampleRate = this.streamParams.sourceSampleRate;
     const frameSize = this.streamParams.frameSize;
 
-    // if no `frameRate` or `frameRate` is 0 we shall halt!
-    if (!frameRate || frameRate <= 0)
-      throw new Error('Invalid framerate value (0) for biquad');
+    // if no `sampleRate` or `sampleRate` is 0 we shall halt!
+    if (!sampleRate || sampleRate <= 0)
+      throw new Error('Invalid sampleRate value (0) for biquad');
 
     const type = this.params.get('type');
     const f0 = this.params.get('f0');
     const gain = this.params.get('gain');
     const q = this.params.get('q');
     const bandwidth = this.params.get('bandwidth');
-    const normF0 = f0 / frameRate;
+    const normF0 = f0 / (sampleRate / 2);
     let qFactor = q;
 
     // if bandwidth is defined, override the definition of the `q` factor.
@@ -389,7 +392,9 @@ class Biquad extends BaseLfo {
       yn_2: new Float32Array(frameSize)
     };
 
+    // type, f0, q, gain, coefs
     calculateCoefs(type, normF0, qFactor, gain, this.coefs);
+    console.log(this.coefs);
 
     this.propagateStreamParams();
   }
@@ -397,6 +402,7 @@ class Biquad extends BaseLfo {
   /** @private */
   processSignal(frame) {
     const frameSize = this.streamParams.frameSize;
+    // coefs, state, inFrame, outFrame, size
     biquadArrayDf1(this.coefs, this.state, frame.data, this.frame.data, frameSize);
   }
 }

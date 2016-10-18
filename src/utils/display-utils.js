@@ -1,4 +1,4 @@
-const colors = ['steelblue', 'orange', '#00e600', '#ff0000', 'purple', '#224153'];
+const colors = ['#4682B4', '#ffa500', '#00e600', '#ff0000', '#800080', '#224153'];
 
 export const getColors = function(type, nbr) {
   switch (type) {
@@ -24,6 +24,9 @@ export const getColors = function(type, nbr) {
       break;
     case 'spectrum':
       return colors[2]; // green
+      break;
+    case 'trace':
+      return colors[1]; // orange
       break;
   }
 };

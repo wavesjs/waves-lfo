@@ -17,6 +17,7 @@
       "src/operator/Select.js",
       "src/operator/Slicer.js",
       "src/operator/Toggle.js",
+      "src/operator/Yin.js",
 
       "src/sink/BpfDisplay.js",
       "src/sink/Logger.js",
