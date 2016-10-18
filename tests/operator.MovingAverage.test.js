@@ -80,7 +80,5 @@ tape('MovingAverage', (t) => {
     t.deepEqual(avg, expected[i], 'should output a proper mean');
   }
 
-  t.comment('@todo - test `process`');
-
   t.end();
 });

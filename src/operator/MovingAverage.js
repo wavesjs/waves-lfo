@@ -19,9 +19,12 @@ const definitions = {
 };
 
 /**
- * Compute a moving average operation on the incomming value(s).
+ * Compute a moving average operation on the incomming frames (`scalar` or
+ * `vector` type). If the input is of type vector, the moving average is
+ * computed for each dimension in parallel. If the source sample rate is defined
+ * frame time is shifted in the middle of the window defined by the order.
  *
- * @todo - Implement `processSignal`
+ * _support `standalone` usage_
  *
  * @memberof module:operator
  *
@@ -31,15 +34,26 @@ const definitions = {
  * @param {Number} [options.fill=0] - Value to fill the ring buffer with before
  *  the firsts input frames.
  *
+ * @todo - Implement `processSignal` ?
+ *
  * @example
  * import * as lfo from 'waves-lfo';
  *
- * const eventIn = new lfo.source.EventIn({ frameSize: 2, frameType: 'vector' });
- * const movingAverage = new lfo.operator.MovingAverage({ order: 5, fill: 0 });
+ * const eventIn = new lfo.source.EventIn({
+ *   frameSize: 2,
+ *   frameType: 'vector'
+ * });
+ *
+ * const movingAverage = new lfo.operator.MovingAverage({
+ *   order: 5,
+ *   fill: 0
+ * });
+ *
  * const logger = new lfo.sink.Logger({ data: true });
  *
  * eventIn.connect(movingAverage);
  * movingAverage.connect(logger);
+ *
  * eventIn.start();
  *
  * eventIn.process(null, [1, 1]);
@@ -123,18 +137,17 @@ class MovingAverage extends BaseLfo {
   }
 
   /**
-   * Allows for the use of a `MovingMedian` outside a graph (e.g. inside
-   * another node), in this case `processStreamParams` and `resetStream`
-   * should be called manually on the node.
+   * Use the `MovingAverage` operator in `standalone` mode (i.e. outside of a
+   * graph) with a `scalar` input.
    *
    * @param {Number} value - Value to feed the moving average with.
    * @return {Number} - Average value.
    *
    * @example
-   * const movingAverage = new MovingAverage({ order: 5, fill: 0 });
-   * // the frame size must be defined manually as it is not forwarded by a parent node
-   * movingAverage.processStreamParams({ frameSize: 1 });
-   * movingAverage.resetStream();
+   * import * as lfo from 'waves-lfo';
+   *
+   * const movingAverage = new lfo.operator.MovingAverage({ order: 5 });
+   * movingAverage.initStream({ frameSize: 1, frameType: 'scalar' });
    *
    * movingAverage.inputScalar(1);
    * > 0.2
@@ -165,18 +178,17 @@ class MovingAverage extends BaseLfo {
   }
 
   /**
-   * Allows for the use of a `MovingMedian` outside a graph (e.g. inside
-   * another node), in this case `processStreamParams` and `resetStream`
-   * should be called manually on the node.
+   * Use the `MovingAverage` operator in `standalone` mode (i.e. outside of a
+   * graph) with a `vector` input.
    *
    * @param {Array} values - Values to feed the moving average with.
    * @return {Float32Array} - Average value for each dimension.
    *
    * @example
-   * const movingAverage = new MovingAverage({ order: 5, fill: 0 });
-   * // the frame size must be defined manually as it is not forwarded by a parent node
-   * movingAverage.processStreamParams({ frameSize: 2 });
-   * movingAverage.resetStream();
+   * import * as lfo from 'waves-lfo';
+   *
+   * const movingAverage = new lfo.operator.MovingAverage({ order: 5 });
+   * movingAverage.initStream({ frameSize: 2, frameType: 'scalar' });
    *
    * movingAverage.inputArray([1, 1]);
    * > [0.2, 0.2]
