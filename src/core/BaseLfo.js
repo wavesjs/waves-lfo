@@ -113,9 +113,9 @@ class BaseLfo {
     this.prevOp = null;
 
     /**
-     * When set to `true` the sub-graph starting at the current node is
-     * reinitialized on the next incomming frame. This attribute is set to
-     * `true` when a static parameter is updated.
+     * Is set to true when a static parameter is updated. On the next input
+     * frame all the subgraph streamParams starting from this node will be
+     * updated.
      *
      * @type {Boolean}
      * @name _reinit
@@ -388,8 +388,8 @@ class BaseLfo {
    */
   prepareFrame() {
     if (this._reinit === true) {
-      this.processStreamParams();
-      this.resetStream();
+      const streamParams = this.prevOp !== null ? this.prevOp.streamParams : {};
+      this.initStream(streamParams);
       this._reinit = false;
     }
   }
