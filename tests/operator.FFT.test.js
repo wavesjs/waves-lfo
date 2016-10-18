@@ -9,6 +9,8 @@ import FFT from '../src/operator/FFT';
 import RMSE from './utils/RMSE';
 
 tape('FFT', (t) => {
+  const tolerance = 1e-5;
+
   t.comment('compare against "./data/pipo-fft.txt"');
   t.comment('cf max patch "./data/pipo-fft.maxpat"');
   t.comment('with file "./audio/cherokee.wav"');
@@ -21,6 +23,7 @@ tape('FFT', (t) => {
   t.comment('- fft.mode: magnitude');
   t.comment('- fft.norm: true');
   t.comment('- fft.weighting: none');
+  t.comment(`tolerance: ${tolerance}`);
 
   const compareFile = './data/pipo-fft.txt';
   const audioFile = './audio/cherokee.wav';
@@ -58,7 +61,7 @@ tape('FFT', (t) => {
     const rmse = new RMSE({
       expectedFrames: expectedFrames,
       asserter: t,
-      tolerance: 1e-5,
+      tolerance: tolerance,
     });
 
     source.connect(slicer);

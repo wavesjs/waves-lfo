@@ -9,6 +9,8 @@ import DCT from '../src/operator/DCT';
 import RMSE from './utils/RMSE';
 
 tape('DCT', (t) => {
+  const tolerance = 1e-5;
+
   t.comment('compare against "./data/pipo-dct.txt"');
   t.comment('cf max patch "./data/pipo-dct.maxpat"');
   t.comment('with file "./audio/sine-172.265625-44.1kHz-1sec.wav"');
@@ -19,6 +21,7 @@ tape('DCT', (t) => {
   t.comment('- slice.wind: none');
   t.comment('- dct.order: 12');
   t.comment('- dct.weighting: htk');
+  t.comment(`tolerance: ${tolerance}`);
 
   const compareFile = './data/pipo-dct.txt';
   const audioFile = './audio/sine-172.265625-44.1kHz-1sec.wav';
@@ -53,7 +56,7 @@ tape('DCT', (t) => {
     const rmse = new RMSE({
       expectedFrames: expectedFrames,
       asserter: t,
-      tolerance: 1e-5,
+      tolerance: tolerance,
     });
 
     source.connect(slicer);

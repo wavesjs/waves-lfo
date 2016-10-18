@@ -17,8 +17,7 @@ tape('Magnitude', (t) => {
   t.comment('inputVector');
 
   const node = new Magnitude();
-  node.processStreamParams({});
-  node.resetStream();
+  node.initStream({ frameSize: 3 });
 
   const mag = node.inputVector([1, 2, 3]);
   t.equal(node.streamParams.frameSize, 1, 'should have out frame size of 1');
