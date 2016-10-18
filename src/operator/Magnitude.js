@@ -82,9 +82,7 @@ class Magnitude extends BaseLfo {
   }
 
   /**
-   * Allows for the use of a `Magnitude` outside a graph (e.g. inside another
-   * node), in this case `processStreamParams` and `resetStream` sould be
-   * called manually on the node.
+   * Use a `Magnitude` operator outside of a graph (i.e. `standalone` mode).
    *
    * @param {Array|Float32Array} values - Values to process.
    * @return {Number} - Magnitude value.
