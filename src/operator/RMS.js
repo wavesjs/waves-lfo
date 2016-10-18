@@ -1,18 +1,37 @@
-import BaseLfo from '../Core/BaseLfo';
+import BaseLfo from '../core/BaseLfo';
 import parameters from 'parameters';
 
 const sqrt = Math.sqrt;
 
 /**
- * Compute the Root Mean Sqaure of a signal.
+ * Compute the Root Mean Square of a `signal`.
  *
  * @memberof module:operator
+ *
+ * @example
+ * import * as lfo from 'waves-lfo';
+ *
+ * // assuming some `AudioBuffer`
+ * const audioInBuffer = new lfo.source.AudioInBuffer({
+ *   audioBuffer: audioBuffer,
+ *   frameSize: 512,
+ * });
+ *
+ * const rms = new lfo.operator.RMS();
+ * const logger = new lfo.sink.Logger({ data: true });
+ *
+ * audioInBuffer.connect(rms);
+ * rms.connect(logger);
+ *
+ * audioInBuffer.start();
  */
 class RMS extends BaseLfo {
-  constructor() {
-    super();
+  constructor(options = {}) {
+    // throw error if trying to set inexistant param
+    super({}, options);
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
@@ -30,7 +49,13 @@ class RMS extends BaseLfo {
    * @param {Number} signal - Signal block to be computed.
    * @return {Number} - rms of the input signal block.
    *
-   * @todo - example
+   * @example
+   * import * as lfo from 'waves-lfo';
+   *
+   * const rms = new lfo.operator.RMS();
+   * rms.initParam({ frameType: 'signal', frameSize: 256 });
+   *
+   * rms.inputSignal(signal);
    */
   inputSignal(signal) {
     const length = signal.length;
