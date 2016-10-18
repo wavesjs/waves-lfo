@@ -9,12 +9,37 @@ const sqrt = Math.sqrt;
  * @memberof module:operator
  *
  * @example
- * // todo
+ * import * as lfo from 'waves-lfo';
+ *
+ * const audioContext = new AudioContext();
+ *
+ * navigator.mediaDevices
+ *   .getUserMedia({ audio: true })
+ *   .then(init)
+ *   .catch((err) => console.error(err.stack));
+ *
+ * function init(stream) {
+ *   const source = audioContext.createMediaStreamSource(stream);
+ *
+ *   const audioInNode = new lfo.source.AudioInNode({
+ *     sourceNode: source,
+ *     audioContext: audioContext,
+ *   });
+ *
+ *   const meanStddev = new lfo.operator.MeanStddev();
+ *
+ *   const traceDisplay = new lfo.sink.TraceDisplay({
+ *     canvas: '#trace',
+ *   });
+ *
+ *   audioInNode.connect(meanStddev);
+ *   meanStddev.connect(traceDisplay);
+ *   audioInNode.start();
+ * }
  */
 class MeanStddev extends BaseLfo {
   constructor(options) {
     super();
-    // this.params = parameters(definitions, options);
   }
 
   processStreamParams(prevStreamParams) {
@@ -27,6 +52,20 @@ class MeanStddev extends BaseLfo {
     this.propagateStreamParams();
   }
 
+  /**
+   * Use a `MeanStddev` operator outside of a graph (i.e. `standalone` mode).
+   *
+   * @param {Array|Float32Array} values - Values to process.
+   * @return {Array} - Mean and standart deviation of the input values.
+   *
+   * @example
+   * import * as lfo from 'waves-lfo';
+   *
+   * const meanStddev = new lfo.operator.MeanStddev();
+   * meanStddev.initStream({ frameType: 'vector', frameSize: 1024 });
+   * meanStddev.inputVector(someSineSignal);
+   * > [0, 0.7071]
+   */
   inputSignal(values) {
     const outData = this.frame.data;
     const length = values.length;
@@ -52,6 +91,7 @@ class MeanStddev extends BaseLfo {
     return outData;
   }
 
+  /** @private */
   processSignal(frame) {
     this.inputSignal(frame.data);
   }
