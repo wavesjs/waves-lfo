@@ -82,7 +82,7 @@ class Magnitude extends BaseLfo {
   }
 
   /**
-   * Use a `Magnitude` operator outside of a graph (i.e. `standalone` mode).
+   * Use the `Magnitude` operator in `standalone` mode (i.e. outside of a graph).
    *
    * @param {Array|Float32Array} values - Values to process.
    * @return {Number} - Magnitude value.

@@ -90,7 +90,7 @@ class DCT extends BaseLfo {
   }
 
   /**
-   * Use the DCT operator outside of a graph (i.e. `standalone` mode).
+   * Use the `Magnitude` operator in `standalone` mode (i.e. outside of a graph).
    *
    * @param {Array} values - Input values.
    * @return {Array} - DCT of the input array.

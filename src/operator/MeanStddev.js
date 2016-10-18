@@ -55,7 +55,7 @@ class MeanStddev extends BaseLfo {
   }
 
   /**
-   * Use a `MeanStddev` operator outside of a graph (i.e. `standalone` mode).
+   * Use the `MeanStddev` operator in `standalone` mode (i.e. outside of a graph).
    *
    * @param {Array|Float32Array} values - Values to process.
    * @return {Array} - Mean and standart deviation of the input values.

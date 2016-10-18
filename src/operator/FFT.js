@@ -292,7 +292,7 @@ class FFT extends BaseLfo {
   }
 
   /**
-   * Use the FFT operator outside of a graph (i.e. `standalone` mode).
+   * Use the `FFT` operator in `standalone` mode (i.e. outside of a graph).
    *
    * @param {Array} signal - Input values.
    * @return {Array} - FFT of the input signal.
