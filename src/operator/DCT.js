@@ -33,6 +33,8 @@ const definitions = {
 
 /**
  * Compute the Discrete Cosine Transform of an input signal.
+ * (HTK style weighting). This operator can handle `signal` as well as `vector`
+ * inputs.
  *
  * @memberof module:operator
  *
@@ -40,15 +42,37 @@ const definitions = {
  * @param {Number} [options.order=12] - Number of computed bins.
  *
  * @example
- * // todo
+ * import * as lfo from 'waves-lfo';
+ *
+ * // assuming some audio buffer
+ * const source = new AudioInBuffer({
+ *   audioBuffer: audioBuffer,
+ *   useWorker: false,
+ * });
+ *
+ * const slicer = new Slicer({
+ *   frameSize: 512,
+ *   hopSize: 512,
+ * });
+ *
+ * const dct = new DCT({
+ *   order: 12,
+ * });
+ *
+ * const logger = new lfo.sink.Logger({ data: true });
+ *
+ * source.connect(slicer);
+ * slicer.connect(dct);
+ * dct.connect(logger);
+ *
+ * source.start();
  */
 class DCT extends BaseLfo {
   constructor(options) {
-    super();
-
-    this.params = parameters(definitions, options);
+    super(definitions, options);
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
@@ -64,6 +88,18 @@ class DCT extends BaseLfo {
     this.propagateStreamParams();
   }
 
+  /**
+   * Use the DCT operator outside of a graph (`standalone` mode).
+   *
+   * @param {Array} values - Input values.
+   * @return {Array} - DCT of the input array.
+   *
+   * @example
+   * const dct = new lfo.operator.DCT({ order: 12 });
+   * // mandatory for use in standalone mode
+   * dct.initStream({ frameSize: 512 });
+   * dct.inputSignal(data);
+   */
   inputSignal(values) {
     const order = this.params.get('order');
     const frameSize = values.length;
@@ -81,10 +117,12 @@ class DCT extends BaseLfo {
     return outFrame;
   }
 
+  /** @private */
   processSignal(frame) {
     this.inputSignal(frame.data);
   }
 
+  /** @private */
   processVector(frame) {
     this.inputSignal(frame.data);
   }
