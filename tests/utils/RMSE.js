@@ -15,6 +15,10 @@ const definitions = {
     type: 'float',
     default: 0,
   },
+  startIndex: {
+    type: 'integer',
+    default: 0,
+  },
 };
 
 class RMSE extends BaseLfo {
@@ -48,6 +52,7 @@ class RMSE extends BaseLfo {
     const t = this.params.get('asserter');
     const tolerance = this.params.get('tolerance');
     const expected = this.expectedFrames[this.frameIndex];
+    const startIndex = this.params.get('startIndex');
 
     if (!expected) {
       t.fail('No more expected frame');
@@ -63,7 +68,7 @@ class RMSE extends BaseLfo {
     // compute RMSE
     let sum = 0;
 
-    for (let i = 0; i < len; i++) {
+    for (let i = startIndex; i < len; i++) {
       const diff = data[i] - expected[i];
       sum += diff * diff;
     }
