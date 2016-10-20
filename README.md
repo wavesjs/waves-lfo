@@ -1,15 +1,51 @@
 # `lfo` - Low Frequency Operators
 
-_review_ - `lfo` is an API that aims to formalise the processing and analysis of arbitrary data streams (audio, video, sensor data etc.). By normalizing the stream format in it's input and output ends, a graph allows to manipulate and analyse the data through a processing chain and encapsulate common processing algorithms with a unified interface that can be shared and reused.
+> `lfo` is an library that formalize the processing and analysis of abitrary 
+> data streams (audio signal, sensors, etc.) by creating graphs with input 
+> (`source`), output(s) (`sink`) and processing units (`operator`).
+> 
+> The library expose two different flavor (`waves-lfo/client` and 
+> `waves-lfo/node`) allowing it to consumed both client side or in a node
+> application. While the processing nodes are shared between this two entry 
+> points, the `source` and `sink` nodes are specific to the environment.
+
+Nodes of a `lfo` graph are divided in 3 categories:
+
+- **`sources`** are responsible for acquering signals and their properties (frameRate, frameSize, etc.)
+- **`sinks`** are endpoints of the graph. Such nodes can be recorders, visualizers, etc.
+- **`operators`** make computation on the input stream and forward results to the next(s) operator(s).
+
+A graph should then contain at least a `source` node, a `sink` and one or several `operator` nodes in between:
+
+
+![](https://dl.dropboxusercontent.com/u/606131/lfo.png)
+
+## Documentation
+
+[http://wavesjs.github.io/waves-lfo](http://wavesjs.github.io/waves-lfo)
 
 ## Usage
+
+### Install
 
 ```sh
 $ npm install [--save] wavesjs/waves-lfo
 ```
 
+### Import the library
+
 ```js
-import * as lfo from 'waves-lfo';
+// in browser
+import * as lfo from 'waves-lfo/client';
+
+// in node
+import * as lfo from 'waves-lfo/node';
+```
+
+### Create a graph
+
+```js
+import * as lfo from 'waves-lfo/client';
 
 const eventIn = new lfo.source.EventIn({ 
   frameType: 'vector' 
@@ -48,58 +84,39 @@ __Stream__ - Succession of frames, the state of the stream is defined in the `st
 - `sourceSampleRate`: number of frame per seconds as defined by the source of the graph
 - `description`: array describing the output dimensions when `frameType` is `vector` (or `scalar`)
 
-## Structure of a graph
-
-Nodes of a `lfo` graph are divided in 3 categories:
-
-- **`sources`** are responsible for acquering signals and their properties (frameRate, frameSize, etc.)
-- **`sinks`** are endpoints of the graph. Such nodes can be recorders, visualizers, etc.
-- **`operators`** make computation on the input stream and forward results to the next(s) operator(s).
-
-A graph should then contain at least a `source` node, a `sink` and one or several `operator` nodes in between:
-
-
-![](https://dl.dropboxusercontent.com/u/606131/lfo.png)
-
-
-## Available nodes
-
-## Similarities and differences with PiPo
+## Available nodes and examples
 
 ## Implementation of an `lfo` operator
 
-<!--
+
 ```js
-// @todo - update
+// define class parameters
+const parameters = {
+  factor: {
+    type: 'integer',
+    default: 1,
+  },
+};
+
 class Multiplier extends BaseLfo {
   constructor(options) {
-    // define the default value for the `factor` parameter, and allow to 
-    // override with the given `options`
-    super({ factor: 1 }, options);
-
-    // create a `float` parameter for the `factor` parameter, as a `static`
-    // parameter the value of the parameter can be changed without 
-    // reinitializing the node and its children
-    this.addFloatParam('factor', -Infinity, +Infinity, 'static');
+    // set the parameters and options of the node
+    super(parameters, options);
   }
 
-  process(time, frame, metadata) {
+  // implementing this method allow the node to handle incomming `vector` frames
+  processVector(frame) {
     const frameSize = this.streamParams.frameSize;
     const factor = this.getParam('factor');
 
-    // copy input value in `outFrame` and perform operations
+    // transfert data from `frame` (output of previous node)
+    // and current node data, the data from the incomming frame
+    // should never be changed
     for (let i = 0; i < frameSize; i++)
-      this.outFrame[i] = frame[i];
-
-    // forward time and metadata to the children nodes
-    this.time = time;
-    this.metadata = metadata;
-
-    this.output();
+      this.frame.data[i] = frame.data[i] * factor;
   }
 }
 
 const multiplier = new Multiplier({ factor: 4 });
 ```
--->
 
