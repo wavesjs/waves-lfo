@@ -5,7 +5,7 @@
 > (`source`), output(s) (`sink`) and processing units (`operator`).
 > 
 > The library expose two different flavor (`waves-lfo/client` and 
-> `waves-lfo/node`) allowing it to consumed both client side or in a node
+> `waves-lfo/node`) allowing it to be consumed both client side or in a node
 > application. While the processing nodes are shared between this two entry 
 > points, the `source` and `sink` nodes are specific to the environment.
 
@@ -120,3 +120,13 @@ class Multiplier extends BaseLfo {
 const multiplier = new Multiplier({ factor: 4 });
 ```
 
+<hr />
+## License
+
+This module is released under the BSD-3-Clause license.
+
+<!--
+Acknowledgments
+
+This code has been developed in the framework of the WAVE and CoSiMa research projects, funded by the French National Research Agency (ANR).
+-->
