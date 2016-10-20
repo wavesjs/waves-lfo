@@ -3,16 +3,16 @@ import path from 'path';
 import tape from 'tape';
 import * as utils from './utils/utils';
 
-import AudioInBuffer from '../src/source/AudioInBuffer';
-import Slicer from '../src/operator/Slicer';
-import Yin from '../src/operator/_Yin1';
-import Bridge from '../src/sink/Bridge';
+import AudioInBuffer from '../src/client/source/AudioInBuffer';
+import Slicer from '../src/common/operator/Slicer';
+import Yin from '../src/common/operator/Yin';
+import Bridge from '../src/client/sink/Bridge';
 
 
 tape('Yin', (t) => {
   const tolerance = 7e-3;
   const compareFile = './data/pipo-yin.txt';
-  const audioFile = './audio/gould-bach-first-prelude-15sec.wav';
+  const audioFile = './audio/piano-scale-c-major.wav';
 
   t.comment(`compare against "${compareFile}"`);
   t.comment(`cf max patch "./data/pipo-yin.maxpat"`);
@@ -24,7 +24,7 @@ tape('Yin', (t) => {
   t.comment('- slice.norm: none');
   t.comment('- yin.downsamplingExp: 2');
   t.comment('- yin.threshold: 0.1');
-  t.comment(`tolerance: ${tolerance}`);
+  // t.comment(`tolerance: ${tolerance}`);
 
   const asset = av.Asset.fromFile(path.join(__dirname, audioFile));
   asset.on('error', (err) => console.log(err.stack));
@@ -32,7 +32,9 @@ tape('Yin', (t) => {
   asset.decodeToBuffer((buffer) => {
     // create a load compare file function
     const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
-    const len = expectedFrames.length;
+    const frameSize = 2048;
+    const len = Math.floor(buffer.length / frameSize);
+    console.log('buffer.length', buffer.length);
     const results = [];
 
     // mimic web audio needed interface
@@ -47,8 +49,8 @@ tape('Yin', (t) => {
     });
 
     const slicer = new Slicer({
-      frameSize: 2048,
-      hopSize: 2048,
+      frameSize: frameSize,
+      hopSize: frameSize,
     });
 
     const yin = new Yin({
@@ -63,7 +65,7 @@ tape('Yin', (t) => {
         results.push(frame.data);
         counter++;
 
-        if (counter === len)
+        if (counter >= len)
           compareResults();
       },
     });
@@ -81,15 +83,19 @@ tape('Yin', (t) => {
       let sum = 0;
 
       for (let i = 0; i < len; i++) {
-        console.log(expectedFrames[i][0], results[i][0]);
-        const diff = results[i][0] - expectedFrames[i][0];
-        sum += diff * diff;
+        // don't test against no found frequencies
+        if (results[i][0] === -1) continue;
+
+        console.log(results[i]);
+        // const diff = results[i][0] - expectedFrames[i][0];
+        // sum += diff * diff;
       }
 
-      const mean = sum / len;
-      const rmse = Math.sqrt(mean);
+      // const mean = sum / len;
+      // const rmse = Math.sqrt(mean);
 
-      t.comment(`pitch error: ${rmse}`);
+      // t.comment(`pitch error: ${rmse}`);
+      t.end();
     }
   });
 

@@ -1,29 +1,12 @@
 import BaseLfo from '../core/BaseLfo';
 
-/**
- * based on:
- * - http://recherche.ircam.fr/equipes/pcm/cheveign/pss/2002_JASA_YIN.pdf
- * - PiPo.yin and rta library implementations.
- *
- * @private
- */
-
-
 const ceil = Math.ceil;
-const sqrt = Math.sqrt;
 
-function autocorrelation(correlation, acSize, buffer, windowSize) {
-  // corr, acSize, buffer, windowSize
-  for (let tau = 0; tau < acSize; tau++) {
-    correlation[tau] = 0;
-
-    for (let i = 0; i < windowSize; i++)
-      correlation[tau] += buffer[tau + i] * buffer[i];
-  }
-
-  return correlation;
-}
-
+/**
+ * @private
+ * paper: http://recherche.ircam.fr/equipes/pcm/cheveign/pss/2002_JASA_YIN.pdf
+ * implementation based on https://github.com/ashokfernandez/Yin-Pitch-Tracking
+ */
 
 const definitions = {
   threshold: {
@@ -40,11 +23,12 @@ const definitions = {
   },
   minFreq: { //
     type: 'float',
-    default: 60, // means 735 samples
+    default: 60, // mean 735 samples
     min: 0,
     metas: { kind: 'static' },
   },
-};
+}
+
 
 /**
  * Yin fundamental frequency estimator, based on algorithm described in
@@ -90,7 +74,7 @@ const definitions = {
  * source.start();
  */
 class Yin extends BaseLfo {
-  constructor(options = {}) {
+  constructor(options) {
     super(definitions, options);
 
     this.probability = 0;
@@ -100,44 +84,69 @@ class Yin extends BaseLfo {
   }
 
   /** @private */
+  _downsample(input, size, output, downSamplingExp) {
+    const outputSize = size >> downSamplingExp;
+    let i, j;
+
+    switch (downSamplingExp) {
+      case 0: // no down sampling
+        for (i = 0; i < size; i++)
+          output[i] = input[i];
+
+        break;
+      case 1:
+        for (i = 0, j = 0; i < outputSize; i++, j += 2)
+          output[i] = 0.5 * (input[j] + input[j + 1]);
+
+        break
+      case 2:
+        for (i = 0, j = 0; i < outputSize; i++, j += 4)
+          output[i] = 0.25 * (input[j] + input[j + 1] + input[j + 2] + input[j + 3]);
+
+        break;
+      case 3:
+        for (i = 0, j = 0; i < outputSize; i++, j += 8)
+          output[i] = 0.125 * (input[j] + input[j + 1] + input[j + 2] + input[j + 3] + input[j + 4] + input[j + 5] + input[j + 6] + input[j + 7]);
+
+        break;
+    }
+
+    return outputSize;
+  }
+
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
-    this.inputFrameSize = prevStreamParams.frameSize;
-
     this.streamParams.frameType = 'vector';
-    this.streamParams.frameSize = 4;
-    this.streamParams.description = ['frequency', 'energy', 'periodicity', 'AC1'];
+    this.streamParams.frameSize = 2;
+    this.streamParams.description = ['frequency', 'confidence'];
 
-    const sourceSampleRate = this.streamParams.sourceSampleRate;
+    this.inputFrameSize = prevStreamParams.frameSize;
     // handle params
+    const sourceSampleRate = this.streamParams.sourceSampleRate;
     const downSamplingExp = this.params.get('downSamplingExp');
     const downFactor = 1 << downSamplingExp; // 2^n
     const downSR = sourceSampleRate / downFactor;
     const downFrameSize = this.inputFrameSize / downFactor; // n_tick_down // 1 / 2^n
 
-    let minFreq = this.params.get('minFreq');
+    const minFreq = this.params.get('minFreq');
     // limit min freq, cf. paper IV. sensitivity to parameters
-    minFreq = (minFreq > 0.25 * downSR) ? 0.25 * downSR : minFreq;
-    // size of autocorrelation
-    this.acSize = ceil(downSR / minFreq) + 2;
+    const minFreqNbrSamples = downSR / minFreq;
+    // const bufferSize = prevStreamParams.frameSize;
+    this.halfBufferSize = downFrameSize / 2;
 
     // minimum error to not crash but not enought to have results
-    if (this.acSize >= downFrameSize)
+    if (minFreqNbrSamples > this.halfBufferSize)
       throw new Error('Invalid input frame size, too small for given "minFreq"');
 
-    // allocate memory
-    this.buffer = new Float32Array(downFrameSize);
-    this.corr = new Float32Array(this.acSize);
     this.downSamplingExp = downSamplingExp;
     this.downSamplingRate = downSR;
-
-    // maximum number of searched minima
-    this.yinMaxMins = 128; // cf. PiPo for this value choice
-    // interleaved min / tau used in this._yin
-    this.yinMins = new Float32Array(this.yinMaxMins * 2);
-    // values returned by _yin
-    this.yinResults = new Array(2); // min, tau
+    this.downFrameSize = downFrameSize;
+    this.buffer = new Float32Array(downFrameSize);
+    // autocorrelation buffer
+    this.yinBuffer = new Float32Array(this.halfBufferSize);
+    this.yinBuffer.fill(0);
 
     this.propagateStreamParams();
   }
@@ -173,96 +182,93 @@ class Yin extends BaseLfo {
     return outputSize;
   }
 
-  /** @private */
-  _yin(corr, acSize, buffer, downSize, threshold) {
-    const windowSize = downSize - acSize;
+  /**
+   * Step 1, 2 and 3 - Squared difference of the shifted signal with itself.
+   * cumulative mean normalized difference.
+   *
+   * @private
+   */
+  _normalizedDifference(buffer) {
+    const halfBufferSize = this.halfBufferSize;
+    const yinBuffer = this.yinBuffer;
+    let sum = 0;
 
-    autocorrelation(corr, acSize, buffer, windowSize);
+    // difference for different shift values (tau)
+    for (let tau = 0; tau < halfBufferSize; tau++) {
+      let squaredDifference = 0; // reset buffer
 
-    const corr0 = corr[0]; // energy of the input signal in windowSize (a^2)
-    const maxMins = this.yinMaxMins;
-    const mins = this.yinMins;
-    const yinResults = this.yinResults;
-    let biasedThreshold = threshold;
-    let minCounter = 0;
-    let absTau = acSize - 1.5;
-    let absMin = 1;
-    let x;
-    let xm;
-    let energy;
-    let diff;
-    let diffLeft;
-    let diffRight;
-    let sum;
+      // take difference of the signal with a shifted version of itself then
+      // sqaure the result
+      for (let i = 0; i < halfBufferSize; i++) {
+        const delta = buffer[i] - buffer[i + tau];
+        squaredDifference += delta * delta;
+      }
 
-    // diff[0]
-    x = buffer[0];
-    xm = buffer[windowSize];
-    // corr[0] is a^2, corr[1-n] is ab, energy is b^2 (windowSize shifted by tau)
-    energy = corr0 + xm * xm - x * x;
-    diffLeft = 0;
-    diff = 0;
-    // (a - b)^2 = a^2 - 2ab + b2  (squared difference)
-    diffRight = corr0 + energy - 2 * corr[1];
-    sum = 0;
-
-    // diff[1]
-    x = buffer[1];
-    xm = buffer[1 + windowSize];
-    energy += xm * xm - x * x;
-    diffLeft = diff;
-    diff = diffRight;
-    diffRight = corr0 + energy - 2 * corr[2];
-    sum = diff;
-
-    // minimum difference search
-    for (let i = 2; i < acSize - 1 && minCounter < maxMins; i++) {
-      x = buffer[i];
-      xm = buffer[i + windowSize];
-      energy += xm * xm - x * x;
-      diffLeft = diff;
-      diff = diffRight;
-      diffRight = corr0 + energy - 2 * corr[i + 1];
-      sum += diff;
-
-      // local minima
-      if (diff < diffLeft && diff < diffRight && sum !== 0) {
-        // a bit of black magic... quadratic interpolation ?
-        const a = diffLeft + diffRight - 2 * diff;
-        const b = 0.5 * (diffRight - diffLeft);
-        const min = diff - (b * b) / (2 * a);
-        const normMin = i * min / sum;
-        const tau = i - b / a;
-
-        mins[minCounter * 2] = normMin;
-        mins[minCounter * 2 + 1] = tau;
-        minCounter += 1;
-
-        if (normMin < absMin)
-          absMin = normMin;
+      // step 3 - normalize yinBuffer
+      if (tau > 0) {
+        sum += squaredDifference;
+        yinBuffer[tau] = squaredDifference * (tau / sum);
       }
     }
 
-    biasedThreshold += absMin;
+    yinBuffer[0] = 1;
+  }
 
-    // first minimum under biased threshold
-    for (let i = 0; i < minCounter; i++) {
-      const j = i * 2;
+  /**
+   * Step 4 - find first best tau that is under the thresold.
+   *
+   * @private
+   */
+  _absoluteThreshold() {
+    const threshold = this.params.get('threshold');
+    const yinBuffer = this.yinBuffer;
+    const halfBufferSize = this.halfBufferSize;
+    let tau;
 
-      if (mins[j] < biasedThreshold) {
-        absMin = mins[j];
-        absTau = mins[j + 1];
+    for (tau = 1; tau < halfBufferSize; tau++) {
+      if (yinBuffer[tau] < threshold) {
+        // keep increasing tau if next value is better
+        while (tau + 1 < halfBufferSize && yinBuffer[tau + 1] < yinBuffer[tau])
+          tau += 1;
+
+        // best tau found , yinBuffer[tau] can be seen as an estimation of
+        // aperiodicity then: periodicity = 1 - aperiodicity
+        this.probability = 1 - yinBuffer[tau];
         break;
       }
     }
 
-    if (absMin < 0)
-      absMin = 0;
+    // return -1 if not match found
+    return (tau === halfBufferSize) ? -1 : tau;
+  }
 
-    yinResults[0] = absMin;
-    yinResults[1] = absTau;
+  /**
+   * Step 5 - Find a better fractionnal approximate of tau.
+   * this can probably be simplified...
+   *
+   * @private
+   */
+  _parabolicInterpolation(tauEstimate) {
+    const halfBufferSize = this.halfBufferSize;
+    const yinBuffer = this.yinBuffer;
+    let betterTau;
+    // @note - tauEstimate cannot be zero as the loop start at 1 in step 4
+    const x0 = tauEstimate - 1;
+    const x2 = (tauEstimate < halfBufferSize - 1) ? tauEstimate + 1 : tauEstimate;
 
-    return yinResults;
+    // if `tauEstimate` is last index, we can't interpolate
+    if (x2 === tauEstimate) {
+        betterTau = tauEstimate;
+    } else {
+      const s0 = yinBuffer[x0];
+      const s1 = yinBuffer[tauEstimate];
+      const s2 = yinBuffer[x2];
+
+      // @note - don't fully understand this formula neither...
+      betterTau = tauEstimate + (s2 - s0) / (2 * (2 * s1 - s2 - s0));
+    }
+
+    return betterTau;
   }
 
   /**
@@ -285,45 +291,35 @@ class Yin extends BaseLfo {
    * const results = yin.inputSignal(signal);
    */
   inputSignal(input) {
-    const threshold = this.params.get('threshold');
+    this.pitch = -1;
+    this.probability = 0;
+
+    const buffer = this.buffer;
     const inputFrameSize = this.inputFrameSize;
     const downSamplingExp = this.downSamplingExp;
-    const downSamplingRate = this.downSamplingRate;
-    const acSize = this.acSize;
+    const sampleRate = this.downSamplingRate;
     const outData = this.frame.data;
-    const buffer = this.buffer;
-    const corr = this.corr;
+    let tauEstimate = -1;
 
-    let ac1OverAc0;
-    let periodicity;
-    let energy;
+    // subsampling
+    this._downsample(input, inputFrameSize, buffer, downSamplingExp);
+    // step 1, 2, 3 - normalized squared difference of the signal with a
+    // shifted version of itself
+    this._normalizedDifference(buffer);
+    // step 4 - find first best tau estimate that is over the threshold
+    tauEstimate = this._absoluteThreshold();
 
-    const downSize = this._downsample(input, inputFrameSize, buffer, downSamplingExp);
-    const res = this._yin(corr, acSize, buffer, downSize, threshold);
+    if (tauEstimate !== -1) {
+      // step 5 - so far tau is an integer shift of the signal, check if
+      // there is a better fractionnal value around
+      tauEstimate = this._parabolicInterpolation(tauEstimate);
+      this.pitch = sampleRate / tauEstimate;
+    }
 
-    const min = res[0];
-    const period = res[1];
+    // step 6 - ?
 
-    // energy
-    energy = sqrt(corr[0] / (downSize - acSize));
-
-    // periodicity
-    if (min > 0)
-      periodicity = (min < 1) ? 1.0 - sqrt(min) : 0;
-    else
-      periodicity = 1;
-
-    // ac1 over ac0 (kind of spectral slope ?)
-    if (corr[0] !== 0)
-      ac1OverAc0 = corr[1] / corr[0];
-    else
-      ac1OverAc0 = 0;
-
-    // populate frame with results
-    outData[0] = downSamplingRate / period;
-    outData[1] = energy;
-    outData[2] = periodicity;
-    outData[3] = ac1OverAc0;
+    outData[0] = this.pitch;
+    outData[1] = this.probability;
 
     return outData;
   }
