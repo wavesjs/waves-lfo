@@ -1,4 +1,4 @@
-import * as lfo from 'waves-lfo';
+import * as lfo from 'waves-lfo/client';
 import * as controllers from 'waves-basic-controllers';
 import * as loaders from 'waves-loaders';
 
