@@ -29,7 +29,6 @@ const definitions = {
   },
 }
 
-
 /**
  * Yin fundamental frequency estimator, based on algorithm described in
  * [YIN, a fundamental frequency estimator for speech and music](http://recherche.ircam.fr/equipes/pcm/cheveign/pss/2002_JASA_YIN.pdf)
@@ -315,8 +314,6 @@ class Yin extends BaseLfo {
       tauEstimate = this._parabolicInterpolation(tauEstimate);
       this.pitch = sampleRate / tauEstimate;
     }
-
-    // step 6 - ?
 
     outData[0] = this.pitch;
     outData[1] = this.probability;

@@ -1,4 +1,4 @@
-import BaseLfo from '../../src/core/BaseLfo';
+import BaseLfo from '../../src/common/core/BaseLfo';
 import path from 'path';
 import fs from 'fs';
 import util from 'util';

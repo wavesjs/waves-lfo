@@ -27,7 +27,7 @@ tape('Mel', (t) => {
   t.comment('test against librosa');
 
   const mel = new Mel({
-    nbrFilters: 24, // two less than librosa because boudaries are excluded
+    nbrBands: 24, // two less than librosa because boudaries are excluded
     minFreq: 0,
     maxFreq: 22050, // NQuyst
   });
@@ -112,7 +112,7 @@ tape('Mel', (t) => {
 
     const mel = new Mel({
       log: false, // if log === true rmse doesn't look appropriate
-      nbrFilters: 24,
+      nbrBands: 24,
     });
 
     const rmse = new RMSE({

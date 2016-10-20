@@ -1,4 +1,4 @@
-import BaseLfo from '../../src/core/BaseLfo';
+import BaseLfo from '../../src/common/core/BaseLfo';
 
 /**
  * node that make assertions against expected frames

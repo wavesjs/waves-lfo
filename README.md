@@ -86,8 +86,9 @@ __Stream__ - Succession of frames, the state of the stream is defined in the `st
 
 ## Available nodes and examples
 
-## Implementation of an `lfo` operator
+@todo
 
+## Implementation of an `lfo` operator
 
 ```js
 // define class parameters

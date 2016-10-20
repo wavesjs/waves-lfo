@@ -24,11 +24,12 @@ function melToHertzHtk(freqMel) {
  * @param {Number} minFreq - Minimum Frequency to be considerered.
  * @param {Number} maxFreq - Maximum frequency to consider.
  * @return {Array<Object>} - Description of the weights to apply on the bins for
- *  each mel filter.
+ *  each mel filter. Each description has the following structure:
+ *  { startIndex: binIndex, centerFreq: binCenterFrequency, weights: [] }
  *
  * @private
  */
-function getMelBandWeights(nbrBins, nbrFilters, sampleRate, minFreq, maxFreq, type = 'htk') {
+function getMelBandWeights(nbrBins, nbrBands, sampleRate, minFreq, maxFreq, type = 'htk') {
 
   let hertzToMel = null;
   let melToHertz = null;
@@ -44,26 +45,24 @@ function getMelBandWeights(nbrBins, nbrFilters, sampleRate, minFreq, maxFreq, ty
     throw new Error(`Invalid mel band type: "${type}"`);
   }
 
-  const melBandDescriptions = new Array(nbrFilters);
+  const melBandDescriptions = new Array(nbrBands);
   // center frequencies of FFT bins
   const fftFreqs = new Float32Array(nbrBins);
   // center frequencies of mel bands - uniformly spaced in mel domain between
   // limits, there are 2 more frequencies than the actual number of filters in
   // order to calculate the slopes
-  const filterFreqs = new Float32Array(nbrFilters + 2);
-  // matrix to hold all the coefs to apply on the bins
-  // const weightMatrix = new Float32Array(nbrFilters * nbrBins);
+  const filterFreqs = new Float32Array(nbrBands + 2);
 
   const fftSize = (nbrBins - 1) * 2;
   // compute bins center frequencies
   for (let i = 0; i < nbrBins; i++)
     fftFreqs[i] = sampleRate * i / fftSize;
 
-  for (let i = 0; i < nbrFilters + 2; i++)
-    filterFreqs[i] = melToHertz(minMel + i / (nbrFilters + 1) * (maxMel - minMel));
+  for (let i = 0; i < nbrBands + 2; i++)
+    filterFreqs[i] = melToHertz(minMel + i / (nbrBands + 1) * (maxMel - minMel));
 
   // loop throught filters
-  for (let i = 0; i < nbrFilters; i++) {
+  for (let i = 0; i < nbrBands; i++) {
     let minWeightIndexDefined = 0;
 
     const description = {
@@ -100,7 +99,6 @@ function getMelBandWeights(nbrBins, nbrFilters, sampleRate, minFreq, maxFreq, ty
     }
 
     // @todo - do some scaling for Slaney-style mel
-
     melBandDescriptions[i] = description;
   }
 
@@ -114,7 +112,7 @@ const definitions = {
     default: false,
     metas: { kind: 'static' },
   },
-  nbrFilters: {
+  nbrBands: {
     type: 'integer',
     default: 24,
     metas: { kind: 'static' },
@@ -146,7 +144,7 @@ const definitions = {
  *
  * @param {Object} options - Override default parameters.
  * @param {Boolean} [options.log=false] - Apply a logarithmic scale on the output.
- * @param {Number} [options.nbrFilters=24] - Number of filters defining the mel
+ * @param {Number} [options.nbrBands=24] - Number of filters defining the mel
  *  bands.
  * @param {Number} [options.minFreq=0] - Minimum frequency.
  * @param {Number} [options.maxFreq=null] - Maximum frequency, if null `maxFreq`
@@ -168,32 +166,40 @@ class Mel extends BaseLfo {
     this.prepareStreamParams(prevStreamParams);
 
     const nbrBins = prevStreamParams.frameSize;
-    const nbrFilters = this.params.get('nbrFilters');
+    const nbrBands = this.params.get('nbrBands');
     const sampleRate = this.streamParams.sourceSampleRate;
     const minFreq = this.params.get('minFreq');
     let maxFreq = this.params.get('maxFreq');
 
     //
-    this.streamParams.frameSize = nbrFilters;
+    this.streamParams.frameSize = nbrBands;
     this.streamParams.frameType = 'vector';
     this.streamParams.description = [];
 
     if (maxFreq === null)
       maxFreq = this.streamParams.sourceSampleRate / 2;
 
-    this.melBandDescriptions = getMelBandWeights(nbrBins, nbrFilters, sampleRate, minFreq, maxFreq);
+    this.melBandDescriptions = getMelBandWeights(nbrBins, nbrBands, sampleRate, minFreq, maxFreq);
 
     this.propagateStreamParams();
   }
 
-  // @todo
-  // inputVector() {}
+  /**
+   * Use the `Mel` operator in `standalone` mode (i.e. outside of a graph).
+   *
+   * @param {Array} spectrum - FFT bins.
+   * @return {Array} - Mel bands.
+   *
+   * @example
+   * const mel = new lfo.operator.Mel({ nbrBands: 24 });
+   * // mandatory for use in standalone mode
+   * mel.initStream({ frameSize: 256, frameType: 'vector' });
+   * mel.inputVector(fftBins);
+   */
+  inputVector(bins) {
 
-  /** @private */
-  processVector(frame) {
     const power = this.params.get('power');
     const log = this.params.get('log');
-    const spectrum = frame.data;
     const melBands = this.frame.data;
     const nbrBands = this.streamParams.frameSize;
     let scale = 1;
@@ -209,7 +215,7 @@ class Mel extends BaseLfo {
       let value = 0;
 
       for (let j = 0; j < weights.length; j++)
-        value += weights[j] * spectrum[startIndex + j];
+        value += weights[j] * bins[startIndex + j];
 
       // apply same logic as in PiPoBands
       if (scale !== 1)
@@ -222,12 +228,18 @@ class Mel extends BaseLfo {
           value = minLog;
       }
 
-      if (power !== 1) // allow to
+      if (power !== 1)
         value = pow(value, power);
 
-      // console.log(raw, value);
       melBands[i] = value;
     }
+
+    return melBands;
+  }
+
+  /** @private */
+  processVector(frame) {
+    this.inputVector(frame.data);
   }
 }
 
