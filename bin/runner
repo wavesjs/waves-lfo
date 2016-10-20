@@ -39,7 +39,7 @@ var browserifyOptions = {
  * Watched directories
  */
 var srcDirectory = path.join(cwd, 'src');
-var distDirectory = path.join(cwd, 'dist');
+var distDirectory = path.join(cwd, '.');
 
 var umdTarget = path.join(cwd, pkg.name + '.umd.js');
 var minTarget = path.join(cwd, pkg.name + '.min.js');

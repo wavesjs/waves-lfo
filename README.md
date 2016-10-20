@@ -1,6 +1,6 @@
 # `lfo` - Low Frequency Operators
 
-`lfo` is an API that aims to formalise the processing and analysis of arbitrary data streams (audio, video, sensor data etc.). By normalizing the stream format in it's input and output ends, a graph allows to manipulate and analyse the data through a processing chain and encapsulate common processing algorithms with a unified interface that can be shared and reused.
+_review_ - `lfo` is an API that aims to formalise the processing and analysis of arbitrary data streams (audio, video, sensor data etc.). By normalizing the stream format in it's input and output ends, a graph allows to manipulate and analyse the data through a processing chain and encapsulate common processing algorithms with a unified interface that can be shared and reused.
 
 ## Usage
 
@@ -11,12 +11,17 @@ $ npm install [--save] wavesjs/waves-lfo
 ```js
 import * as lfo from 'waves-lfo';
 
-const eventIn = new lfo.source.EventIn({ frameSize: 3, frameType: 'vector' });
+const eventIn = new lfo.source.EventIn({ 
+  frameType: 'vector' 
+  frameSize: 3, 
+  frameRate: 0,
+});
+
 const rms = new lfo.operator.RMS();
 const logger = new lfo.sinks.Logger({ data: true });
 
 eventIn.connect(rms);
-rms.connect(sink);
+rms.connect(logger);
 
 eventIn.start();
 eventIn.process([2, 1, 3]);
@@ -57,8 +62,13 @@ A graph should then contain at least a `source` node, a `sink` and one or severa
 ![](https://dl.dropboxusercontent.com/u/606131/lfo.png)
 
 
-## Implementation of a new `lfo` operator
+## Available nodes
 
+## Similarities and differences with PiPo
+
+## Implementation of an `lfo` operator
+
+<!--
 ```js
 // @todo - update
 class Multiplier extends BaseLfo {
@@ -91,4 +101,5 @@ class Multiplier extends BaseLfo {
 
 const multiplier = new Multiplier({ factor: 4 });
 ```
+-->
 

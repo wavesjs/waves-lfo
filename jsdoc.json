@@ -38,9 +38,11 @@
     "plugins/markdown"
   ],
   "opts": {
-    "destination": "./docs",
     "projectTitle": "WavesJS - Low Frequency Operators",
-    "template": "node_modules/jsdoc-template"
+    "template": "node_modules/jsdoc-template",
+    "destination": "./docs",
+    "encoding": "utf8",
+    "tutorials": "./examples/sink-bridge"
   },
   "templates": {
     "default": {
