@@ -3,9 +3,9 @@ import path from 'path';
 import tape from 'tape';
 import * as utils from './utils/utils';
 
-import AudioInBuffer from '../src/source/AudioInBuffer';
-import Slicer from '../src/operator/Slicer';
-import DCT from '../src/operator/DCT';
+import AudioInFile from '../src/node/source/AudioInFile';
+import Slicer from '../src/common/operator/Slicer';
+import DCT from '../src/common/operator/DCT';
 import RMSE from './utils/RMSE';
 
 tape('DCT', (t) => {
@@ -25,44 +25,31 @@ tape('DCT', (t) => {
 
   const compareFile = './data/pipo-dct.txt';
   const audioFile = './audio/sine-172.265625-44.1kHz-1sec.wav';
+  const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
 
-  const asset = av.Asset.fromFile(path.join(__dirname, audioFile));
-  asset.on('error', (err) => console.log(err.stack));
-
-  asset.decodeToBuffer((buffer) => {
-    // create a load compare file function
-    const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
-
-    // mimic web audio needed interface
-    const audioBuffer = {
-      sampleRate: asset.format.sampleRate,
-      getChannelData: () => buffer,
-    };
-
-    const source = new AudioInBuffer({
-      audioBuffer: audioBuffer,
-      useWorker: false,
-    });
-
-    const slicer = new Slicer({
-      frameSize: 512,
-      hopSize: 512,
-    });
-
-    const dct = new DCT({
-      order: 12,
-    });
-
-    const rmse = new RMSE({
-      expectedFrames: expectedFrames,
-      asserter: t,
-      tolerance: tolerance,
-    });
-
-    source.connect(slicer);
-    slicer.connect(dct);
-    dct.connect(rmse);
-
-    source.start();
+  const audioInFile = new AudioInFile({
+    filename: path.join(__dirname, audioFile),
+    frameSize: 512,
   });
+
+  const slicer = new Slicer({
+    frameSize: 512,
+    hopSize: 512,
+  });
+
+  const dct = new DCT({
+    order: 12,
+  });
+
+  const rmse = new RMSE({
+    expectedFrames: expectedFrames,
+    asserter: t,
+    tolerance: tolerance,
+  });
+
+  audioInFile.connect(slicer);
+  slicer.connect(dct);
+  dct.connect(rmse);
+
+  audioInFile.start();
 });

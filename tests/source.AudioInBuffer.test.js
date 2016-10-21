@@ -2,8 +2,8 @@ import tape from 'tape';
 import av from 'av';
 import path from 'path';
 
-import BaseLfo from '../src/core/BaseLfo';
-import AudioInBuffer from '../src/source/AudioInBuffer';
+import BaseLfo from '../src/common/core/BaseLfo';
+import AudioInBuffer from '../src/client/source/AudioInBuffer';
 
 // compare output of the AudioInBuffer against manual slicing of the buffer
 class Asserter extends BaseLfo {

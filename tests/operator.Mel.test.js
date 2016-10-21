@@ -3,10 +3,10 @@ import path from 'path';
 import tape from 'tape';
 import * as utils from './utils/utils';
 
-import AudioInBuffer from '../src/source/AudioInBuffer';
-import Slicer from '../src/operator/Slicer';
-import FFT from '../src/operator/FFT';
-import Mel from '../src/operator/Mel';
+import AudioInFile from '../src/node/source/AudioInFile';
+import Slicer from '../src/common/operator/Slicer';
+import FFT from '../src/common/operator/FFT';
+import Mel from '../src/common/operator/Mel';
 import RMSE from './utils/RMSE';
 // import FileLogger from './utils/FileLogger';
 
@@ -26,14 +26,14 @@ tape('Mel', (t) => {
   t.comment('htk - mel bands center frequencies');
   t.comment('test against librosa');
 
-  const mel = new Mel({
+  const melCenterFreqs = new Mel({
     nbrBands: 24, // two less than librosa because boudaries are excluded
     minFreq: 0,
     maxFreq: 22050, // NQuyst
   });
 
-  mel.initStream({ frameSize: 256, sourceSampleRate: 44100 });
-  const centerFreqs = mel.melBandDescriptions.map((desc) => desc.centerFreq);
+  melCenterFreqs.initStream({ frameSize: 256, sourceSampleRate: 44100 });
+  const centerFreqs = melCenterFreqs.melBandDescriptions.map((desc) => desc.centerFreq);
 
   t.equal(centerFreqs.length, htkCenterFrequencies.length, 'mel center frequencies should have same length (excluding boundaries)');
 
@@ -79,54 +79,40 @@ tape('Mel', (t) => {
 
   const compareFile = './data/pipo-mel.txt';
   const audioFile = './audio/cherokee.wav';
+  const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
 
-  const asset = av.Asset.fromFile(path.join(__dirname, audioFile));
-  asset.on('error', (err) => console.log(err.stack));
-
-  asset.decodeToBuffer((buffer) => {
-    // create a load compare file function
-    const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
-
-    // mimic web audio needed interface
-    const audioBuffer = {
-      sampleRate: asset.format.sampleRate,
-      getChannelData: () => buffer,
-    };
-
-    const source = new AudioInBuffer({
-      audioBuffer: audioBuffer,
-      useWorker: false,
-    });
-
-    const slicer = new Slicer({
-      frameSize: 256,
-      hopSize: 256,
-    });
-
-    const fft = new FFT({
-      size: 1024,
-      window: 'hann',
-      mode: 'power',
-      norm: 'power',
-    });
-
-    const mel = new Mel({
-      log: false, // if log === true rmse doesn't look appropriate
-      nbrBands: 24,
-    });
-
-    const rmse = new RMSE({
-      expectedFrames: expectedFrames,
-      asserter: t,
-      tolerance: tolerance,
-    });
-
-    source.connect(slicer);
-    slicer.connect(fft);
-    fft.connect(mel);
-    mel.connect(rmse);
-
-    source.start();
+  const audioInFile = new AudioInFile({
+    filename: path.join(__dirname, audioFile),
+    frameSize: 512,
   });
 
+  const slicer = new Slicer({
+    frameSize: 256,
+    hopSize: 256,
+  });
+
+  const fft = new FFT({
+    size: 1024,
+    window: 'hann',
+    mode: 'power',
+    norm: 'power',
+  });
+
+  const mel = new Mel({
+    log: false, // if log === true rmse doesn't look appropriate
+    nbrBands: 24,
+  });
+
+  const rmse = new RMSE({
+    expectedFrames: expectedFrames,
+    asserter: t,
+    tolerance: tolerance,
+  });
+
+  audioInFile.connect(slicer);
+  slicer.connect(fft);
+  fft.connect(mel);
+  mel.connect(rmse);
+
+  audioInFile.start();
 });

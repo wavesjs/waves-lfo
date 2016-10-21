@@ -1,4 +1,4 @@
-import MeanStddev from '../src/operator/MeanStddev';
+import MeanStddev from '../src/common/operator/MeanStddev';
 import tape from 'tape';
 
 tape('MeanStddev', (t) => {

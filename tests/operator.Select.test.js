@@ -1,5 +1,5 @@
-import Select from '../src/operator/Select';
-import EventIn from '../src/source/EventIn';
+import Select from '../src/common/operator/Select';
+import EventIn from '../src/common/source/EventIn';
 import Asserter from './utils/Asserter';
 import tape from 'tape';
 

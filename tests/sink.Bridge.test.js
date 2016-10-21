@@ -1,5 +1,5 @@
-import EventIn from '../src/source/EventIn';
-import Bridge from '../src/sink/Bridge';
+import EventIn from '../src/common/source/EventIn';
+import Bridge from '../src/common/sink/Bridge';
 import tape from 'tape';
 
 tape('Bridge', (t) => {
@@ -25,7 +25,7 @@ tape('Bridge', (t) => {
   let index = 0;
 
   const bridge = new Bridge({
-    callback: (frame) => {
+    processFrame: (frame) => {
       const expected = index === 0 ? frame0 : frame1;
 
       t.comment('push paradigm');
@@ -36,6 +36,10 @@ tape('Bridge', (t) => {
 
       index++;
     },
+    finalizeStream: (endTime) => {
+      t.comment('finalize');
+      t.pass('Should call `finalizeStream`');
+    }
   });
 
   eventIn.connect(bridge);
@@ -51,6 +55,8 @@ tape('Bridge', (t) => {
   t.looseEqual(bridge.frame.data, expected.data, 'should execute with proper data');
   t.equal(bridge.frame.data === expected.data, false, 'should be a copy data');
   t.deepEqual(bridge.frame.metadata, expected.metadata, 'should execute with proper metadata');
+
+  eventIn.stop();
 
   t.end();
 });

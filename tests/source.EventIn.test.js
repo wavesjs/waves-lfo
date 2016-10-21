@@ -1,5 +1,5 @@
-import BaseLfo from '../src/core/BaseLfo';
-import EventIn from '../src/source/EventIn';
+import BaseLfo from '../src/common/core/BaseLfo';
+import EventIn from '../src/common/source/EventIn';
 import tape from 'tape';
 
 
@@ -12,35 +12,36 @@ tape('EventIn', (t) => {
   t.equal(a.params.get('absoluteTime'), false, 'should have proper default values');
   t.equal(a.params.get('frameType'), 'signal', 'should have proper default values');
   t.equal(a.params.get('frameSize'), 1, 'should have proper default values');
-  t.equal(a.params.get('sampleRate'), 0, 'should have proper default values');
+  t.equal(a.params.get('frameRate'), null, 'should have proper default values');
+  t.equal(a.params.get('sampleRate'), null, 'should have proper default values');
   t.equal(a.params.get('description'), null, 'should have proper default values');
 
+  t.comment('Vector frame options');
   const options = {
     absoluteTime: true,
     frameSize: 3,
     frameType: 'vector',
-    sampleRate: 20,
+    frameRate: 20,
     description: ['a', 'b', 'c'],
   };
 
   // test parameters overrides
   const b = new EventIn(options);
 
-  t.equal(b.params.get('absoluteTime'), options.absoluteTime, 'should ovveride default values');
-  t.equal(b.params.get('frameType'), options.frameType, 'should ovveride default values');
-  t.equal(b.params.get('frameSize'), options.frameSize, 'should ovveride default values');
-  t.equal(b.params.get('sampleRate'), options.sampleRate, 'should ovveride default values');
-  t.equal(b.params.get('description'), options.description, 'should ovveride default values');
+  t.equal(b.params.get('absoluteTime'), options.absoluteTime, 'should override "absoluteTime" default value');
+  t.equal(b.params.get('frameType'), options.frameType, 'should override "frameType" default value');
+  t.equal(b.params.get('frameSize'), options.frameSize, 'should override "frameSize" default value');
+  t.equal(b.params.get('description'), options.description, 'should override "description" default value');
 
   t.comment('start (~ processStreamParams)');
 
   b.start();
 
-  t.equal(b.streamParams.frameSize, options.frameSize, 'should initialize streamParams properly');
-  t.equal(b.streamParams.sourceSampleRate, options.sampleRate, 'should initialize streamParams properly');
-  t.equal(b.streamParams.frameType, options.frameType, 'should initialize streamParams properly');
-  t.equal(b.streamParams.description, options.description, 'should initialize streamParams properly');
-  t.equal(b.streamParams.frameRate, options.sampleRate, 'should initialize streamParams properly');
+  t.equal(b.streamParams.frameSize, options.frameSize, 'should initialize streamParams.frameSize properly');
+  t.equal(b.streamParams.frameType, options.frameType, 'should initialize streamParams.frameType properly');
+  t.equal(b.streamParams.description, options.description, 'should initialize streamParam.description properly');
+  t.equal(b.streamParams.frameRate, options.frameRate, 'should initialize streamParams.frameRate properly');
+  t.equal(b.streamParams.sourceSampleRate, options.frameRate, 'should initialize streamParams.sampleRate properly');
 
 
   t.comment('processFrame');

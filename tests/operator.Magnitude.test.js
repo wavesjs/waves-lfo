@@ -1,4 +1,4 @@
-import Magnitude from '../src/operator/Magnitude';
+import Magnitude from '../src/common/operator/Magnitude';
 import tape from 'tape';
 
 tape('Magnitude', (t) => {

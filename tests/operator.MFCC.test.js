@@ -3,7 +3,7 @@ import path from 'path';
 import tape from 'tape';
 import * as utils from './utils/utils';
 
-import AudioInBuffer from '../src/client/source/AudioInBuffer';
+import AudioInFile from '../src/node/source/AudioInFile';
 import Slicer from '../src/common/operator/Slicer';
 import FFT from '../src/common/operator/FFT';
 import Mel from '../src/common/operator/Mel';
@@ -42,69 +42,58 @@ tape('MFCC Manual', (t) => {
   t.comment('- dct.weighting: htk');
   t.comment(`tolerance: ${tolerance}`);
 
-  const asset = av.Asset.fromFile(path.join(__dirname, audioFile));
-  asset.on('error', (err) => console.log(err.stack));
+  const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
+  const len = expectedFrames.length;
+  const results = [];
 
-  asset.decodeToBuffer((buffer) => {
-    // create a load compare file function
-    const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
-    const len = expectedFrames.length;
-    const results = [];
-
-    const audioBuffer = {
-      sampleRate: asset.format.sampleRate,
-      getChannelData: () => buffer,
-    };
-
-    const source = new AudioInBuffer({
-      audioBuffer: audioBuffer,
-      useWorker: false,
-    });
-
-    const slicer = new Slicer({
-      frameSize: 256,
-      // hopSize: 512,
-    });
-
-    const fft = new FFT({
-      mode: 'power',
-      window: 'hann',
-      norm: 'power',
-      size: 256,
-    });
-
-    const mel = new Mel({
-      nbrBands: 24,
-      log: true,
-      power: 1,
-      minFreq: 0,
-    });
-
-    const dct = new DCT({
-      order: 12,
-    });
-
-    const rmse = new RMSE({
-      asserter: t,
-      expectedFrames: expectedFrames,
-      tolerance: 2,
-      startIndex: 1, // ignore first value as dct is different than pipo here
-    });
-
-    const fileLogger = new FileLogger({
-      filename: path.join(__dirname, logFile),
-    });
-
-    source.connect(slicer);
-    slicer.connect(fft);
-    fft.connect(mel);
-    mel.connect(dct);
-
-    dct.connect(rmse);
-    dct.connect(fileLogger);
-
-    source.start();
+  const audioInFile = new AudioInFile({
+    filename: path.join(__dirname, audioFile),
+    frameSize: 512,
   });
+
+  const slicer = new Slicer({
+    frameSize: 256,
+    // hopSize: 512,
+  });
+
+  const fft = new FFT({
+    mode: 'power',
+    window: 'hann',
+    norm: 'power',
+    size: 256,
+  });
+
+  const mel = new Mel({
+    nbrBands: 24,
+    log: true,
+    power: 1,
+    minFreq: 0,
+  });
+
+  const dct = new DCT({
+    order: 12,
+  });
+
+  const rmse = new RMSE({
+    asserter: t,
+    expectedFrames: expectedFrames,
+    tolerance: 2,
+    startIndex: 1, // ignore first value as dct is different than pipo here
+  });
+
+  const fileLogger = new FileLogger({
+    filename: path.join(__dirname, logFile),
+  });
+
+  audioInFile.connect(slicer);
+  slicer.connect(fft);
+  fft.connect(mel);
+  mel.connect(dct);
+
+  dct.connect(rmse);
+  dct.connect(fileLogger);
+
+  audioInFile.start();
 });
 
 
@@ -133,52 +122,41 @@ tape('MFCC Packed', (t) => {
   t.comment('- dct.weighting: htk');
   t.comment(`tolerance: ${tolerance}`);
 
-  const asset = av.Asset.fromFile(path.join(__dirname, audioFile));
-  asset.on('error', (err) => console.log(err.stack));
+  const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
+  const len = expectedFrames.length;
+  const results = [];
 
-  asset.decodeToBuffer((buffer) => {
-    // create a load compare file function
-    const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
-    const len = expectedFrames.length;
-    const results = [];
-
-    const audioBuffer = {
-      sampleRate: asset.format.sampleRate,
-      getChannelData: () => buffer,
-    };
-
-    const source = new AudioInBuffer({
-      audioBuffer: audioBuffer,
-      useWorker: false,
-    });
-
-    const slicer = new Slicer({
-      frameSize: 256,
-      // hopSize: 512,
-    });
-
-    const mfcc = new MFCC({
-      nbrBands: 24,
-      nbrCoefs: 12,
-    });
-
-    const rmse = new RMSE({
-      asserter: t,
-      expectedFrames: expectedFrames,
-      tolerance: 2,
-      startIndex: 1, // ignore first value as dct is different than pipo here
-    });
-
-    const fileLogger = new FileLogger({
-      filename: path.join(__dirname, logFile),
-    });
-
-    source.connect(slicer);
-    slicer.connect(mfcc);
-
-    mfcc.connect(rmse);
-    mfcc.connect(fileLogger);
-
-    source.start();
+  const audioInFile = new AudioInFile({
+    filename: path.join(__dirname, audioFile),
+    frameSize: 512,
   });
+
+  const slicer = new Slicer({
+    frameSize: 256,
+    // hopSize: 512,
+  });
+
+  const mfcc = new MFCC({
+    nbrBands: 24,
+    nbrCoefs: 12,
+  });
+
+  const rmse = new RMSE({
+    asserter: t,
+    expectedFrames: expectedFrames,
+    tolerance: 2,
+    startIndex: 1, // ignore first value as dct is different than pipo here
+  });
+
+  const fileLogger = new FileLogger({
+    filename: path.join(__dirname, logFile),
+  });
+
+  audioInFile.connect(slicer);
+  slicer.connect(mfcc);
+
+  mfcc.connect(rmse);
+  mfcc.connect(fileLogger);
+
+  audioInFile.start();
 });

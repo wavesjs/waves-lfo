@@ -1,4 +1,4 @@
-import MovingAverage from '../src/operator/MovingAverage';
+import MovingAverage from '../src/common/operator/MovingAverage';
 import tape from 'tape';
 
 tape('MovingAverage', (t) => {

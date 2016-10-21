@@ -1,9 +1,9 @@
-import Toggle from '../src/operator/Toggle';
-import EventIn from '../src/source/EventIn';
+import OnOff from '../src/common/operator/OnOff';
+import EventIn from '../src/common/source/EventIn';
 import Asserter from './utils/Asserter';
 import tape from 'tape';
 
-tape('Toggle', (t) => {
+tape('OnOff', (t) => {
   const frames = [
     { time: 0, data: [1, 2] },
     { time: 1, data: [3, 4] },
@@ -21,13 +21,13 @@ tape('Toggle', (t) => {
     frameType: 'vector',
   });
 
-  const toggle = new Toggle();
+  const onOff = new OnOff();
 
   const asserter = new Asserter(t);
   asserter.setExpectedFrames(expected);
 
-  eventIn.connect(toggle);
-  toggle.connect(asserter);
+  eventIn.connect(onOff);
+  onOff.connect(asserter);
 
   eventIn.start();
 
@@ -35,11 +35,11 @@ tape('Toggle', (t) => {
   eventIn.processFrame(frames[0]);
 
   // asserter bypassed
-  toggle.setState('off');
+  onOff.setState('off');
   eventIn.processFrame(frames[1]);
 
   // subgraph reopened
-  toggle.setState('on');
+  onOff.setState('on');
   eventIn.processFrame(frames[2]);
 
   t.end();

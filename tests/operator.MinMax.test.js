@@ -1,6 +1,6 @@
 import Asserter from './utils/Asserter';
-import MinMax from '../src/operator/MinMax';
-import EventIn from '../src/source/EventIn';
+import MinMax from '../src/common/operator/MinMax';
+import EventIn from '../src/common/source/EventIn';
 import tape from 'tape';
 
 tape('MinMax', (t) => {

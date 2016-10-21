@@ -3,10 +3,11 @@ import path from 'path';
 import tape from 'tape';
 import * as utils from './utils/utils';
 
-import AudioInBuffer from '../src/client/source/AudioInBuffer';
+import AudioInFile from '../src/node/source/AudioInFile';
 import Slicer from '../src/common/operator/Slicer';
 import Yin from '../src/common/operator/Yin';
-import Bridge from '../src/client/sink/Bridge';
+import Bridge from '../src/common/sink/Bridge';
+import DataToFile from '../src/node/sink/DataToFile';
 
 
 tape('Yin', (t) => {
@@ -26,78 +27,67 @@ tape('Yin', (t) => {
   t.comment('- yin.threshold: 0.1');
   // t.comment(`tolerance: ${tolerance}`);
 
-  const asset = av.Asset.fromFile(path.join(__dirname, audioFile));
-  asset.on('error', (err) => console.log(err.stack));
+  // create a load compare file function
+  const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
+  const frameSize = 2048;
+  const results = [];
 
-  asset.decodeToBuffer((buffer) => {
-    // create a load compare file function
-    const expectedFrames = utils.loadPiPoOutput(path.join(__dirname, compareFile));
-    const frameSize = 2048;
-    const len = Math.floor(buffer.length / frameSize);
-    console.log('buffer.length', buffer.length);
-    const results = [];
-
-    // mimic web audio needed interface
-    const audioBuffer = {
-      sampleRate: asset.format.sampleRate,
-      getChannelData: () => buffer,
-    };
-
-    const source = new AudioInBuffer({
-      audioBuffer: audioBuffer,
-      useWorker: false,
-    });
-
-    const slicer = new Slicer({
-      frameSize: frameSize,
-      hopSize: frameSize,
-    });
-
-    const yin = new Yin({
-      threshold: 0.1,
-      // downSamplingExp: 2,
-    });
-
-    let counter = 0;
-
-    const bridge = new Bridge({
-      callback: (frame) => {
-        results.push(frame.data);
-        counter++;
-
-        if (counter >= len)
-          compareResults();
-      },
-    });
-
-    source.connect(slicer);
-    slicer.connect(yin);
-    yin.connect(bridge);
-
-    source.start();
-
-    function compareResults() {
-      // @todo - test each column in a loop
-
-      // pitch
-      let sum = 0;
-
-      for (let i = 0; i < len; i++) {
-        // don't test against no found frequencies
-        if (results[i][0] === -1) continue;
-
-        console.log(results[i]);
-        // const diff = results[i][0] - expectedFrames[i][0];
-        // sum += diff * diff;
-      }
-
-      // const mean = sum / len;
-      // const rmse = Math.sqrt(mean);
-
-      // t.comment(`pitch error: ${rmse}`);
-      t.end();
-    }
+  const audioInFile = new AudioInFile({
+    filename: path.join(__dirname, audioFile),
+    frameSize: frameSize,
   });
 
+  const slicer = new Slicer({
+    frameSize: frameSize,
+    hopSize: frameSize,
+  });
+
+  const yin = new Yin({
+    threshold: 0.1,
+    downSamplingExp: 2,
+  });
+
+  let counter = 0;
+
+  const bridge = new Bridge({
+    processFrame: (frame) => results.push(frame.data),
+    finalizeStream: (endTime) => compareResults(),
+  });
+
+  const dataToFile = new DataToFile({
+    filename: path.join(__dirname, './data/lfo-yin.json'),
+    format: 'json',
+  });
+
+  audioInFile.connect(slicer);
+  slicer.connect(yin);
+  yin.connect(bridge);
+  yin.connect(dataToFile);
+
+  audioInFile.start();
+
+  function compareResults() {
+    let sum = 0;
+    let len = 0;
+
+    console.log('expected length:', expectedFrames.length);
+    console.log('results length:', results.length);
+
+    for (let i = 0; i < expectedFrames.length; i++) {
+      console.log(expectedFrames[i][0], results[i]);
+
+      // don't compare when pitch not found
+      // if (results[i] !== -1) {
+      //   const diff = results[i][0] - expectedFrames[i][0];
+      //   sum += diff * diff;
+      //   len += 1;
+      // }
+    }
+
+    // const mean = sum / len;
+    // const rmse = Math.sqrt(mean);
+    // t.comment(`pitch error: ${rmse}`);
+    t.end();
+  }
 });
 

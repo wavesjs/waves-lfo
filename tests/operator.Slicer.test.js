@@ -1,6 +1,6 @@
-import Slicer from '../src/operator/Slicer';
-import EventIn from '../src/source/EventIn';
-import Logger from '../src/sink/Logger';
+import Slicer from '../src/common/operator/Slicer';
+import EventIn from '../src/common/source/EventIn';
+import Logger from '../src/common/sink/Logger';
 import Asserter from './utils/Asserter';
 import tape from 'tape';
 
@@ -214,7 +214,36 @@ tape('Slicer (frameSize < hopSize)', (t) => {
   t.end();
 });
 
-console.log('----------------------------------------------------------');
-console.log('@todo - create test for output framesize > input frameSize');
-console.log('----------------------------------------------------------');
+tape('Slicer (inputFrameSize < frameSize)', (t) => {
+  const blocks = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]];
+
+  const expectedFrames = [
+    { time: 0, data: [0, 1, 2, 3, 4, 5] },
+    { time: 2, data: [6, 7, 8, 9, 10, 11] },
+  ];
+
+  const eventIn = new EventIn({
+    frameType: 'signal',
+    frameSize: 3,
+    sampleRate: 3,
+  });
+
+  const slicer = new Slicer({
+    frameSize: 6,
+    hopSize: 6,
+  });
+
+  const asserter = new Asserter(t);
+  asserter.setExpectedFrames(expectedFrames);
+
+  eventIn.connect(slicer);
+  slicer.connect(asserter);
+
+  eventIn.start();
+  blocks.forEach((signal, index) => eventIn.process(index, signal));
+
+  t.end();
+});
+
 
