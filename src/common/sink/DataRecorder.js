@@ -131,6 +131,7 @@ class DataRecorder extends BaseLfo {
   processFrame(frame) {
     if (this.isRecording) {
       this.prepareFrame(frame);
+
       const separateArrays = this.params.get('separateArrays');
 
       this.frame.data = new Float32Array(frame.data);

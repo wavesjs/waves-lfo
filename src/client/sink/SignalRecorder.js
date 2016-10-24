@@ -1,88 +1,7 @@
 import BaseLfo from '../../common/core/BaseLfo';
 
-const AudioContext = (window.AudioContext || window.webkitAudioContext);
+const AudioContext = (window && (window.AudioContext || window.webkitAudioContext));
 
-const worker = `
-var isInfiniteBuffer = false;
-var stack = [];
-var buffer;
-var bufferLength;
-var currentIndex;
-
-function init() {
-  buffer = new Float32Array(bufferLength);
-  stack.length = 0;
-  currentIndex = 0;
-}
-
-function append(block) {
-  var availableSpace = bufferLength - currentIndex;
-  var currentBlock;
-  // return if already full
-  if (availableSpace <= 0) { return; }
-
-  if (availableSpace < block.length) {
-    currentBlock = block.subarray(0, availableSpace);
-  } else {
-    currentBlock = block;
-  }
-
-  buffer.set(currentBlock, currentIndex);
-  currentIndex += currentBlock.length;
-
-  if (isInfiniteBuffer && currentIndex === buffer.length) {
-    stack.push(buffer);
-
-    currentBlock = block.subarray(availableSpace);
-    buffer = new Float32Array(buffer.length);
-    buffer.set(currentBlock, 0);
-    currentIndex = currentBlock.length;
-  }
-}
-
-self.addEventListener('message', function(e) {
-  switch (e.data.command) {
-    case 'init':
-      if (isFinite(e.data.duration)) {
-        bufferLength = e.data.sampleRate * e.data.duration;
-      } else {
-        isInfiniteBuffer = true;
-        bufferLength = e.data.sampleRate * 10;
-      }
-
-      init();
-      break;
-
-    case 'process':
-      var block = new Float32Array(e.data.buffer);
-      append(block);
-
-
-      // if the buffer is full return it, only works with finite buffers
-      if (!isInfiniteBuffer && currentIndex === bufferLength) {
-        var buf = buffer.buffer.slice(0);
-        self.postMessage({ buffer: buf }, [buf]);
-        init();
-      }
-      break;
-
-    case 'stop':
-      if (!isInfiniteBuffer) {
-        var copy = buffer.buffer.slice(0, currentIndex * (32 / 8));
-        self.postMessage({ buffer: copy }, [copy]);
-      } else {
-        var copy = new Float32Array(stack.length * bufferLength + currentIndex);
-        stack.forEach(function(buffer, index) {
-          copy.set(buffer, bufferLength * index);
-        });
-
-        copy.set(buffer.subarray(0, currentIndex), stack.length * bufferLength);
-        self.postMessage({ buffer: copy.buffer }, [copy.buffer]);
-      }
-      init();
-      break;
-  }
-}, false)`;
 
 const definitions = {
   duration: {
@@ -90,6 +9,12 @@ const definitions = {
     default: 10,
     min: 0,
     metas: { kind: 'static' },
+  },
+  callback: {
+    type: 'any',
+    default: null,
+    nullable: true,
+    metas: { kind: 'dynamic' },
   },
   ignoreLeadingZeros: {
     type: 'boolean',
@@ -122,13 +47,18 @@ const definitions = {
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.duration=10] - Maximum duration of the recording.
+ * @param {Number} [options.callback] - Callback to execute when a new record is
+ *  ended. This can happen: `stop` is called on the recorder, `stop` is called
+ *  on the source or when the buffer is full according to the given `duration`.
+ * @param {Object} [options.ignoreLeadingZeros=true] - Start the effective
+ *  recording on the first non-zero value.
  * @param {Boolean} [options.retrieveAudioBuffer=false] - Define if an `AudioBuffer`
  *  should be retrieved or only the raw Float32Array of data.
+ *  (works only in browser)
  * @param {AudioContext} [options.audioContext=null] - If
  *  `retrieveAudioBuffer` is set to `true`, audio context to be used
  *  in order to create the final audio buffer.
- * @param {Object} [options.ignoreLeadingZeros=true] - Start the effective
- *  recording on the first non-zero value.
+ *  (works only in browser)
  *
  * @memberof module:client.sink
  *
@@ -190,26 +120,40 @@ class SignalRecorder extends BaseLfo {
     const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
     let audioContext = this.params.get('audioContext');
     // needed to retrieve an AudioBuffer
-    if (retrieveAudioBuffer && audioContext === null)
+    if (retrieveAudioBuffer && audioContext === null && AudioContext)
       audioContext = new AudioContext();
 
-    this.audioContext = audioContext;
+    this._audioContext = audioContext;
     this._ignoreZeros = false;
+    this._isInfiniteBuffer = false;
+    this._stack = [];
+    this._buffer = null;
+    this._bufferLength = null;
+    this._currentIndex = null;
+  }
 
-    const blob = new Blob([worker], { type: 'text/javascript' });
-    this.worker = new Worker(window.URL.createObjectURL(blob));
+  _initBuffer() {
+    this._buffer = new Float32Array(bufferLength);
+    this._stack.length = 0;
+    this._currentIndex = 0;
   }
 
   /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
-    // initialize worker according to stream params
-    this.worker.postMessage({
-      command: 'init',
-      sampleRate: this.streamParams.sourceSampleRate,
-      duration: this.params.get('duration'),
-    });
+    const duration = this.params.get('duration');
+    const sampleRate = this.streamParams.sourceSampleRate;
+
+    if (isFinite(e.data.duration)) {
+      this._isInfiniteBuffer = false;
+      this._bufferLength = sampleRate * duration;
+    } else {
+      this._isInfiniteBuffer = true;
+      this._bufferLength = sampleRate * 10;
+    }
+
+    this._initBuffer();
 
     this.propagateStreamParams();
   }
@@ -223,12 +167,50 @@ class SignalRecorder extends BaseLfo {
   }
 
   /**
-   * Stop recording.
+   * Stop recording and execute the callback defined in parameters.
    */
   stop() {
     if (this.isRecording) {
-      this.worker.postMessage({ command: 'stop' });
+      // ignore next incomming frame
       this.isRecording = false;
+
+      const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
+      const callback = this.params.get('callback');
+      let output;
+
+      if (!this._isInfiniteBuffer) {
+        output = this._buffer;
+      } else {
+        const bufferLength = this._bufferLength;
+        const currentIndex = this._currentIndex;
+        const stack = this._stack;
+        const buffer = this._buffer;
+
+        output = new Float32Array(stack.length * bufferLength + currentIndex);
+
+        // copy all stacked buffers
+        for (let i = 0; i < stack.length; i++) {
+          const stackedBuffer = stack[i];
+          output.set(stackedBuffer, bufferLength * i);
+        };
+        // copy data contained in current buffer
+        output.set(buffer.subarray(0, currentIndex), stack.length * bufferLength);
+      }
+
+      if (retrieveAudioBuffer && this._audioContext) {
+        const length = output.length;
+        const sampleRate = this.streamParams.sourceSampleRate;
+        const audioBuffer = this._audioContext.createBuffer(1, length, sampleRate);
+        const channelData = audioBuffer.getChannelData(0);
+        channelData.set(output, 0);
+
+        callback(audioBuffer);
+      } else {
+        callback(output);
+      }
+
+      // reinit buffer, stack, and currentIndex
+      this._initBuffer();
     }
   }
 
@@ -239,17 +221,16 @@ class SignalRecorder extends BaseLfo {
 
   /** @private */
   processSignal(frame) {
-    // console.log(frame, this.isRecording);
     if (!this.isRecording)
       return;
 
-    // `sendFrame` must be recreated each time because
-    // it is copied in the worker and lost for this context
-    let sendFrame = null;
+    let block = null;
     const input = frame.data;
+    const bufferLength = this._bufferLength;
+    const buffer = this._buffer;
 
     if (this._ignoreZeros === false) {
-      sendFrame = new Float32Array(input);
+      block = new Float32Array(input);
     } else if (input[input.length - 1] !== 0) {
       // find first index where value !== 0
       let i;
@@ -258,54 +239,38 @@ class SignalRecorder extends BaseLfo {
         if (input[i] !== 0) break;
 
       // copy non zero segment
-      sendFrame = new Float32Array(input.subarray(i));
+      block = new Float32Array(input.subarray(i));
+      // don't repeat this logic once a non-zero value has been found
       this._ignoreZeros = false;
     }
 
-    if (sendFrame !== null) {
-      const buffer = sendFrame.buffer;
+    if (block !== null) {
+      const availableSpace = bufferLength - this._currentIndex;
+      let currentBlock;
+      // return if already full (can it happen ?)
+      // if (availableSpace <= 0) return;
 
-      this.worker.postMessage({
-        command: 'process',
-        buffer: buffer
-      }, [buffer]);
+      if (availableSpace < block.length)
+        currentBlock = block.subarray(0, availableSpace);
+      else
+        currentBlock = block;
+
+      buffer.set(currentBlock, this._currentIndex);
+      this._currentIndex += currentBlock.length;
+
+      if (this._isInfiniteBuffer && this._currentIndex === bufferLength) {
+        this._stack.push(buffer);
+
+        currentBlock = block.subarray(availableSpace);
+        buffer = new Float32Array(bufferLength);
+        buffer.set(currentBlock, 0);
+        this._currentIndex = currentBlock.length;
+      }
     }
-  }
 
-  /**
-   * Retrieve a `Promise` that will be fulfilled with the `Float32Array` or
-   * the `AudioBuffer` when the stream is stopped or when the buffer is full
-   * according to the duration defined in parameters.
-   *
-   * @return {Promise<AudioBuffer>}
-   */
-  retrieve() {
-    return new Promise((resolve, reject) => {
-      const callback = (e) => {
-        const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
-        // if called when buffer is full, stop the recorder too
-        this.isRecording = false;
-
-        this.worker.removeEventListener('message', callback, false);
-        // create an audio buffer from the data
-        const buffer = new Float32Array(e.data.buffer);
-
-        if (retrieveAudioBuffer) {
-          const length = buffer.length;
-          const sampleRate = this.streamParams.sourceSampleRate;
-
-          const audioBuffer = this.audioContext.createBuffer(1, length, sampleRate);
-          const channelData = audioBuffer.getChannelData(0);
-          channelData.set(buffer, 0);
-
-          resolve(audioBuffer);
-        } else {
-          resolve(buffer);
-        }
-      };
-
-      this.worker.addEventListener('message', callback, false);
-    });
+    //  stop if the buffer is finite and full
+    if (!_isInfiniteBuffer && this._currentIndex === bufferLength) {
+      this.stop();
   }
 }
 
