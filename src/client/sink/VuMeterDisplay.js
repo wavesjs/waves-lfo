@@ -29,7 +29,7 @@ const definitions = {
 /**
  * Simple VU-Meter to used on a `signal` stream.
  *
- * @memberof module:sink
+ * @memberof module:client.sink
  *
  * @param {Object} options - Override defaults parameters.
  * @param {Number} [options.offset=-14] - dB offset applied to the signal.
@@ -81,10 +81,6 @@ class VuMeterDisplay extends BaseDisplay {
     }
 
     this.peakLifetime = 1; // sec
-
-    // @todo - check doesn't work...
-    // this.ctx.fillStyle = '#000000';
-    // this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
   }
 
   /** @private */

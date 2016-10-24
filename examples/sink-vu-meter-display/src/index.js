@@ -17,7 +17,7 @@ function init(stream) {
     sourceNode: source,
   });
 
-  const toggle = new lfo.operator.Toggle({
+  const onOff = new lfo.operator.OnOff({
     state: 'on',
   });
 
@@ -25,14 +25,14 @@ function init(stream) {
     canvas: '#vu-meter',
   });
 
-  audioInNode.connect(toggle);
-  toggle.connect(vuMeter);
+  audioInNode.connect(onOff);
+  onOff.connect(vuMeter);
   audioInNode.start();
 
   new controllers.Buttons('', ['start', 'stop'], '#controllers', (value) => {
     if (value === 'start')
-      toggle.setState('on');
+      onOff.setState('on');
     else
-      toggle.setState('off');
+      onOff.setState('off');
   });
 }

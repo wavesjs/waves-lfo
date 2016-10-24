@@ -93,7 +93,7 @@ const definitions = {
  *  as forwarded as given in the process method, or relatively to the time of
  *  the first `process` call after start.
  *
- * @memberof module:source
+ * @memberof module:common.source
  *
  * @todo - Add a `logicalTime` parameter to tag frame according to frame rate.
  *
@@ -139,9 +139,9 @@ class EventIn extends BaseLfo {
    * the graph. Any call to `process` or `processFrame` before `start` will be
    * ignored.
    *
-   * @see {@link module:core.BaseLfo#processStreamParams}
-   * @see {@link module:core.BaseLfo#resetStream}
-   * @see {@link module:source.EventIn#stop}
+   * @see {@link module:common.core.BaseLfo#processStreamParams}
+   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:common.source.EventIn#stop}
    */
   start(startTime = null) {
     this.initStream();
@@ -156,11 +156,11 @@ class EventIn extends BaseLfo {
    * Finalize the stream and stop the whole graph. Any call to `process` or
    * `processFrame` after `stop` will be ignored.
    *
-   * @see {@link module:core.BaseLfo#finalizeStream}
-   * @see {@link module:source.EventIn#start}
+   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:common.source.EventIn#start}
    */
   stop() {
-    if (this._isStarted && this._startTime) {
+    if (this._isStarted && this._startTime !== null) {
       const currentTime = this._getTime();
       const endTime = this.frame.time + (currentTime - this._systemTime);
 
@@ -192,7 +192,7 @@ class EventIn extends BaseLfo {
         throw new Error('Undefined "frameRate" for "vector" stream');
 
       this.streamParams.frameRate = frameRate;
-      this.streamParams.sampleRate = frameRate;
+      this.streamParams.sourceSampleRate = frameRate;
     }
 
     this.propagateStreamParams();

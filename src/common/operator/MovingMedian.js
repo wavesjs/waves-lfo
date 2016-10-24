@@ -23,7 +23,9 @@ const definitions = {
  * computed for each dimension in parallel. If the source sample rate is defined
  * frame time is shifted to the middle of the window defined by the order.
  *
- * @memberof module:operator
+ * _support `standalone` usage_
+ *
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.order=9] - Number of successive values in which

@@ -31,8 +31,9 @@ const definitions = {
 /**
  * Display the spectrum of the incomming input of type `signal`.
  *
- * @memberof module:sink
+ * @memberof module:client.sink
  *
+ * @param {Object} options - Override default parameters.
  * @param {Number} [options.scale=1] - Scale display of the spectrogram.
  * @param {String} [options.color=null] - Color of the spectrogram.
  * @param {Number} [options.min=-80] - Minimum displayed value (in dB).
@@ -47,7 +48,6 @@ const definitions = {
  *  in which to draw. _constant parameter_
  *
  * @todo - expose more `fft` config options
- * @todo - add a slicer ?
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

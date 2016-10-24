@@ -24,7 +24,7 @@ const definitions = {
 };
 
 /**
- * Use a WebAudio node as a source for the graph.
+ * Use a `WebAudio` node as a source for the graph.
  *
  * @param {Object} options - Override parameter' default values.
  * @param {AudioNode} [options.sourceNode=null] - Audio node to process
@@ -33,9 +33,9 @@ const definitions = {
  *  create the audio node (mandatory).
  * @param {Number} [options.frameSize=512] - Size of the output blocks, define
  *  the `frameSize` in the `streamParams`.
- * @param {Number} [channel=0] - Number of the channel to process.
+ * @param {Number} [options.channel=0] - Number of the channel to process.
  *
- * @memberof module:source
+ * @memberof module:client.source
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
@@ -81,9 +81,9 @@ class AudioInNode extends BaseLfo {
    * Propagate the `streamParams` in the graph and start to propagate signal
    * blocks produced by the audio node into the graph.
    *
-   * @see {@link module:core.BaseLfo#processStreamParams}
-   * @see {@link module:core.BaseLfo#resetStream}
-   * @see {@link module:source.AudioInNode#stop}
+   * @see {@link module:common.core.BaseLfo#processStreamParams}
+   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:client.source.AudioInNode#stop}
    */
   start() {
     this.initStream();
@@ -96,8 +96,8 @@ class AudioInNode extends BaseLfo {
   /**
    * Finalize the stream and stop the whole graph.
    *
-   * @see {@link module:core.BaseLfo#finalizeStream}
-   * @see {@link module:source.AudioInNode#start}
+   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:client.source.AudioInNode#start}
    */
   stop() {
     this.finalizeStream(this.frame.time);

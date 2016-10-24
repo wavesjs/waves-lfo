@@ -1,7 +1,13 @@
 import BaseLfo from '../../common/core/BaseLfo';
 
 const definitions = {
-  callback: {
+  processFrame: {
+    type: 'any',
+    default: null,
+    nullable: true,
+    metas: { kind: 'dynamic' },
+  },
+  finalizeStream: {
     type: 'any',
     default: null,
     nullable: true,
@@ -15,11 +21,16 @@ const definitions = {
  *
  * This sink can handle any type of input (`signal`, `vector`, `scalar`)
  *
- * @memberof module:sink
+ * @memberof module:common.sink
  *
  * @param {Object} options - Override default parameters.
- * @param {Function} [options.callback=null] - Callback to be executed
- *  on each frame.
+ * @param {Function} [options.processFrame=null] - Callback executed on each
+ *  `processFrame` call.
+ * @param {Function} [options.finalizeStream=null] - Callback executed on each
+ *  `finalizeStream` call.
+ *
+ * @see {@link module:common.core.BaseLfo#processFrame}
+ * @see {@link module:common.core.BaseLfo#processStreamParams}
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
@@ -36,7 +47,7 @@ const definitions = {
  * });
  *
  * const bridge = new Bridge({
- *   callback: (frame) => console.log(frame),
+ *   processFrame: (frame) => console.log(frame),
  * });
  *
  * eventIn.connect(bridge);
@@ -55,35 +66,35 @@ const definitions = {
 class Bridge extends BaseLfo {
   constructor(options = {}) {
     super(definitions, options);
-
-    /**
-     * Alias `this.frame`.
-     *
-     * @type {Object}
-     * @name data
-     * @instance
-     * @memberof module:sink.Bridge
-     */
-    this.data = null;
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
     this.propagateStreamParams();
+  }
 
-    // alias `this.frame`
-    this.data = this.frame;
+  /** @private */
+  finalizeStream(endTime) {
+    const finalizeStreamCallback = this.params.get('finalizeStream');
+
+    if (finalizeStreamCallback !== null)
+      finalizeStreamCallback(endTime);
   }
 
   // process any type
+  /** @private */
   processScalar() {}
+  /** @private */
   processVector() {}
+  /** @private */
   processSignal() {}
 
+  /** @private */
   processFrame(frame) {
     this.prepareFrame();
 
-    const callback = this.params.get('callback');
+    const processFrameCallback = this.params.get('processFrame');
     const output = this.frame;
     output.data = new Float32Array(this.streamParams.frameSize);
     // pull interface (we copy data since we don't know what could
@@ -95,8 +106,8 @@ class Bridge extends BaseLfo {
     output.metadata = frame.metadata;
 
     // `push` interface
-    if (callback !== null)
-      callback(output);
+    if (processFrameCallback !== null)
+      processFrameCallback(output);
   }
 }
 

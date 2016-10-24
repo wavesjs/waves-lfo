@@ -104,13 +104,13 @@ const definitions = {
  * through the graph.
  *
  * @param {Object} options - Override parameter' default values.
- * @param {AudioBuffer} audioBuffer - Audio buffer to process.
+ * @param {AudioBuffer} [options.audioBuffer] - Audio buffer to process.
  * @param {Number} [options.frameSize=512] - Size of the output blocks.
- * @param {Number} [channel=0] - Number of the channel to process.
- * @param {Boolean} [useWorker=true] - If false, fallback to main thread for the
- *  slicing of the audio buffer, otherwise use a WebWorker.
+ * @param {Number} [options.channel=0] - Number of the channel to process.
+ * @param {Boolean} [options.useWorker=true] - If false, fallback to main
+ *  thread for the slicing of the audio buffer, otherwise use a WebWorker.
  *
- * @memberof module:source
+ * @memberof module:client.source
  *
  * @todo - Allow to pass raw buffer and sampleRate (simplified use server-side)
  *
@@ -152,9 +152,9 @@ class AudioInBuffer extends BaseLfo {
    * When called, the slicing of the given `audioBuffer` starts immediately and
    * each resulting frame is propagated in graph.
    *
-   * @see {@link module:core.BaseLfo#processStreamParams}
-   * @see {@link module:core.BaseLfo#resetStream}
-   * @see {@link module:source.AudioInBuffer#stop}
+   * @see {@link module:common.core.BaseLfo#processStreamParams}
+   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:client.source.AudioInBuffer#stop}
    */
   start() {
     this.initStream();
@@ -186,8 +186,8 @@ class AudioInBuffer extends BaseLfo {
    * Finalize the stream and stop the whole graph. When called, the slicing of
    * the `audioBuffer` stops immediately.
    *
-   * @see {@link module:core.BaseLfo#finalizeStream}
-   * @see {@link module:source.EventIn#start}
+   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:client.source.AudioInBuffer#start}
    */
   stop() {
     this.worker.terminate();
@@ -202,7 +202,6 @@ class AudioInBuffer extends BaseLfo {
     const frameSize = this.params.get('frameSize');
     const sourceSampleRate = audioBuffer.sampleRate;
     const frameRate = sourceSampleRate / frameSize;
-    console.log(sourceSampleRate);
 
     this.streamParams.frameSize = frameSize;
     this.streamParams.frameRate = frameRate;
@@ -227,7 +226,7 @@ class AudioInBuffer extends BaseLfo {
       this.frame.time = time;
       this.propagateFrame();
 
-      this.endTime = this.time + this.frame.data.length / sourceSampleRate;
+      this.endTime = this.frame.time + this.frame.data.length / sourceSampleRate;
     }
   }
 }

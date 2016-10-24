@@ -5,7 +5,9 @@ const sqrt = Math.sqrt;
 /**
  * Compute the Root Mean Square of a `signal`.
  *
- * @memberof module:operator
+ * _support `standalone` usage_
+ *
+ * @memberof module:common.operator
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
@@ -46,7 +48,7 @@ class RMS extends BaseLfo {
    * another node). Return the rms of the given signal block.
    *
    * @param {Number} signal - Signal block to be computed.
-   * @return {Number} - rms of the input signal block.
+   * @return {Number} - rms of the input signal.
    *
    * @example
    * import * as lfo from 'waves-lfo/client';

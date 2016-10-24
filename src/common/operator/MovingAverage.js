@@ -25,7 +25,7 @@ const definitions = {
  *
  * _support `standalone` usage_
  *
- * @memberof module:operator
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.order=10] - Number of successive values on which

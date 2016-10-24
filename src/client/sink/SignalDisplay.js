@@ -56,7 +56,7 @@ const definitions = {
  *  several display using the `DisplaySync` class. This parameter only exists
  *  for operators that display several consecutive frames on the canvas.
  *
- * @memberof module:sink
+ * @memberof module:client.sink
  *
  * @example
  * const eventIn = new lfo.source.EventIn({

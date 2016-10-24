@@ -5,7 +5,9 @@ const sqrt = Math.sqrt;
 /**
  * Compute mean and standard deviation of a given `signal`.
  *
- * @memberof module:operator
+ * _support `standalone` usage_
+ *
+ * @memberof module:common.operator
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

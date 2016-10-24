@@ -26,7 +26,7 @@ const definitions = {
  * @param {Boolean} [options.power=false] - If true, returns the squared
  *  magnitude (power).
  *
- * @memberof module:operator
+ * @memberof module:common.operator
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

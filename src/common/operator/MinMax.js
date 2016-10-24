@@ -5,7 +5,7 @@ import BaseLfo from '../core/BaseLfo';
  *
  * _support `standalone` usage_
  *
- * @memberof module:operator
+ * @memberof module:common.operator
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

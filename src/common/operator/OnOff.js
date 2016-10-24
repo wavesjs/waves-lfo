@@ -10,17 +10,17 @@ const definitions = {
 };
 
 /**
- * The Toggle operator allows to stop the propagation of the stream in the
+ * The OnOff operator allows to stop the propagation of the stream in a
  * subgraph. When "on", frames are propagated, when "off" the propagation is
  * stopped.
  *
  * The `streamParams` propagation is never bypassed so the subsequent subgraph
  * is always ready for incomming frames.
  *
- * @memberof module:operator
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
- * @param {String} [options.state='on'] - Default state of the toggle.
+ * @param {String} [options.state='on'] - Default state.
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
@@ -37,12 +37,12 @@ const definitions = {
  *   frameType: 'vector',
  * });
  *
- * const toggle = new Toggle();
+ * const onOff = new OnOff();
  *
  * const logger = new Logger({ data: true });
  *
- * eventIn.connect(toggle);
- * toggle.connect(logger);
+ * eventIn.connect(onOff);
+ * onOff.connect(logger);
  *
  * eventIn.start();
  *
@@ -50,15 +50,15 @@ const definitions = {
  * > [0, 1]
  *
  * // bypass subgraph
- * toggle.setState('off');
+ * onOff.setState('off');
  * eventIn.processFrame(frames[1]);
  *
  * // re-open subgraph
- * toggle.setState('on');
+ * onOff.setState('on');
  * eventIn.processFrame(frames[2]);
  * > [5, 6]
  */
-class Toggle extends BaseLfo {
+class OnOff extends BaseLfo {
   constructor(options = {}) {
     super(definitions, options);
 
@@ -66,7 +66,7 @@ class Toggle extends BaseLfo {
   }
 
   /**
-   * Set the state of the toggle.
+   * Set the state of the `OnOff`.
    *
    * @param {String} state - New state of the operator (`on` or `off`)
    */
@@ -99,4 +99,4 @@ class Toggle extends BaseLfo {
   }
 }
 
-export default Toggle;
+export default OnOff;

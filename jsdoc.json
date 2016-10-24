@@ -2,36 +2,46 @@
   "source": {
     "include": [
       "README.md",
-      "src/core/BaseLfo.js",
+      "src/common/core/BaseLfo.js",
 
-      "src/operator/Biquad.js",
-      "src/operator/DCT.js",
-      "src/operator/FFT.js",
-      "src/operator/Magnitude.js",
-      "src/operator/MeanStddev.js",
-      "src/operator/Mel.js",
-      "src/operator/MinMax.js",
-      "src/operator/MovingAverage.js",
-      "src/operator/MovingMedian.js",
-      "src/operator/RMS.js",
-      "src/operator/Select.js",
-      "src/operator/Slicer.js",
-      "src/operator/Toggle.js",
-      "src/operator/Yin.js",
+      "src/common/operator/DCT.js",
+      "src/common/operator/FFT.js",
+      "src/common/operator/Magnitude.js",
+      "src/common/operator/MeanStddev.js",
+      "src/common/operator/Mel.js",
+      "src/common/operator/MFCC.js",
+      "src/common/operator/MinMax.js",
+      "src/common/operator/MovingAverage.js",
+      "src/common/operator/MovingMedian.js",
+      "src/common/operator/OnOff.js",
+      "src/common/operator/RMS.js",
+      "src/common/operator/Select.js",
+      "src/common/operator/Slicer.js",
+      "src/common/operator/Yin.js",
 
-      "src/sink/BpfDisplay.js",
-      "src/sink/Logger.js",
-      "src/sink/MarkerDisplay.js",
-      "src/sink/SignalDisplay.js",
-      "src/sink/SpectrumDisplay.js",
-      "src/sink/VuMeterDisplay.js",
-      "src/sink/WaveformDisplay.js",
+      "src/common/sink/Bridge.js",
+      "src/common/sink/Logger.js",
 
-      "src/source/AudioInBuffer.js",
-      "src/source/AudioInNode.js",
-      "src/source/EventIn.js",
+      "src/common/source/EventIn.js",
 
-      "src/utils/DisplaySync.js"
+      "src/client/sink/BaseDisplay.js",
+      "src/client/sink/BpfDisplay.js",
+      "src/client/sink/DataRecorder.js",
+      "src/client/sink/MarkerDisplay.js",
+      "src/client/sink/SignalDisplay.js",
+      "src/client/sink/SignalRecorder.js",
+      "src/client/sink/SpectrumDisplay.js",
+      "src/client/sink/TraceDisplay.js",
+      "src/client/sink/VuMeterDisplay.js",
+      "src/client/sink/WaveformDisplay.js",
+
+      "src/client/source/AudioInBuffer.js",
+      "src/client/source/AudioInNode.js",
+
+      "src/node/sink/DataToFile.js",
+
+      "src/node/source/AudioInFile.js"
+
     ]
   },
   "plugins": [
@@ -41,8 +51,7 @@
     "projectTitle": "WavesJS - Low Frequency Operators",
     "template": "node_modules/jsdoc-template",
     "destination": "./docs",
-    "encoding": "utf8",
-    "tutorials": "./examples/sink-bridge"
+    "encoding": "utf8"
   },
   "templates": {
     "default": {

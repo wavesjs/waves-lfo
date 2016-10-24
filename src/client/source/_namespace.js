@@ -1,6 +1,6 @@
 import AudioInBuffer from './AudioInBuffer';
 import AudioInNode from './AudioInNode';
-import EventIn from './EventIn';
+import EventIn from '../../common/source/EventIn';
 
 export default {
   AudioInBuffer,

@@ -36,7 +36,7 @@ const definitions = {
  *
  * _support `standalone` usage_
  *
- * @memberof module:operator
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.order=12] - Number of computed bins.
@@ -89,7 +89,7 @@ class DCT extends BaseLfo {
   }
 
   /**
-   * Use the `Magnitude` operator in `standalone` mode (i.e. outside of a graph).
+   * Use the `DCT` operator in `standalone` mode (i.e. outside of a graph).
    *
    * @param {Array} values - Input values.
    * @return {Array} - DCT of the input array.

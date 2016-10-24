@@ -23,13 +23,14 @@ const definitions = {
  * the given options.
  * This operator updates the stream parameters according to its configuration.
  *
- * @memberof module:operator
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.frameSize=512] - Frame size of the output signal.
  * @param {Number} [options.hopSize=null] - Number of samples between two
  *  consecutive frames. If null, `hopSize` is set to `frameSize`.
- * @param {Boolean} [options.centeredTimeTag] - Center the time tag of the frame.
+ * @param {Boolean} [options.centeredTimeTag] - Move the time tag to the middle
+ *  of the frame.
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

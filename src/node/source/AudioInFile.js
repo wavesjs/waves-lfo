@@ -21,13 +21,15 @@ const definitions = {
 };
 
 /**
- * Extract raw values from a given file. This node is based on the
+ * Read a file and propagate raw signal into the graph.
+ *
+ * This node is based on the
  * [`aurora.js`](https://github.com/audiocogs/aurora.js) library.
  *
  * @param {Object} options - Override default options.
- * @param {String} filename - Path to the file.
- * @param {Number} frameSize - Size of output frame.
- * @param {Number} channel - Channel number of the input file.
+ * @param {String} [options.filename=null] - Path to the file.
+ * @param {Number} [options.frameSize=512] - Size of output frame.
+ * @param {Number} [options.channel=0] - Channel number of the input file.
  *
  * @todo - define which channel should be loaded.
  *
@@ -61,6 +63,10 @@ class AudioInFile extends BaseLfo {
 
   /**
    * Start the graph, load the file and start slicing it.
+   *
+   * @see {@link module:common.core.BaseLfo#processStreamParams}
+   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:node.source.AudioInFile#stop}
    */
   start() {
     this.isStarted = true;
@@ -75,6 +81,9 @@ class AudioInFile extends BaseLfo {
 
   /**
    * Finalize the stream and stop the graph.
+   *
+   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:node.source.AudioInFile#start}
    */
   stop() {
     this.isStarted = false;

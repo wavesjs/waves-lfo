@@ -1,8 +1,9 @@
+import Bridge from '../../common/sink/Bridge';
+import Logger from '../../common/sink/Logger';
+import DataRecorder from '../../common/sink/DataRecorder';
+
 import BaseDisplay from './BaseDisplay';
 import BpfDisplay from './BpfDisplay';
-import Bridge from './Bridge';
-import DataRecorder from './DataRecorder';
-import Logger from './Logger';
 import MarkerDisplay from './MarkerDisplay';
 import SignalRecorder from './SignalRecorder';
 import SignalDisplay from './SignalDisplay';
@@ -12,11 +13,12 @@ import VuMeterDisplay from './VuMeterDisplay';
 import WaveformDisplay from './WaveformDisplay';
 
 export default {
+  Bridge,
+  Logger,
+  DataRecorder,
+
   BaseDisplay,
   BpfDisplay,
-  Bridge,
-  DataRecorder,
-  Logger,
   MarkerDisplay,
   SignalDisplay,
   SignalRecorder,

@@ -3,6 +3,7 @@ import FFT from './FFT';
 import Mel from './Mel';
 import DCT from './DCT';
 
+
 const definitions = {
   nbrBands: {
     type: 'integer',
@@ -14,10 +15,56 @@ const definitions = {
     default: 12,
     meta: { kind: 'static' },
   },
+  minFreq: {
+    type: 'float',
+    default: 0,
+    meta: { kind: 'static' },
+  },
+  maxFreq: {
+    type: 'float',
+    default: null,
+    nullable: true,
+    meta: { kind: 'static' },
+  }
 };
 
+
 /**
- * @todo
+ * Compute the MFCC of the incomming `signal`. Is basically a wrapper around
+ * `FFT`, `Mel` and `DCT`.
+ *
+ * _support `standalone` usage_
+ *
+ * @memberof module:common.operator
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {nbrBands} [options.nbrBands=24] - Number of Mel bands.
+ * @param {nbrCoefs} [options.nbrCoefs=12] - Number of output coefs.
+ *
+ * @example
+ * import lfo from 'waves-lfo/node'
+ *
+ * const audioInFile = new lfo.source.AudioInFile({
+ *   filename: 'path/to/file',
+ *   frameSize: 512,
+ * });
+ *
+ * const slicer = new lfo.operator.Slicer({
+ *   frameSize: 256,
+ * });
+ *
+ * const mfcc = new lfo.operator.MFCC({
+ *   nbrBands: 24,
+ *   nbrCoefs: 12,
+ * });
+ *
+ * const logger = new lfo.sink.Logger({ data: true });
+ *
+ * audioInFile.connect(slicer);
+ * slicer.connect(mfcc);
+ * mfcc.connect(logger);
+ *
+ * audioInFile.start();
  */
 class MFCC extends BaseLfo {
   constructor(options) {
@@ -30,6 +77,8 @@ class MFCC extends BaseLfo {
 
     const nbrBands = this.params.get('nbrBands');
     const nbrCoefs = this.params.get('nbrCoefs');
+    const minFreq = this.params.get('minFreq');
+    const maxFreq = this.params.get('maxFreq');
     const inputFrameSize = prevStreamParams.frameSize;
     const inputFrameRate = prevStreamParams.frameRate;
     const inputSampleRate = prevStreamParams.sourceSampleRate;
@@ -50,7 +99,8 @@ class MFCC extends BaseLfo {
       nbrBands: nbrBands,
       log: true,
       power: 1,
-      minFreq: 0,
+      minFreq: minFreq,
+      maxFreq: maxFreq,
     });
 
     this.dct = new DCT({
@@ -83,7 +133,16 @@ class MFCC extends BaseLfo {
   }
 
   /**
-   * @todo
+   * Use the `MFCC` operator in `standalone` mode (i.e. outside of a graph).
+   *
+   * @param {Array} data - Signal chunk to analyse.
+   * @return {Array} - MFCC coefficients.
+   *
+   * @example
+   * const mfcc = new lfo.operator.MFCC();
+   * // mandatory for use in standalone mode
+   * mfcc.initStream({ frameSize: 256, frameType: 'vector' });
+   * mfcc.inputSignal(signal);
    */
   inputSignal(data) {
     const output = this.frame.data;

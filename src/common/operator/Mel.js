@@ -140,21 +140,55 @@ const definitions = {
  * Compute the mel bands spectrum from a given spectrum (`vector` type).
  * _Use the `htk` mel band style._
  *
- * @memberof module:operator
+ * _support `standalone` usage_
+ *
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Boolean} [options.log=false] - Apply a logarithmic scale on the output.
  * @param {Number} [options.nbrBands=24] - Number of filters defining the mel
  *  bands.
- * @param {Number} [options.minFreq=0] - Minimum frequency.
- * @param {Number} [options.maxFreq=null] - Maximum frequency, if null `maxFreq`
- *  is set to Nyquist frequency.
+ * @param {Number} [options.minFreq=0] - Minimum frequency to consider.
+ * @param {Number} [options.maxFreq=null] - Maximum frequency to consider.
+ *  If `null`, is set to Nyquist frequency.
  * @param {Number} [options.power=1] - Apply a power scaling on each mel band.
  *
  * @todo - implement Slaney style mel bands
  *
  * @example
- * // todo
+ * import lfo from 'waves-lfo/node'
+ *
+ * // read a file from path (node only source)
+ * const audioInFile = new lfo.source.AudioInFile({
+ *   filename: 'path/to/file',
+ *   frameSize: 512,
+ * });
+ *
+ * const slicer = new lfo.operator.Slicer({
+ *   frameSize: 256,
+ *   hopSize: 256,
+ * });
+ *
+ * const fft = new lfo.operator.FFT({
+ *   size: 1024,
+ *   window: 'hann',
+ *   mode: 'power',
+ *   norm: 'power',
+ * });
+ *
+ * const mel = new lfo.operator.Mel({
+ *   log: true,
+ *   nbrBands: 24,
+ * });
+ *
+ * const logger = new lfo.sink.Logger({ data: true });
+ *
+ * audioInFile.connect(slicer);
+ * slicer.connect(fft);
+ * fft.connect(mel);
+ * mel.connect(logger);
+ *
+ * audioInFile.start();
  */
 class Mel extends BaseLfo {
   constructor(options = {}) {

@@ -3,9 +3,9 @@ import BaseLfo from '../core/BaseLfo';
 const ceil = Math.ceil;
 
 /**
- * @private
  * paper: http://recherche.ircam.fr/equipes/pcm/cheveign/pss/2002_JASA_YIN.pdf
  * implementation based on https://github.com/ashokfernandez/Yin-Pitch-Tracking
+ * @private
  */
 
 const definitions = {
@@ -34,11 +34,16 @@ const definitions = {
  * [YIN, a fundamental frequency estimator for speech and music](http://recherche.ircam.fr/equipes/pcm/cheveign/pss/2002_JASA_YIN.pdf)
  * by Cheveigne and Kawahara.
  * On each frame, this operator propagate a vector containing the following
- * values: `frequency`, `energy`, `periodicity` and `AC1`.
+ * values: `frequency`, `probability`.
  *
  * For good results the input frame size should be large (1024 or 2048).
  *
- * @memberof module:operator
+ * _support `standalone` usage_
+ *
+ * @note - In node for a frame of 2048 samples, average computation time is:
+ *         0.00016742283339993389 second.
+ *
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.threshold=0.1] - Absolute threshold to test the

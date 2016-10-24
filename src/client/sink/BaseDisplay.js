@@ -51,9 +51,13 @@ const hasDurationDefinitions = {
 /**
  * Base class to extend in order to create graphic sinks.
  *
+ * <span class="warning">_This class should be considered abstract and only
+ * be used to be extended._</span>
+ *
  * @todo - fix float rounding errors (produce decays in sync draws)
  *
- * @memberof module:sink
+ * @memberof module:client.sink
+ *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
  *  _dynamic parameter_
@@ -67,7 +71,6 @@ const hasDurationDefinitions = {
  *  in which to insert the canvas. _constant parameter_
  * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
  *  in which to draw. _constant parameter_
- *
  * @param {Number} [options.duration=1] - Duration (in seconds) represented in
  *  the canvas. This parameter only exists for operators that display several
  *  consecutive frames on the canvas. _dynamic parameter_
@@ -75,8 +78,6 @@ const hasDurationDefinitions = {
  *  display should considerer as the origin. Is only usefull when synchronizing
  *  several display using the `DisplaySync` class. This parameter only exists
  *  for operators that display several consecutive frames on the canvas.
- *
- * @see {@link module:utils.DisplaySync}
  */
 class BaseDisplay extends BaseLfo {
   constructor(defs, options = {}, hasDuration = true) {

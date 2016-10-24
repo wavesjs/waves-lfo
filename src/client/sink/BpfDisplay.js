@@ -23,6 +23,8 @@ const definitions = {
 /**
  * Break Point Function, display a stream of type `vector`.
  *
+ * @memberof module:client.sink
+ *
  * @param {Object} options - Override default parameters.
  * @param {String} [options.colors=null] - Array of colors for each index of the
  *  vector. _dynamic parameter_
@@ -30,7 +32,6 @@ const definitions = {
  *  _dynamic parameter_
  * @param {String} [options.line=true] - Display a line between each consecutive
  *  values of the vector. _dynamic parameter_
- * @param {Object} options - Override default parameters.
  * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
  *  _dynamic parameter_
  * @param {Number} [options.max=1] - Maximum value represented in the canvas.
@@ -48,8 +49,6 @@ const definitions = {
  * @param {Number} [options.referenceTime=null] - Optionnal reference time the
  *  display should considerer as the origin. Is only usefull when synchronizing
  *  several display using the `DisplaySync` class.
- *
- * @memberof module:sink
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

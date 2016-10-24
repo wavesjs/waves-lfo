@@ -1,13 +1,13 @@
 # `lfo` - Low Frequency Operators
 
-> `lfo` is an library that formalize the processing and analysis of abitrary 
-> data streams (audio signal, sensors, etc.) by creating graphs with input 
-> (`source`), output(s) (`sink`) and processing units (`operator`).
-> 
-> The library expose two different flavor (`waves-lfo/client` and 
-> `waves-lfo/node`) allowing it to be consumed both client side or in a node
-> application. While the processing nodes are shared between this two entry 
-> points, the `source` and `sink` nodes are specific to the environment.
+*`lfo` is an library for processing and analysis of abitrary 
+data streams (audio signal, sensors, etc.). While being designed for
+real-time use-cases, it can also be used offline (i.e. batch 
+processing).*
+
+*The library expose two entry points:`waves-lfo/client` and 
+`waves-lfo/node`. The library can then be consumed both client side or in
+a node application by providing environment specific `sources` and `sinks`.*
 
 Nodes of a `lfo` graph are divided in 3 categories:
 
@@ -15,7 +15,7 @@ Nodes of a `lfo` graph are divided in 3 categories:
 - **`sinks`** are endpoints of the graph. Such nodes can be recorders, visualizers, etc.
 - **`operators`** make computation on the input stream and forward results to the next(s) operator(s).
 
-A graph should then contain at least a `source` node, a `sink` and one or several `operator` nodes in between:
+A `graph` is a combination of at least a `source`, a `sink` and zero to many `operator`(s) in between:
 
 
 ![](https://dl.dropboxusercontent.com/u/606131/lfo.png)
@@ -23,6 +23,8 @@ A graph should then contain at least a `source` node, a `sink` and one or severa
 ## Documentation
 
 [http://wavesjs.github.io/waves-lfo](http://wavesjs.github.io/waves-lfo)
+
+_Note: in the documentation all nodes that belongs to the `common` namespace can be used both in browser and in node._
 
 ## Usage
 
@@ -77,7 +79,7 @@ __Data__ - Generic term to designate a `vector` a `signal` or a `scalar`
 
 __Frame__ - Object associating a time tag, data, and optionnal metadatas.
 
-__Stream__ - Succession of frames, the state of the stream is defined in the `streamParams` attribute in each node by the following values:
+__Stream__ - Succession of frames, the state of the stream at each node is defined in the `streamParams` attribute. The `streamParams` object contains the following entries:
 - `frameSize`: number of values in the frame at the output of the node
 - `frameRate`: number of frame per seconds at the output of the node (if `0`, no frame rate)
 - `frameType`: define if the output of the node should be considered as a `signal`, a `vector` or a `scalar`
@@ -85,6 +87,10 @@ __Stream__ - Succession of frames, the state of the stream is defined in the `st
 - `description`: array describing the output dimensions when `frameType` is `vector` (or `scalar`)
 
 ## Available nodes and examples
+
+@todo
+
+## Standalone usage
 
 @todo
 
@@ -120,6 +126,10 @@ class Multiplier extends BaseLfo {
 
 const multiplier = new Multiplier({ factor: 4 });
 ```
+
+## `PiPo` and `lfo`
+
+@todo
 
 <hr />
 ## License

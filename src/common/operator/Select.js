@@ -19,7 +19,7 @@ const definitions = {
  * selected, the output will be of type `scalar`, otherwise the output will
  * be a vector containing the selected indices.
  *
- * @memberof module:operator
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default values.
  * @param {Number} options.index - Index to select from the input frame.

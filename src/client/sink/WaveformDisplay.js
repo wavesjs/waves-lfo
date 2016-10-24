@@ -45,7 +45,7 @@ const definitions = {
  *  display should considerer as the origin. Is only usefull when synchronizing
  *  several display using the `DisplaySync` class.
  *
- * @memberof module:sink
+ * @memberof module:client.sink
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

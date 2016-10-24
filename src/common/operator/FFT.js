@@ -167,12 +167,13 @@ const definitions = {
 }
 
 /**
- * Perfom a Fast Fourier Transform on an incomming `signal`, [FFT implementation
- * by Nayuki](https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js).
+ * Compute the Fast Fourier Transform of an incomming `signal`.
+ *
+ * FFT implementation by [Nayuki](https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js).
  *
  * _support `standalone` usage_
  *
- * @memberof module:operator
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
  * @param {Number} [options.size=1024] - Size of the fft, should be a power of

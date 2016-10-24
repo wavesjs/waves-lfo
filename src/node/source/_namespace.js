@@ -1,5 +1,5 @@
 import AudioInFile from './AudioInFile';
-import EventIn from './EventIn';
+import EventIn from '../../common/source/EventIn';
 
 export default {
   AudioInFile,

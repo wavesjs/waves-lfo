@@ -1,6 +1,6 @@
 import BaseLfo from '../../common/core/BaseLfo';
 
-const AudioContext = window.AudioContext || window.webkitAudioContext;
+const AudioContext = (window.AudioContext || window.webkitAudioContext);
 
 const worker = `
 var isInfiniteBuffer = false;
@@ -110,11 +110,12 @@ const definitions = {
 
 /**
  * Record an `signal` input stream of arbitrary duration and retrieve it
- * when done (as a raw `Float32Array` or an `AudioBuffer` occording to the
- * given configuration).
- * When recording is stopped (either when the `stop` method is called or the
- * defined duration has been recorded), the `Promise` returned by the `retrieve`
- * method is fullfilled with the `AudioBuffer` containing the recorded audio.
+ * when done.
+ *
+ * When recording is stopped (either when the `stop` method is called, the
+ * defined duration has been recorded, or the source of the graph finalized
+ * the stream), the `Promise` returned by the `retrieve` method is fullfilled
+ * with the `AudioBuffer` or `Float32Array` containing the recorded signal.
  *
  * @todo - add option to return only the Float32Array and not an audio buffer
  *  (node compliant) `retrieveAudioBuffer: false`
@@ -129,7 +130,7 @@ const definitions = {
  * @param {Object} [options.ignoreLeadingZeros=true] - Start the effective
  *  recording on the first non-zero value.
  *
- * @memberof module:sink
+ * @memberof module:client.sink
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
@@ -182,7 +183,7 @@ class SignalRecorder extends BaseLfo {
      * @type {Boolean}
      * @name isRecording
      * @instance
-     * @memberof module:sink.SignalRecorder
+     * @memberof module:client.sink.SignalRecorder
      */
     this.isRecording = false;
 
@@ -272,9 +273,9 @@ class SignalRecorder extends BaseLfo {
   }
 
   /**
-   * Retrieve the `Float32Array` or the `AudioBuffer` when the stream is
-   * stopped or when the buffer is full according to the duration defined in
-   * parameters.
+   * Retrieve a `Promise` that will be fulfilled with the `Float32Array` or
+   * the `AudioBuffer` when the stream is stopped or when the buffer is full
+   * according to the duration defined in parameters.
    *
    * @return {Promise<AudioBuffer>}
    */

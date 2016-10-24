@@ -25,8 +25,9 @@ const definitions = {
  * Display a marker according to the input frame.
  * This sink can handle input of type `vector`.
  *
- * @memberof module:sink
+ * @memberof module:client.sink
  *
+ * @param {Object} options - Override default parameters.
  * @param {String} options.color - Color of the marker.
  * @param {Number} [options.thresholdIndex=0] - Index of the incomming frame
  *  data to compare against the threshold. _Should be used in conjonction with
@@ -34,7 +35,6 @@ const definitions = {
  * @param {Number} [options.threshold=null] - Minimum value the incomming value
  *  must have to trigger the display of a marker. If null each incomming event
  *  triggers a marker. _Should be used in conjonction with `thresholdIndex`_.
- * @param {Object} options - Override default parameters.
  * @param {Number} [options.width=300] - Width of the canvas.
  *  _dynamic parameter_
  * @param {Number} [options.height=150] - Height of the canvas.

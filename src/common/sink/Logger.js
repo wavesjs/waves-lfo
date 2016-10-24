@@ -44,9 +44,7 @@ const definitions = {
  * @param {Boolean} [options.frameIndex=false] - Log index of the incomming
  *  `frame`.
  *
- * @memberof module:sink
- *
- * @todo - Log in a file (for server-side use).
+ * @memberof module:common.sink
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
