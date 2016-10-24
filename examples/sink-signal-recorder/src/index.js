@@ -18,9 +18,16 @@ function init(stream) {
   });
 
   const signalRecorder = new lfo.sink.SignalRecorder({
-    duration: 6,
+    duration: Infinity,
     retrieveAudioBuffer: true,
     audioContext: audioContext,
+    callback: (buffer) => {
+      const bufferSource = audioContext.createBufferSource();
+      bufferSource.buffer = buffer;
+
+      bufferSource.connect(audioContext.destination);
+      bufferSource.start();
+    }
   });
 
   const vuMeterDisplay = new lfo.sink.VuMeterDisplay({
@@ -34,17 +41,6 @@ function init(stream) {
   new controllers.Buttons('', ['record', 'stop'], '#controllers', (value) => {
     if (value === 'record') {
       signalRecorder.start();
-
-      signalRecorder
-        .retrieve()
-        .then((buffer) => {
-          const bufferSource = audioContext.createBufferSource();
-          bufferSource.buffer = buffer;
-
-          bufferSource.connect(audioContext.destination);
-          bufferSource.start();
-        })
-        .catch((err) => console.error(err.stack));
     } else {
       signalRecorder.stop();
     }

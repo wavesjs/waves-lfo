@@ -12,7 +12,7 @@ const definitions = {
     default: null,
     nullable: true,
     metas: { kind: 'dynamic' },
-  }
+  },
 };
 
 /**
@@ -41,15 +41,13 @@ const definitions = {
  *  frameRate: 0,
  * });
  *
- * const recorder = new lfo.sink.DataRecorder();
+ * const recorder = new lfo.sink.DataRecorder({
+ *   callback: (data) => console.log(data),
+ * });
  *
  * eventIn.connect(recorder);
  * eventIn.start();
  * recorder.start();
- *
- * recorder.retrieve()
- *  .then((result) => console.log(result))
- *  .catch((err) => console.error(err.stack));
  *
  * eventIn.process(0, [0, 1]);
  * eventIn.process(1, [1, 2]);

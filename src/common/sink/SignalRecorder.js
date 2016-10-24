@@ -1,8 +1,5 @@
 import BaseLfo from '../../common/core/BaseLfo';
 
-const AudioContext = (window && (window.AudioContext || window.webkitAudioContext));
-
-
 const definitions = {
   duration: {
     type: 'float',
@@ -80,28 +77,22 @@ const definitions = {
  *     audioContext: audioContext,
  *   });
  *
- *   const audioRecorder = new lfo.sink.SignalRecorder({
- *     duration: 2,
+ *   const signalRecorder = new lfo.sink.SignalRecorder({
+ *     duration: 6,
  *     retrieveAudioBuffer: true,
  *     audioContext: audioContext,
- *   });
- *
- *   audioInNode.connect(audioRecorder);
- *   audioInNode.start();
- *
- *   audioRecorder
- *     .retrieve()
- *     .then((buffer) => {
+ *     callback: (buffer) => {
  *       const bufferSource = audioContext.createBufferSource();
  *       bufferSource.buffer = buffer;
- *
  *       bufferSource.connect(audioContext.destination);
  *       bufferSource.start();
- *     })
- *     .catch((err) => console.error(err.stack));
+ *     }
+ *   });
  *
- *   audioRecorder.start();
- * }
+ *   audioInNode.connect(signalRecorder);
+ *   audioInNode.start();
+ *   signalRecorder.start();
+ * });
  */
 class SignalRecorder extends BaseLfo {
   constructor(options = {}) {
@@ -120,8 +111,8 @@ class SignalRecorder extends BaseLfo {
     const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
     let audioContext = this.params.get('audioContext');
     // needed to retrieve an AudioBuffer
-    if (retrieveAudioBuffer && audioContext === null && AudioContext)
-      audioContext = new AudioContext();
+    if (retrieveAudioBuffer && audioContext === null)
+      throw new Error('Invalid parameter "audioContext": and AudioContext must be provided when `retrieveAudioBuffer` is set to `true`')
 
     this._audioContext = audioContext;
     this._ignoreZeros = false;
@@ -133,7 +124,7 @@ class SignalRecorder extends BaseLfo {
   }
 
   _initBuffer() {
-    this._buffer = new Float32Array(bufferLength);
+    this._buffer = new Float32Array(this._bufferLength);
     this._stack.length = 0;
     this._currentIndex = 0;
   }
@@ -145,7 +136,7 @@ class SignalRecorder extends BaseLfo {
     const duration = this.params.get('duration');
     const sampleRate = this.streamParams.sourceSampleRate;
 
-    if (isFinite(e.data.duration)) {
+    if (isFinite(duration)) {
       this._isInfiniteBuffer = false;
       this._bufferLength = sampleRate * duration;
     } else {
@@ -176,16 +167,16 @@ class SignalRecorder extends BaseLfo {
 
       const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
       const callback = this.params.get('callback');
+      const currentIndex = this._currentIndex;
+      const buffer = this._buffer;
       let output;
 
       if (!this._isInfiniteBuffer) {
-        output = this._buffer;
+        output = new Float32Array(currentIndex);
+        output.set(buffer.subarray(0, currentIndex), 0);
       } else {
         const bufferLength = this._bufferLength;
-        const currentIndex = this._currentIndex;
         const stack = this._stack;
-        const buffer = this._buffer;
-
         output = new Float32Array(stack.length * bufferLength + currentIndex);
 
         // copy all stacked buffers
@@ -262,14 +253,14 @@ class SignalRecorder extends BaseLfo {
         this._stack.push(buffer);
 
         currentBlock = block.subarray(availableSpace);
-        buffer = new Float32Array(bufferLength);
-        buffer.set(currentBlock, 0);
+        this._buffer = new Float32Array(bufferLength);
+        this._buffer.set(currentBlock, 0);
         this._currentIndex = currentBlock.length;
       }
     }
 
     //  stop if the buffer is finite and full
-    if (!_isInfiniteBuffer && this._currentIndex === bufferLength) {
+    if (!this._isInfiniteBuffer && this._currentIndex === bufferLength)
       this.stop();
   }
 }
