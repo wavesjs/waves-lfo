@@ -1,294 +1,39 @@
-/**
- * @author Jean-Philippe.Lambert@ircam.fr, Norbert.Schnell@ircam.fr, victor.saiz@ircam.fr
- *
- * @brief  Biquad filter and coefficients calculator
- *
- * Based on the "Cookbook formulae for audio EQ biquad filter
- * coefficients" by Robert Bristow-Johnson
- *
- * @private
- */
-
-// y(n) = b0 x(n) + b1 x(n-1) + b2 x(n-2)
-//                - a1 x(n-1) - a2 x(n-2)
-//
-// f0 is normalised by the nyquist frequency
-// q must be > 0.
-// gain must be > 0. and is linear
-//
-// when there is no gain parameter, one can simply multiply the b
-//  * coefficients by a (linear) gain
-//
-// a0 is always 1. as each coefficient is normalised by a0, including a0
-//
-// a1 is a[0] and a2 is a[1]
-
 import BaseLfo from '../core/BaseLfo';
 
-var sin = Math.sin;
-var cos = Math.cos;
-var M_PI = Math.PI;
-var sqrt = Math.sqrt;
+const sin = Math.sin;
+const cos = Math.cos;
+const sqrt = Math.sqrt;
+const pow = Math.pow;
+const _2PI = Math.PI * 2;
 
-// -------------------------------------------
-// coefs calculations
-// -------------------------------------------
+// plot (from http://www.earlevel.com/scripts/widgets/20131013/biquads2.js)
+// var len = 512;
+// var magPlot = [];
+// for (var idx = 0; idx < len; idx++) {
+//   var w;
+//   if (plotType == "linear")
+//     w = idx / (len - 1) * Math.PI;  // 0 to pi, linear scale
+//   else
+//     w = Math.exp(Math.log(1 / 0.001) * idx / (len - 1)) * 0.001 * Math.PI;  // 0.001 to 1, times pi, log scale
 
-// LPF: H(s) = 1 / (s^2 + s/Q + 1)
-function lowpass_coefs(f0, q, coefs) {
-  var w0 = M_PI * f0;
-  var alpha = sin(w0) / (2.0 * q);
-  var c = cos(w0);
+//   var phi = Math.pow(Math.sin(w/2), 2);
+//   var y = Math.log(Math.pow(a0+a1+a2, 2) - 4*(a0*a1 + 4*a0*a2 + a1*a2)*phi + 16*a0*a2*phi*phi) - Math.log(Math.pow(1+b1+b2, 2) - 4*(b1 + 4*b2 + b1*b2)*phi + 16*b2*phi*phi);
+//   y = y * 10 / Math.LN10
+//   if (y == -Infinity)
+//     y = -200;
 
-  var a0_inv = 1.0 / (1.0 + alpha);
+//   if (plotType == "linear")
+//     magPlot.push([idx / (len - 1) * Fs / 2, y]);
+//   else
+//     magPlot.push([idx / (len - 1) / 2, y]);
 
-  coefs.a1 = (-2.0 * c) * a0_inv;
-  coefs.a2 = (1.0 - alpha) * a0_inv;
-
-  coefs.b0 = ((1.0 - c) * 0.5) * a0_inv;
-  coefs.b1 = (1.0 - c) * a0_inv;
-  coefs.b2 = coefs.b0;
-}
-
-// HPF: H(s) = s^2 / (s^2 + s/Q + 1)
-function highpass_coefs(f0, q, coefs) {
-  var w0 = M_PI * f0;
-  var alpha = sin(w0) / (2.0 * q);
-  var c = cos(w0);
-
-  var a0_inv = 1.0 / (1.0 + alpha);
-
-  coefs.a1 = (-2.0 * c) * a0_inv;
-  coefs.a2 = (1.0 - alpha) * a0_inv;
-
-  coefs.b0 = ((1.0 + c) * 0.5) * a0_inv;
-  coefs.b1 = (-1.0 - c) * a0_inv;
-  coefs.b2 = coefs.b0;
-}
-
-// BPF: H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q)
-function bandpass_constant_skirt_coefs(f0, q, coefs) {
-  var w0 = M_PI * f0;
-  var s = sin(w0);
-  var alpha = s / (2.0 * q);
-  var c = cos(w0);
-
-  var a0_inv = 1.0 / (1.0 + alpha);
-
-  coefs.a1 = (-2.0 * c) * a0_inv;
-  coefs.a2 = (1.0 - alpha) * a0_inv;
-
-  coefs.b0 = (s * 0.5) * a0_inv;
-  coefs.b1 = 0.0;
-  coefs.b2 = -coefs.b0;
-}
-
-// BPF: H(s) = (s/Q) / (s^2 + s/Q + 1)      (constant 0 dB peak gain)
-function bandpass_constant_peak_coefs(f0, q, coefs) {
-  var w0 = M_PI * f0;
-  var alpha = sin(w0) / (2.0 * q);
-  var c = cos(w0);
-
-  var a0_inv = 1.0 / (1.0 + alpha);
-
-  coefs.a1 = (-2.0 * c) * a0_inv;
-  coefs.a2 = (1.0 - alpha) * a0_inv;
-
-  coefs.b0 = alpha * a0_inv;
-  coefs.b1 = 0.0;
-  coefs.b2 = -coefs.b0;
-}
-
-// notch: H(s) = (s^2 + 1) / (s^2 + s/Q + 1)
-function notch_coefs(f0, q, coefs) {
-  var w0 = M_PI * f0;
-  var alpha = sin(w0) / (2.0 * q);
-  var c = cos(w0);
-
-  var a0_inv = 1.0 / (1.0 + alpha);
-
-  coefs.a1 = (-2.0 * c) * a0_inv;
-  coefs.a2 = (1.0 - alpha) * a0_inv;
-
-  coefs.b0 = a0_inv;
-  coefs.b1 = coefs.a1;
-  coefs.b2 = coefs.b0;
-}
-
-// APF: H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1)
-function allpass_coefs(f0, q, coefs) {
-  var w0 = M_PI * f0;
-  var alpha = sin(w0) / (2.0 * q);
-  var c = cos(w0);
-
-  var a0_inv = 1.0 / (1.0 + alpha);
-
-  coefs.a1 = (-2.0 * c) * a0_inv;
-  coefs.a2 = (1.0 - alpha) * a0_inv;
-
-  coefs.b0 = coefs.a2;
-  coefs.b1 = coefs.a1;
-  coefs.b2 = 1.0;
-}
-
-// peakingEQ: H(s) = (s^2 + s*(A/Q) + 1) / (s^2 + s/(A*Q) + 1)
-// A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40)
-// gain is linear here
-function peaking_coefs(f0, q, gain, coefs) {
-  var g = sqrt(gain);
-  var g_inv = 1.0 / g;
-
-  var w0 = M_PI * f0;
-  var alpha = sin(w0) / (2.0 * q);
-  var c = cos(w0);
-
-  var a0_inv = 1.0 / (1.0 + alpha * g_inv);
-
-  coefs.a1 = (-2.0 * c) * a0_inv;
-  coefs.a2 = (1.0 - alpha * g_inv) * a0_inv;
-
-  coefs.b0 = (1.0 + alpha * g) * a0_inv;
-  coefs.b1 = coefs.a1;
-  coefs.b2 = (1.0 - alpha * g) * a0_inv;
-}
-
-// lowShelf: H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1)
-// A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40)
-// gain is linear here
-function lowshelf_coefs(f0, q, gain, coefs) {
-  var g = sqrt(gain);
-
-  var w0 = M_PI * f0;
-  var alpha_2_sqrtg = sin(w0) * sqrt(g) / q ;
-  var c = cos(w0);
-
-  var a0_inv = 1.0 / ( (g+1.0) + (g-1.0) * c + alpha_2_sqrtg);
-
-  coefs.a1 = (-2.0 *     ( (g-1.0) + (g+1.0) * c                ) ) * a0_inv;
-  coefs.a2 = (             (g+1.0) + (g-1.0) * c - alpha_2_sqrtg  ) * a0_inv;
-
-  coefs.b0 = (       g * ( (g+1.0) - (g-1.0) * c + alpha_2_sqrtg) ) * a0_inv;
-  coefs.b1 = ( 2.0 * g * ( (g-1.0) - (g+1.0) * c                ) ) * a0_inv;
-  coefs.b2 = (       g * ( (g+1.0) - (g-1.0) * c - alpha_2_sqrtg) ) * a0_inv;
-}
-
-// highShelf: H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A)
-// A = sqrt( 10^(dBgain/20) ) = 10^(dBgain/40)
-// gain is linear here
-function highshelf_coefs(f0, q, gain, coefs) {
-  var g = sqrt(gain);
-
-  var w0 = M_PI * f0;
-  var alpha_2_sqrtg = sin(w0) * sqrt(g) / q ;
-  var c = cos(w0);
-
-  var a0_inv = 1.0 / ( (g+1.0) - (g-1.0) * c + alpha_2_sqrtg);
-
-  coefs.a1 = ( 2.0 *     ( (g-1.0) - (g+1.0) * c                ) ) * a0_inv;
-  coefs.a2 = (             (g+1.0) - (g-1.0) * c - alpha_2_sqrtg  ) * a0_inv;
-
-  coefs.b0 = (      g * (  (g+1.0) + (g-1.0) * c + alpha_2_sqrtg) ) * a0_inv;
-  coefs.b1 = (-2.0 * g * ( (g-1.0) + (g+1.0) * c                ) ) * a0_inv;
-  coefs.b2 = (      g * (  (g+1.0) + (g-1.0) * c - alpha_2_sqrtg) ) * a0_inv;
-}
-
-// helper function
-function calculateCoefs(type, f0, q, gain, coefs) {
-
-  switch(type) {
-    case 'lowpass':
-      lowpass_coefs(f0, q, coefs);
-      break;
-
-    case 'highpass':
-      highpass_coefs(f0, q, coefs);
-      break;
-
-    case 'bandpass_constant_skirt':
-      bandpass_constant_skirt_coefs(f0, q, coefs);
-      break;
-
-    case 'bandpass_constant_peak':
-      bandpass_constant_peak_coefs(f0, q, coefs);
-      break;
-
-    case 'notch':
-      notch_coefs(f0, q, coefs);
-      break;
-
-    case 'allpass':
-      allpass_coefs(f0, q, coefs);
-      break;
-
-    case 'peaking':
-      peaking_coefs(f0, q, gain, coefs);
-      break;
-
-    case 'lowshelf':
-      lowshelf_coefs(f0, q, gain, coefs);
-      break;
-
-    case 'highshelf':
-      highshelf_coefs(f0, q, gain, coefs);
-      break;
-  }
-
-  // apply gain
-  switch (type) {
-    case 'lowpass':
-    case 'highpass':
-    case 'bandpass_constant_skirt':
-    case 'bandpass_constant_peak':
-    case 'notch':
-    case 'allpass':
-      if (gain != 1.0) {
-        coefs.b0 *= gain;
-        coefs.b1 *= gain;
-        coefs.b2 *= gain;
-      }
-      break;
-    /* gain is already integrated for the following */
-    case 'peaking':
-    case 'lowshelf':
-    case 'highshelf':
-      break;
-  }
-}
-
-// direct form I
-// a0 = 1, a1 = a[0], a2 = a[1]
-// 4 states (in that order): x(n-1), x(n-2), y(n-1), y(n-2)
-function biquadArrayDf1(coefs, state, inFrame, outFrame, size) {
-  for(let i = 0; i < size; i++) {
-    var y = coefs.b0 * inFrame[i]
-          + coefs.b1 * state.xn_1[i] + coefs.b2 * state.xn_2[i]
-          - coefs.a1 * state.yn_1[i] - coefs.a2 * state.yn_2[i];
-
-    outFrame[i] = y;
-
-    // update states
-    state.xn_2[i] = state.xn_1[i];
-    state.xn_1[i] = inFrame[i];
-
-    state.yn_2[i] = state.yn_1[i];
-    state.yn_1[i] = y;
-  }
-}
-
-// transposed direct form II
-// a0 = 1, a1 = a[0], a2 = a[1]
-// 2 states
-function biquadArrayDf2(coefs, state, inFrame, outFrame, size) {
-  for (let i = 0; i < size; i++) {
-    outFrame[i] = coefs.b0 * inFrame[i] + state.xn_1[i];
-
-    // update states
-    state.xn_1[i] = coefs.b1 * inFrame[i] - coefs.a1[i] * outFrame[i] + state.xn_2[i];
-    state.xn_2[i] = coefs.b2 * inFrame[i] - coefs.a2[i] * outFrame[i];
-  }
-}
-
-
+//   if (idx == 0)
+//     minVal = maxVal = y;
+//   else if (y < minVal)
+//     minVal = y;
+//   else if (y > maxVal)
+//     maxVal = y;
+// }
 
 const definitions = {
   type: {
@@ -298,6 +43,7 @@ const definitions = {
       'lowpass',
       'highpass',
       'bandpass_constant_skirt',
+      'bandpass',
       'bandpass_constant_peak',
       'notch',
       'allpass',
@@ -305,38 +51,42 @@ const definitions = {
       'lowshelf',
       'highshelf',
     ],
-    metas: { kind: 'static' },
+    metas: { kind: 'dyanmic' },
   },
   f0: {
     type: 'float',
     default: 1,
-    metas: { kind: 'static' },
+    metas: { kind: 'dyanmic' },
   },
   gain: {
     type: 'float',
     default: 1,
     min: 0,
-    metas: { kind: 'static' },
+    metas: { kind: 'dyanmic' },
   },
   q: {
     type: 'float',
     default: 1,
     min: 0.001, // PIPO_BIQUAD_MIN_Q
     // max: 1,
-    metas: { kind: 'static' },
+    metas: { kind: 'dyanmic' },
   },
-  bandwidth: {
-    type: 'float',
-    default: null,
-    nullable: true,
-    metas: { kind: 'static' },
-  },
+  // bandwidth: {
+  //   type: 'float',
+  //   default: null,
+  //   nullable: true,
+  //   metas: { kind: 'dyanmic' },
+  // },
 }
+
 
 /**
  * Biquad filter (Direct form I).
  *
- * @memberof module:operator
+ * Based on the ["Cookbook formulae for audio EQ biquad filter coefficients"](http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt)
+ * by Robert Bristow-Johnson.
+ *
+ * @memberof module:common.operator
  *
  * @param {Object} options - Override default values.
  * @param {String} [type='lowpass'] - Type of the filter. Available filters are:
@@ -346,8 +96,6 @@ const definitions = {
  *  to its type.
  * @param {Number} [gain=1] - Gain of the filter.
  * @param {Number} [q=1] - Quality factor of the filter.
- * @param {Number} [bandwidth=null] - Bandwidth of the filter. If defined,
- *  compute the `q` factor according to the `f0` and `bandwidth`.
  *
  * @example
  * // todo
@@ -357,49 +105,192 @@ class Biquad extends BaseLfo {
     super(definitions, options);
   }
 
-  /** @private */
-  processStreamParams(prevStreamParams) {
-    this.prepareStreamParams(prevStreamParams);
+  onParamUpdate(name, value, metas) {
+    this._calculateCoefs();
+  }
 
+  _calculateCoefs() {
     const sampleRate = this.streamParams.sourceSampleRate;
-    const frameSize = this.streamParams.frameSize;
-
-    // if no `sampleRate` or `sampleRate` is 0 we shall halt!
-    if (!sampleRate || sampleRate <= 0)
-      throw new Error('Invalid sampleRate value (0) for biquad');
-
     const type = this.params.get('type');
     const f0 = this.params.get('f0');
     const gain = this.params.get('gain');
     const q = this.params.get('q');
-    const bandwidth = this.params.get('bandwidth');
-    const normF0 = f0 / (sampleRate / 2);
-    let qFactor = q;
+    // const bandwidth = this.params.get('bandwidth');
+    const bandwidth = null;
 
-    // if bandwidth is defined, override the definition of the `q` factor.
-    if (bandwidth !== null)
-      qFactor = f0 / bandwidth;
+    let b0 = 0, b1 = 0, b2 = 0, a0 = 0, a1 = 0, a2 = 0;
 
-    this.coefs = { b0: 0, b1: 0, b2: 0, a1: 0, a2: 0 };
-    this.state = {
-      xn_1: new Float32Array(frameSize),
-      xn_2: new Float32Array(frameSize),
-      yn_1: new Float32Array(frameSize),
-      yn_2: new Float32Array(frameSize)
+    const A = pow(10, gain / 40);
+    const w0 = _2PI * f0 / sampleRate;
+    const cosW0 = cos(w0);
+    const sinW0 = sin(w0);
+    let alpha; // depend of the filter type
+    let _2RootAAlpha; // intermediate value for lowshelf and highshelf
+
+    switch (type) {
+      // H(s) = 1 / (s^2 + s/Q + 1)
+      case 'lowpass':
+        alpha = sinW0 / (2 * q);
+        b0 = (1 - cosW0) / 2;
+        b1 = 1 - cosW0;
+        b2 = b0;
+        a0 = 1 + alpha;
+        a1 = -2 * cosW0;
+        a2 = 1 -alpha;
+        break;
+      // H(s) = s^2 / (s^2 + s/Q + 1)
+      case 'highpass':
+        alpha = sinW0 / (2 * q);
+        b0 = (1 + cosW0) / 2;
+        b1 = - (1 + cosW0)
+        b2 = b0;
+        a0 = 1 + alpha;
+        a1 = -2 * cosW0;
+        a2 = 1 - alpha;
+        break;
+      // H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q)
+      case 'bandpass_constant_skirt':
+        if (bandwidth) {
+          // sin(w0)*sinh( ln(2)/2 * BW * w0/sin(w0) )           (case: BW)
+        } else {
+          alpha = sinW0 / (2 * q);
+        }
+
+        b0 = sinW0 / 2;
+        b1 = 0;
+        b2 = -b0;
+        a0 = 1 + alpha;
+        a1 = -2 * cosW0;
+        a2 = 1 - alpha;
+        break;
+      // H(s) = (s/Q) / (s^2 + s/Q + 1)      (constant 0 dB peak gain)
+      case 'bandpass': // looks like what is gnerally considered as a bandpass
+      case 'bandpass_constant_peak':
+        if (bandwidth) {
+          // sin(w0)*sinh( ln(2)/2 * BW * w0/sin(w0) )           (case: BW)
+        } else {
+          alpha = sinW0 / (2 * q);
+        }
+
+        b0 = alpha;
+        b1 = 0;
+        b2 = -alpha;
+        a0 = 1 + alpha;
+        a1 = -2 * cosW0;
+        a2 = 1 - alpha;
+        break;
+      // H(s) = (s^2 + 1) / (s^2 + s/Q + 1)
+      case 'notch':
+        alpha = sinW0 / (2 * q);
+        b0 = 1;
+        b1 = -2 * cosW0;
+        b2 = 1;
+        a0 = 1 + alpha;
+        a1 = b1;
+        a2 = 1 - alpha;
+        break;
+      // H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1)
+      case 'allpass':
+        alpha = sinW0 / (2 * q);
+        b0 = 1 - alpha;
+        b1 = -2 * cosW0;
+        b2 = 1 + alpha;
+        a0 = b2;
+        a1 = b1;
+        a2 = b0;
+        break;
+      // H(s) = (s^2 + s*(A/Q) + 1) / (s^2 + s/(A*Q) + 1)
+      case 'peaking':
+        if (bandwidth) {
+          // sin(w0)*sinh( ln(2)/2 * BW * w0/sin(w0) )           (case: BW)
+        } else {
+          alpha = sinW0 / (2 * q);
+        }
+
+        b0 = 1 + alpha * A;
+        b1 = -2 * cosW0;
+        b2 = 1 - alpha * A;
+        a0 = 1 + alpha / A;
+        a1 = b1;
+        a2 = 1 - alpha / A;
+        break;
+      // H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1)
+      case 'lowshelf':
+        alpha = sinW0 / (2 * q);
+        _2RootAAlpha = 2 * sqrt(A) * alpha;
+
+        b0 =     A * ((A + 1) - (A - 1) * cosW0 + _2RootAAlpha);
+        b1 = 2 * A * ((A - 1) - (A + 1) * cosW0);
+        b2 =     A * ((A + 1) - (A - 1) * cosW0 - _2RootAAlpha);
+        a0 =          (A + 1) + (A - 1) * cosW0 + _2RootAAlpha;
+        a1 =    -2 * ((A - 1) + (A + 1) * cosW0);
+        a2 =          (A + 1) + (A - 1) * cosW0 - _2RootAAlpha;
+        break;
+      // H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A)
+      case 'highshelf':
+        alpha = sinW0 / (2 * q);
+        _2RootAAlpha = 2 * sqrt(A) * alpha;
+
+        b0 =      A * ((A + 1) + (A - 1) * cosW0 + _2RootAAlpha);
+        b1 = -2 * A * ((A - 1) + (A + 1) * cosW0);
+        b2 =      A * ((A + 1) + (A - 1) * cosW0 - _2RootAAlpha);
+        a0 =           (A + 1) - (A - 1) * cosW0 + _2RootAAlpha;
+        a1 =      2 * ((A - 1) - (A + 1) * cosW0);
+        a2 =           (A + 1) - (A - 1) * cosW0 - _2RootAAlpha;
+
+        break;
+    }
+
+    this.coefs = {
+      b0: b0 / a0,
+      b1: b1 / a0,
+      b2: b2 / a0,
+      a1: a1 / a0,
+      a2: a2 / a0,
     };
 
-    // type, f0, q, gain, coefs
-    calculateCoefs(type, normF0, qFactor, gain, this.coefs);
-    console.log(this.coefs);
+    // reset state
+    this.state = { x1: 0, x2: 0, y1: 0, y2: 0 };
+  }
 
+  /** @private */
+  processStreamParams(prevStreamParams) {
+    this.prepareStreamParams(prevStreamParams);
+
+    // if no `sampleRate` or `sampleRate` is 0 we shall halt!
+    const sampleRate = this.streamParams.sourceSampleRate;
+
+    if (!sampleRate || sampleRate <= 0)
+      throw new Error('Invalid sampleRate value (0) for biquad');
+
+    this._calculateCoefs();
     this.propagateStreamParams();
   }
 
   /** @private */
   processSignal(frame) {
     const frameSize = this.streamParams.frameSize;
-    // coefs, state, inFrame, outFrame, size
-    biquadArrayDf1(this.coefs, this.state, frame.data, this.frame.data, frameSize);
+    const outData = this.frame.data;
+    const inData = frame.data;
+    const state = this.state;
+    const coefs = this.coefs;
+
+    for (let i = 0; i < frameSize; i++) {
+      const x = inData[i];
+      const y = coefs.b0 * x
+              + coefs.b1 * state.x1 + coefs.b2 * state.x2
+              - coefs.a1 * state.y1 - coefs.a2 * state.y2;
+
+      outData[i] = y;
+
+      // update states
+      state.x2 = state.x1;
+      state.x1 = x;
+      state.y2 = state.y1;
+      state.y1 = y;
+    }
+
+    // console.log(this.frame.data);
   }
 }
 
