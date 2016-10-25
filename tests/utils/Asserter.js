@@ -2,7 +2,6 @@ import BaseLfo from '../../src/common/core/BaseLfo';
 
 /**
  * node that make assertions against expected frames
- * @todo - add assertion for metadata
  */
 class Asserter extends BaseLfo {
   constructor(asserter) {

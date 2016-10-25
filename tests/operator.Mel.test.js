@@ -8,7 +8,6 @@ import Slicer from '../src/common/operator/Slicer';
 import FFT from '../src/common/operator/FFT';
 import Mel from '../src/common/operator/Mel';
 import RMSE from './utils/RMSE';
-// import FileLogger from './utils/FileLogger';
 
 // results from librosa
 // > librosa.mel_frequencies(n_mels=26, htk=True, fmin=0, fmax=22050);

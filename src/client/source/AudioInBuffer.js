@@ -1,80 +1,5 @@
 import BaseLfo from '../../common/core/BaseLfo';
 
-const workerCode = `
-self.addEventListener('message', function process(e) {
-  var blockSize = e.data.blockSize;
-  var bufferSource = e.data.buffer;
-  var buffer = new Float32Array(bufferSource);
-  var length = buffer.length;
-  var index = 0;
-
-  while (index < length) {
-    var copySize = Math.min(length - index, blockSize);
-    var block = buffer.subarray(index, index + copySize);
-    var sendBlock = new Float32Array(block);
-
-    postMessage({
-      command: 'process',
-      index: index,
-      buffer: sendBlock.buffer,
-    }, [sendBlock.buffer]);
-
-    index += copySize;
-  }
-
-  postMessage({
-    command: 'finalize',
-    index: index,
-    buffer: bufferSource,
-  }, [bufferSource]);
-}, false)`;
-
-
-class _PseudoWorker {
-  constructor() {
-    this._callback = null;
-  }
-
-  postMessage(e) {
-    const blockSize = e.blockSize;
-    const bufferSource = e.buffer;
-    const buffer = new Float32Array(bufferSource);
-    const length = buffer.length;
-    const that = this;
-    let index = 0;
-
-    (function slice() {
-      if (index < length) {
-        var copySize = Math.min(length - index, blockSize);
-        var block = buffer.subarray(index, index + copySize);
-        var sendBlock = new Float32Array(block);
-
-        that._send({
-          command: 'process',
-          index: index,
-          buffer: sendBlock.buffer,
-        });
-
-        index += copySize;
-        setTimeout(slice, 0);
-      } else {
-        that._send({
-          command: 'finalize',
-          index: index,
-          buffer: buffer,
-        });
-      }
-    }());
-  }
-
-  addListener(callback) {
-    this._callback = callback;
-  }
-
-  _send(msg) {
-    this._callback({ data: msg });
-  }
-}
 
 const definitions = {
   audioBuffer: {
@@ -92,11 +17,6 @@ const definitions = {
     default: 0,
     constant: true,
   },
-  useWorker: {
-    type: 'boolean',
-    default: true,
-    constant: true,
-  },
 };
 
 /**
@@ -107,8 +27,6 @@ const definitions = {
  * @param {AudioBuffer} [options.audioBuffer] - Audio buffer to process.
  * @param {Number} [options.frameSize=512] - Size of the output blocks.
  * @param {Number} [options.channel=0] - Number of the channel to process.
- * @param {Boolean} [options.useWorker=true] - If false, fallback to main
- *  thread for the slicing of the audio buffer, otherwise use a WebWorker.
  *
  * @memberof module:client.source
  *
@@ -142,9 +60,6 @@ class AudioInBuffer extends BaseLfo {
       throw new Error('Invalid "audioBuffer" parameter');
 
     this.endTime = 0;
-    this.worker = null;
-
-    this.processFrame = this.processFrame.bind(this);
   }
 
   /**
@@ -159,27 +74,12 @@ class AudioInBuffer extends BaseLfo {
   start() {
     this.initStream();
 
-    if (this.params.useWorker) {
-      const blob = new Blob([workerCode], { type: "text/javascript" });
-      this.worker = new Worker(window.URL.createObjectURL(blob));
-      this.worker.addEventListener('message', this.processFrame, false);
-    } else {
-      this.worker = new _PseudoWorker();
-      this.worker.addListener(this.processFrame);
-    }
-
     const channel = this.params.get('channel');
-    const useWorker = this.params.get('useWorker');
     const audioBuffer = this.params.get('audioBuffer');
     const buffer = audioBuffer.getChannelData(channel).buffer;
-    // copy data for worker if buffer is used elsewhere
-    const sendBuffer = useWorker ? buffer.slice(0) : buffer;
-
     this.endTime = 0;
-    this.worker.postMessage({
-      blockSize: this.streamParams.frameSize,
-      buffer: sendBuffer,
-    }, [sendBuffer]);
+
+    this.processFrame(buffer);
   }
 
   /**
@@ -190,9 +90,6 @@ class AudioInBuffer extends BaseLfo {
    * @see {@link module:client.source.AudioInBuffer#start}
    */
   stop() {
-    this.worker.terminate();
-    this.worker = null;
-
     this.finalizeStream(this.endTime);
   }
 
@@ -212,22 +109,26 @@ class AudioInBuffer extends BaseLfo {
   }
 
   /** @private */
-  processFrame(e) {
-    const sourceSampleRate = this.streamParams.sourceSampleRate;
-    const command = e.data.command;
-    const index = e.data.index;
-    const buffer = e.data.buffer;
-    const time = index / sourceSampleRate;
+  processFrame(buffer) {
+    const sampleRate = this.streamParams.sourceSampleRate;
+    const frameSize = this.streamParams.frameSize;
+    const length = this.buffer.length;
+    const nbrFrames = Math.ceil(this.buffer.length / frameSize);
+    const data = this.frame.data;
 
-    if (command === 'finalize') {
-      this.finalizeStream(time);
-    } else if (command === 'process') {
-      this.frame.data = new Float32Array(buffer);
-      this.frame.time = time;
+    for (let i = 0; i < nbrFrames; i++) {
+      const offest = i * frameSize;
+      const nbrCopy = Math.min(length - offset, frameSize);
+
+      for (let j = 0; j < frameSize; j++)
+        data[j] = j < nbrCopy ? buffer[offset + j] : 0;
+
+      this.frame.time = offset / sampleRate;
+      this.endTime = this.frame.time + nbrCopy / sourceSampleRate;
       this.propagateFrame();
-
-      this.endTime = this.frame.time + this.frame.data.length / sourceSampleRate;
     }
+
+    this.finalizeStream(this.endTime);
   }
 }
 

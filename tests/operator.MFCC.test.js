@@ -9,8 +9,8 @@ import FFT from '../src/common/operator/FFT';
 import Mel from '../src/common/operator/Mel';
 import DCT from '../src/common/operator/DCT';
 import MFCC from '../src/common/operator/MFCC';
+import DataToFile from '../src/node/sink/DataToFile';
 import RMSE from './utils/RMSE';
-import FileLogger from './utils/FileLogger';
 
 // notes on testing
 // error between each frames while large is stable if we take all cepstrum bins
@@ -81,7 +81,7 @@ tape('MFCC Manual', (t) => {
     startIndex: 1, // ignore first value as dct is different than pipo here
   });
 
-  const fileLogger = new FileLogger({
+  const dataToFile = new DataToFile({
     filename: path.join(__dirname, logFile),
   });
 
@@ -91,7 +91,7 @@ tape('MFCC Manual', (t) => {
   mel.connect(dct);
 
   dct.connect(rmse);
-  dct.connect(fileLogger);
+  dct.connect(dataToFile);
 
   audioInFile.start();
 });
@@ -148,7 +148,7 @@ tape('MFCC Packed', (t) => {
     startIndex: 1, // ignore first value as dct is different than pipo here
   });
 
-  const fileLogger = new FileLogger({
+  const dataToFile = new DataToFile({
     filename: path.join(__dirname, logFile),
   });
 
@@ -156,7 +156,7 @@ tape('MFCC Packed', (t) => {
   slicer.connect(mfcc);
 
   mfcc.connect(rmse);
-  mfcc.connect(fileLogger);
+  mfcc.connect(dataToFile);
 
   audioInFile.start();
 });

@@ -32,4 +32,3 @@ tape('SignalRecorder', (t) => {
 
   t.end();
 });
-

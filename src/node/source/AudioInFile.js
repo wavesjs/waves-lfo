@@ -57,7 +57,6 @@ class AudioInFile extends BaseLfo {
   constructor(options) {
     super(definitions, options);
 
-    this.isStarted = false;
     this.processStreamParams = this.processStreamParams.bind(this);
   }
 
@@ -69,14 +68,14 @@ class AudioInFile extends BaseLfo {
    * @see {@link module:node.source.AudioInFile#stop}
    */
   start() {
-    this.isStarted = true;
-
     const filename = this.params.get('filename');
     this.asset = av.Asset.fromFile(filename);
     this.asset.on('error', (err) => console.log(err.stack));
     // call `processStreamParams` because sampleRate is only available
-    // at this point
-    this.asset.decodeToBuffer(this.processStreamParams);
+    this.asset.decodeToBuffer((buffer) => {
+      this.initStream();
+      this.processFrame(buffer);
+    });
   }
 
   /**
@@ -86,14 +85,11 @@ class AudioInFile extends BaseLfo {
    * @see {@link module:node.source.AudioInFile#start}
    */
   stop() {
-    this.isStarted = false;
-
     this.finalizeStream(this.endTime);
   }
 
   /** @private */
-  processStreamParams(buffer) {
-    // console.log(this.asset);
+  processStreamParams() {
     const frameSize = this.params.get('frameSize');
     const channel = this.params.get('channel');
     const sourceSampleRate = this.asset.format.sampleRate;
@@ -109,7 +105,6 @@ class AudioInFile extends BaseLfo {
     this.channelsPerFrame = channelsPerFrame;
 
     this.propagateStreamParams();
-    this.processFrame(buffer);
   }
 
   /** @private */
