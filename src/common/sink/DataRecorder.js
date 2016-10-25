@@ -103,12 +103,12 @@ class DataRecorder extends BaseLfo {
    */
   stop() {
     if (this.isRecording) {
+      this.isRecording = false;
       const callback = this.params.get('callback');
 
       if (callback !== null)
         callback(this._store);
 
-      this.isRecording = false;
       this._initStore();
     }
   }
@@ -131,16 +131,16 @@ class DataRecorder extends BaseLfo {
       this.prepareFrame(frame);
 
       const separateArrays = this.params.get('separateArrays');
-
-      this.frame.data = new Float32Array(frame.data);
-      this.frame.time = frame.time;
-      this.frame.metadata = frame.metadata;
+      const entry = {
+        time: frame.time,
+        data: new Float32Array(frame.data),
+      };
 
       if (!separateArrays) {
-        this._store.push(this.frame);
+        this._store.push(entry);
       } else {
-        this._store.time.push(this.frame.time);
-        this._store.data.push(this.frame.data);
+        this._store.time.push(entry.time);
+        this._store.data.push(entry.data);
       }
     }
   }
