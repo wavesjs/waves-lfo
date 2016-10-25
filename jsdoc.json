@@ -4,6 +4,7 @@
       "README.md",
       "src/common/core/BaseLfo.js",
 
+      "src/common/operator/Biquad.js",
       "src/common/operator/DCT.js",
       "src/common/operator/FFT.js",
       "src/common/operator/Magnitude.js",

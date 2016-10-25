@@ -94,6 +94,10 @@ __Stream__ - Succession of frames, the state of the stream at each node is defin
 
 @todo
 
+## `SegmentProducer` and `SegmentDescriptor`
+
+@todo
+
 ## Implementation of an `lfo` operator
 
 ```js
