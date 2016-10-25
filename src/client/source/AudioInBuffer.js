@@ -76,7 +76,7 @@ class AudioInBuffer extends BaseLfo {
 
     const channel = this.params.get('channel');
     const audioBuffer = this.params.get('audioBuffer');
-    const buffer = audioBuffer.getChannelData(channel).buffer;
+    const buffer = audioBuffer.getChannelData(channel);
     this.endTime = 0;
 
     this.processFrame(buffer);
@@ -112,19 +112,19 @@ class AudioInBuffer extends BaseLfo {
   processFrame(buffer) {
     const sampleRate = this.streamParams.sourceSampleRate;
     const frameSize = this.streamParams.frameSize;
-    const length = this.buffer.length;
-    const nbrFrames = Math.ceil(this.buffer.length / frameSize);
+    const length = buffer.length;
+    const nbrFrames = Math.ceil(buffer.length / frameSize);
     const data = this.frame.data;
 
     for (let i = 0; i < nbrFrames; i++) {
-      const offest = i * frameSize;
+      const offset = i * frameSize;
       const nbrCopy = Math.min(length - offset, frameSize);
 
       for (let j = 0; j < frameSize; j++)
         data[j] = j < nbrCopy ? buffer[offset + j] : 0;
 
       this.frame.time = offset / sampleRate;
-      this.endTime = this.frame.time + nbrCopy / sourceSampleRate;
+      this.endTime = this.frame.time + nbrCopy / sampleRate;
       this.propagateFrame();
     }
 
