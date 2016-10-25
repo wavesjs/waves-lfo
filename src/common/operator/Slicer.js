@@ -95,6 +95,9 @@ class Slicer extends BaseLfo {
   /** @private */
   finalizeStream(endTime) {
     if (this.frameIndex > 0) {
+      const frameRate = this.streamParams.frameRate;
+      // set the time of the last frame
+      this.frame.time += (1 / frameRate);
       this.frame.data.fill(0, this.frameIndex);
       this.propagateFrame();
     }
