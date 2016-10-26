@@ -104,6 +104,7 @@ class AudioInBuffer extends BaseLfo {
     this.streamParams.frameRate = frameRate;
     this.streamParams.frameType = 'signal';
     this.streamParams.sourceSampleRate = sourceSampleRate;
+    this.streamParams.sourceSampleCount = frameSize;
 
     this.propagateStreamParams();
   }

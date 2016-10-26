@@ -7,7 +7,7 @@ class BaseLfoSegmentDescriptor extends BaseLfo {
     this.segmentMode = false;
     this.segmentStartTime = null;
     this.segmentStopTime = null;
-    this.isInSegment = false;
+    this.inSegment = false;
   }
 
   processSegmentStart(time) {
@@ -20,11 +20,6 @@ class BaseLfoSegmentDescriptor extends BaseLfo {
 
   processFrame(frame) {
     this.prepareFrame();
-
-    // // frameTime and frameMetadata defaults to identity
-    // this.frame.time = frame.time;
-    // this.frame.metadata = frame.metadata;
-
     this.processFunction(frame);
 
     if (this.segmentMode === false)

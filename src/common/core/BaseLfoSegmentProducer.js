@@ -13,6 +13,8 @@ class BaseLfoSegmentProducer extends BaseLfo {
       next.segmentMode = true;
   }
 
+
+
   propagateSegmentStart(time) {
     for (let i = 0; i < this.nextOps.length; i++)
       this.nextOps[i].segmentStart(time);

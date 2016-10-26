@@ -187,12 +187,15 @@ class EventIn extends BaseLfo {
 
       this.streamParams.sourceSampleRate = sampleRate;
       this.streamParams.frameRate = sampleRate / frameSize;
-    } else { // `vector` or `scalar`
+      this.streamParams.sourceSampleCount = frameSize;
+
+    } else if (frameType === 'vector' || frameType === 'scalar') {
       if (frameRate === null)
         throw new Error('Undefined "frameRate" for "vector" stream');
 
       this.streamParams.frameRate = frameRate;
       this.streamParams.sourceSampleRate = frameRate;
+      this.streamParams.sourceSampleCount = 1;
     }
 
     this.propagateStreamParams();

@@ -115,6 +115,7 @@ class AudioInNode extends BaseLfo {
     this.streamParams.frameRate = sampleRate / frameSize;
     this.streamParams.frameType = 'signal';
     this.streamParams.sourceSampleRate = sampleRate;
+    this.streamParams.sourceSampleCount = frameSize;
 
     this._blockDuration = frameSize / sampleRate;
 
