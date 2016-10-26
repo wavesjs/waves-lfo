@@ -1,4 +1,4 @@
-import BaseLfoSegmentDescriptor from '../core/BaseLfoSegmentDescriptor';
+import BaseLfo from '../core/BaseLfo';
 
 /**
  * Find minimun and maximum values of a given `signal`.
@@ -32,24 +32,10 @@ import BaseLfoSegmentDescriptor from '../core/BaseLfoSegmentDescriptor';
  * eventIn.process(null, signal);
  * > [1, 512];
  */
-class MinMax extends BaseLfoSegmentDescriptor {
+class MinMax extends BaseLfo {
   constructor(options = {}) {
     // throw errors if options are given
     super({}, options);
-
-    // segment mode
-    this.segmentStartTime = null;
-    this.min = null;
-    this.max = null;
-  }
-
-  finalizeStream(endTime) {
-    if (this.segmentMode) {
-      this.frame.time = this.segmentStartTime;
-      this.propagateFrame();
-    }
-
-    super.finalizeStream(endTime);
   }
 
   /** @private */
@@ -60,24 +46,8 @@ class MinMax extends BaseLfoSegmentDescriptor {
     this.streamParams.frameSize = 2;
     this.streamParams.description = ['min', 'max'];
 
-    if (this.segmentMode === true)
-      this.streamParams.frameRate = 0;
-
     this.propagateStreamParams();
   }
-
-  processSegmentSignal(frame) {
-    // if (segmentStartTime === null)
-    //   default process
-    // else if (segmentStartTime < frame.time && segmentStopTime < frame.time)
-    //   do nothing
-    // else if (segmentStopTime > frame.time)
-    //   process data until stop time
-    //   propagate frame and reinit buffer
-    // else if (segmentStartTime > frame.time)
-    //
-  }
-
 
   /**
    * Use the `MinMax` operator in `standalone` mode (i.e. outside of a graph).
@@ -111,10 +81,7 @@ class MinMax extends BaseLfoSegmentDescriptor {
 
   /** @private */
   processSignal(frame) {
-    if (this.segmentMode === true)
-      this.processSegmentSignal(frame.data);
-    else
-      this.inputSignal(frame.data);
+    this.inputSignal(frame.data);
   }
 }
 

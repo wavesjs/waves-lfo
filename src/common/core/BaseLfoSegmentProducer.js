@@ -7,7 +7,7 @@ class BaseLfoSegmentProducer extends BaseLfo {
   }
 
   connect(next) {
-    super(next);
+    super.connect(next);
 
     if (next instanceof BaseLfoSegmentDescriptor)
       next.segmentMode = true;

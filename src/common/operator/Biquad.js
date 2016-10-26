@@ -81,7 +81,8 @@ const definitions = {
 
 
 /**
- * Biquad filter (Direct form I).
+ * Biquad filter (Direct form I). If input is of type `vector` the filter is
+ * applied on each dimension i parallel.
  *
  * Based on the ["Cookbook formulae for audio EQ biquad filter coefficients"](http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt)
  * by Robert Bristow-Johnson.
@@ -131,6 +132,9 @@ class Biquad extends BaseLfo {
 
   _calculateCoefs() {
     const sampleRate = this.streamParams.sourceSampleRate;
+    const frameType = this.streamParams.frameType;
+    const frameSize = this.streamParams.frameSize;
+
     const type = this.params.get('type');
     const f0 = this.params.get('f0');
     const gain = this.params.get('gain');
@@ -270,7 +274,16 @@ class Biquad extends BaseLfo {
     };
 
     // reset state
-    this.state = { x1: 0, x2: 0, y1: 0, y2: 0 };
+    if (frameType === 'signal') {
+      this.state = { x1: 0, x2: 0, y1: 0, y2: 0 };
+    } else {
+      this.state = {
+        x1: new Float32Array(frameSize),
+        x2: new Float32Array(frameSize),
+        y1: new Float32Array(frameSize),
+        y2: new Float32Array(frameSize),
+      };
+    }
   }
 
   /** @private */
@@ -285,6 +298,30 @@ class Biquad extends BaseLfo {
 
     this._calculateCoefs();
     this.propagateStreamParams();
+  }
+
+  /** @private */
+  processVector(frame) {
+    const frameSize = this.streamParams.frameSize;
+    const outData = this.frame.data;
+    const inData = frame.data;
+    const state = this.state;
+    const coefs = this.coefs;
+
+    for (let i = 0; i < frameSize; i++) {
+      const x = inData[i];
+      const y = coefs.b0 * x
+              + coefs.b1 * state.x1[i] + coefs.b2 * state.x2[i]
+              - coefs.a1 * state.y1[i] - coefs.a2 * state.y2[i];
+
+      outData[i] = y;
+
+      // update states
+      state.x2[i] = state.x1[i];
+      state.x1[i] = x;
+      state.y2[i] = state.y1[i];
+      state.y1[i] = y;
+    }
   }
 
   /** @private */
