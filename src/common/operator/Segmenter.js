@@ -43,10 +43,61 @@ const definitions = {
 }
 
 /**
- * Create segment based on attacks
+ * Create segments based on attacks.
  *
+ * @memberof module:common.operator
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {Boolean} [options.logInput=false] - Apply log on the input.
+ * @param {Number} [options.minInput=0.000000000001] - Minimum value to use as
+ *  input.
+ * @param {Number} [options.filterOrder=5] - Order of the internally used moving
+ *  average.
+ * @param {Number} [options.threshold=3] - Threshold that triggers a segment
+ *  start.
+ * @param {Number} [options.offThreshold=-Infinity] - Threshold that triggers
+ *  a segment end.
+ * @param {Number} [options.minInter=0.050] - Minimum delay between two semgents.
+ * @param {Number} [options.maxDuration=Infinity] - Maximum duration of a segment.
+ *
+ * @example
+ * // assuming a stream from the microphone
+ * const source = audioContext.createMediaStreamSource(stream);
+ *
+ * const audioInNode = new lfo.source.AudioInNode({
+ *   sourceNode: source,
+ *   audioContext: audioContext,
+ * });
+ *
+ * const slicer = new lfo.operator.Slicer({
+ *   frameSize: frameSize,
+ *   hopSize: hopSize,
+ *   centeredTimeTags: true
+ * });
+ *
+ * const power = new lfo.operator.RMS({
+ *   power: true,
+ * });
+ *
+ * const segmenter = new lfo.operator.Segmenter({
+ *   logInput: true,
+ *   filterOrder: 5,
+ *   threshold: 3,
+ *   offThreshold: -Infinity,
+ *   minInter: 0.050,
+ *   maxDuration: 0.050,
+ * });
+ *
+ * const logger = new lfo.sink.Logger({ time: true });
+ *
+ * audioInNode.connect(slicer);
+ * slicer.connect(power);
+ * power.connect(segmenter);
+ * segmenter.connect(logger);
+ *
+ * audioInNode.start();
  */
-export default class Segmenter extends BaseLfo {
+class Segmenter extends BaseLfo {
   constructor(options) {
     super(definitions, options);
 
@@ -191,3 +242,5 @@ export default class Segmenter extends BaseLfo {
     // do not propagate here as the frameRate is now zero
   }
 }
+
+export default Segmenter;
