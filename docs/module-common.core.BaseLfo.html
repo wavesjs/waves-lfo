@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WavesJS - Low Frequency Operators - Class: BaseLfo</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/overrides.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- if home page assume a title is already present in README -->
+    
+    <h1 class="page-title">Class: BaseLfo</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>BaseLfo</h2>
+        
+            <div class="class-description"><p>Base <code>lfo</code> class to be extended in order to create new nodes.</p>
+<p>Nodes are divided in 3 categories:</p>
+<ul>
+<li><strong><code>source</code></strong> are responsible for acquering a signal and its properties
+(frameRate, frameSize, etc.)</li>
+<li><strong><code>sink</code></strong> are endpoints of the graph, such nodes can be recorders,
+visualizers, etc.</li>
+<li><strong><code>operator</code></strong> are used to make computation on the input signal and
+forward the results below in the graph.</li>
+</ul>
+<p>In most cases the methods to override / extend are:</p>
+<ul>
+<li>the <strong><code>constructor</code></strong> to define the parameters of the new lfo node.</li>
+<li>the <strong><code>processStreamParams</code></strong> method to define how the node modify the
+stream attributes (e.g. by changing the frame size)</li>
+<li>the <strong><code>process{FrameType}</code></strong> method to define the operations that the
+node apply on the stream. The type of input a node can handle is define
+by its implemented interface, if it implements <code>processSignal</code> a stream
+with <code>frameType === 'signal'</code> can be processed, <code>processVector</code> to handle
+an input of type <code>vector</code>.</li>
+</ul>
+<p><span class="warning"><em>This class should be considered abstract and only
+be used to be extended.</em></span></p>
+<p>// overview of the behavior of a node</p>
+<p><strong>processStreamParams(prevStreamParams)</strong></p>
+<p><code>base</code> class (default implementation)</p>
+<ul>
+<li>call <code>preprocessStreamParams</code></li>
+<li>call <code>propagateStreamParams</code></li>
+</ul>
+<p><code>child</code> class</p>
+<ul>
+<li>call <code>preprocessStreamParams</code></li>
+<li>override some of the inherited <code>streamParams</code></li>
+<li>creates the any related logic buffers</li>
+<li>call <code>propagateStreamParams</code></li>
+</ul>
+<p><em>should not call <code>super.processStreamParams</code></em></p>
+<p><strong>prepareStreamParams()</strong></p>
+<ul>
+<li>assign prevStreamParams to this.streamParams</li>
+<li>check if the class implements the correct <code>processInput</code> method</li>
+</ul>
+<p><em>shouldn't be extended, only consumed in <code>processStreamParams</code></em></p>
+<p><strong>propagateStreamParams()</strong></p>
+<ul>
+<li>creates the <code>frameData</code> buffer</li>
+<li>propagate <code>streamParams</code> to children</li>
+</ul>
+<p><em>shouldn't be extended, only consumed in <code>processStreamParams</code></em></p>
+<p><strong>processFrame()</strong></p>
+<p><code>base</code> class (default implementation)</p>
+<ul>
+<li>call <code>preprocessFrame</code></li>
+<li>assign frameTime and frameMetadata to identity</li>
+<li>call the proper function according to inputType</li>
+<li>call <code>propagateFrame</code></li>
+</ul>
+<p><code>child</code> class</p>
+<ul>
+<li>call <code>preprocessFrame</code></li>
+<li>do whatever you want with incomming frame</li>
+<li>call <code>propagateFrame</code></li>
+</ul>
+<p><em>should not call <code>super.processFrame</code></em></p>
+<p><strong>prepareFrame()</strong></p>
+<ul>
+<li>if <code>reinit</code> and trigger <code>processStreamParams</code> if needed</li>
+</ul>
+<p><em>shouldn't be extended, only consumed in <code>processFrame</code></em></p>
+<p><strong>propagateFrame()</strong></p>
+<ul>
+<li>propagate frame to children</li>
+</ul>
+<p><em>shouldn't be extended, only consumed in <code>processFrame</code></em></p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="BaseLfo"><span class="type-signature"></span>new BaseLfo<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line89">line 89</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="frame"><span class="type-signature"></span>frame<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Current frame. This object and its data are updated at each incomming
+frame without reallocating memory.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>time</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Time of the current frame.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Float32Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Data of the current frame.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>metadata</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Metadata associted to the current frame.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line135">line 135</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="nextOps"><span class="type-signature"></span>nextOps<span class="type-signature"> :Array.&lt;BaseLfo></span></h4>
+
+
+
+
+<div class="description">
+    <p>List of nodes connected to the ouput of the node (lower in the graph).
+At each frame, the node forward its <code>frame</code> to to all its <code>nextOps</code>.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;BaseLfo></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line153">line 153</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#connect">module:common.core.BaseLfo#connect</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#disconnect">module:common.core.BaseLfo#disconnect</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="params"><span class="type-signature"></span>params<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Parameter bag containing parameter instances.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line93">line 93</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="prevOp"><span class="type-signature"></span>prevOp<span class="type-signature"> :BaseLfo</span></h4>
+
+
+
+
+<div class="description">
+    <p>The node from which the node receive the frames (upper in the graph).</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">BaseLfo</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line166">line 166</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#connect">module:common.core.BaseLfo#connect</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#disconnect">module:common.core.BaseLfo#disconnect</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="streamParams"><span class="type-signature"></span>streamParams<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Description of the stream output of the node.
+Set to <code>null</code> when the node is destroyed.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>frameSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Frame size at the output of the node.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>frameRate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Frame rate at the output of the node.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>frameType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Frame type at the output of the node,
+ possible values are <code>signal</code>, <code>vector</code> or <code>scalar</code>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>If type is <code>vector</code>, describe
+ the dimension(s) of output stream.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sourceSampleRate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Sample rate of the source of the
+ graph. <em>The value should be defined by sources and never modified</em>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sourceSampleCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Number of consecutive discrete
+ time values contained in the data frame output by the source.
+ <em>The value should be defined by sources and never modified</em>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="connect"><span class="type-signature"></span>connect<span class="signature">(next)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Connect the current node (<code>prevOp</code>) to another node (<code>nextOp</code>).
+A given node can be connected to several operators and propagate the
+stream to each of them.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">BaseLfo</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Next operator in the graph.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line233">line 233</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#processFrame">module:common.core.BaseLfo#processFrame</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#disconnect">module:common.core.BaseLfo#disconnect</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="destroy"><span class="type-signature"></span>destroy<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Destroy all the nodes in the sub-graph starting from the current node.
+When detroyed, the <code>streamParams</code> of the node are set to <code>null</code>, the
+operator is then considered as <code>dead</code> and cannot be reconnected.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line270">line 270</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#connect">module:common.core.BaseLfo#connect</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="disconnect"><span class="type-signature"></span>disconnect<span class="signature">(next<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Remove the given operator from its previous operators' <code>nextOps</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">BaseLfo</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    null
+                
+                </td>
+            
+
+            <td class="description last"><p>The operator to disconnect from the current
+ operator. If <code>null</code> disconnect all the next operators.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line253">line 253</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="finalizeStream"><span class="type-signature"></span>finalizeStream<span class="signature">(endTime)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Finalize the stream. A source node should call this method when stopped,
+<code>finalizeStream</code> is automatically propagated throught the graph.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>endTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Logical time at which the graph is stopped.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line321">line 321</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getParamsDescription"><span class="type-signature"></span>getParamsDescription<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Returns an object describing each available parameter of the node.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line197">line 197</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="initStream"><span class="type-signature"></span>initStream<span class="signature">(streamParams<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Helper to initialize the stream in standalone mode.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>streamParams</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>Stream parameters to be used.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line293">line 293</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#processStreamParams">module:common.core.BaseLfo#processStreamParams</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#resetStream">module:common.core.BaseLfo#resetStream</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="onParamUpdate"><span class="type-signature"></span>onParamUpdate<span class="signature">(name, value, metas)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Function called when a param is updated. By default set the <code>_reinit</code>
+flag to <code>true</code> if the param is <code>static</code> one. This method should be
+extended to handle particular logic bound to a specific parameter.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the parameter.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Mixed</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Value of the parameter.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>metas</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Metadata associated to the parameter.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line219">line 219</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="prepareFrame"><span class="type-signature"></span>prepareFrame<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Common logic to perform at the beginning of the <code>processFrame</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line454">line 454</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#processFrame">module:common.core.BaseLfo#processFrame</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="prepareStreamParams"><span class="type-signature"></span>prepareStreamParams<span class="signature">(prevStreamParams)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Common logic to do at the beginning of the <code>processStreamParam</code>, must be
+called at the beginning of any <code>processStreamParam</code> implementation.</p>
+<p>The method mainly check if the current node implement the interface to
+handle the type of frame propagated by it's parent:</p>
+<ul>
+<li>to handle a <code>vector</code> frame type, the class must implement <code>processVector</code></li>
+<li>to handle a <code>signal</code> frame type, the class must implement <code>processSignal</code></li>
+<li>in case of a 'scalar' frame type, the class can implement any of the
+following by order of preference: <code>processScalar</code>, <code>processVector</code>,
+<code>processSignal</code>.</li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>prevStreamParams</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p><code>streamParams</code> of the previous operator.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line365">line 365</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#processStreamParams">module:common.core.BaseLfo#processStreamParams</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#propagateStreamParams">module:common.core.BaseLfo#propagateStreamParams</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="processFrame"><span class="type-signature"></span>processFrame<span class="signature">(frame)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Define the particular logic the operator applies to the stream.
+According to the frame type of the previous node, the method calls one
+of the following method <code>processVector</code>, <code>processSignal</code> or <code>processScalar</code></p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>frame</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Frame (time, data, and metadata) as given by the
+ previous operator. The incomming frame should never be modified by
+ the operator.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line426">line 426</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#prepareFrame">module:common.core.BaseLfo#prepareFrame</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#propagateFrame">module:common.core.BaseLfo#propagateFrame</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#processStreamParams">module:common.core.BaseLfo#processStreamParams</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="processFunction"><span class="type-signature"></span>processFunction<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Pointer to the method called in <code>processFrame</code> according to the
+frame type of the previous operator. Is dynamically assigned in
+<code>prepareStreamParams</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line445">line 445</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#prepareStreamParams">module:common.core.BaseLfo#prepareStreamParams</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#processFrame">module:common.core.BaseLfo#processFrame</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="processStreamParams"><span class="type-signature"></span>processStreamParams<span class="signature">(prevStreamParams)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Initialize or update the operator's <code>streamParams</code> according to the
+previous operators <code>streamParams</code> values.</p>
+<p>When implementing a new operator this method should:</p>
+<ol>
+<li>call <code>this.prepareStreamParams</code> with the given <code>prevStreamParams</code></li>
+<li>optionnally change values to <code>this.streamParams</code> according to the
+logic performed by the operator.</li>
+<li>optionnally allocate memory for ring buffers, etc.</li>
+<li>call <code>this.propagateStreamParams</code> to trigger the method on the next
+operators in the graph.</li>
+</ol>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>prevStreamParams</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p><code>streamParams</code> of the previous operator.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line343">line 343</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#prepareStreamParams">module:common.core.BaseLfo#prepareStreamParams</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#propagateStreamParams">module:common.core.BaseLfo#propagateStreamParams</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="propagateFrame"><span class="type-signature"></span>propagateFrame<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Forward the current <code>frame</code> to the next operators, is called at the end of
+<code>processFrame</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line468">line 468</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#processFrame">module:common.core.BaseLfo#processFrame</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="propagateStreamParams"><span class="type-signature"></span>propagateStreamParams<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Create the <code>this.frame.data</code> buffer and forward the operator's <code>streamParam</code>
+to all its next operators, must be called at the end of any
+<code>processStreamParams</code> implementation.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line406">line 406</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#processStreamParams">module:common.core.BaseLfo#processStreamParams</a></li>
+        
+            <li><a href="module-common.core.BaseLfo.html#prepareStreamParams">module:common.core.BaseLfo#prepareStreamParams</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="resetParams"><span class="type-signature"></span>resetParams<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Reset all parameters to their initial value (as defined on instantication)</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line206">line 206</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#streamParams">module:common.core.BaseLfo#streamParams</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="resetStream"><span class="type-signature"></span>resetStream<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Reset the <code>frame.data</code> buffer by setting all its values to 0.
+A source operator should call <code>processStreamParams</code> and <code>resetStream</code> when
+started, each of these method propagate through the graph automaticaly.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_core_BaseLfo.js.html">common/core/BaseLfo.js</a>, <a href="common_core_BaseLfo.js.html#line305">line 305</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-common.core.BaseLfo.html#processStreamParams">module:common.core.BaseLfo#processStreamParams</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-client.sink.BaseDisplay.html">client.sink.BaseDisplay</a></li><li><a href="module-client.sink.BpfDisplay.html">client.sink.BpfDisplay</a></li><li><a href="module-client.sink.MarkerDisplay.html">client.sink.MarkerDisplay</a></li><li><a href="module-client.sink.SignalDisplay.html">client.sink.SignalDisplay</a></li><li><a href="module-client.sink.SpectrumDisplay.html">client.sink.SpectrumDisplay</a></li><li><a href="module-client.sink.TraceDisplay.html">client.sink.TraceDisplay</a></li><li><a href="module-client.sink.VuMeterDisplay.html">client.sink.VuMeterDisplay</a></li><li><a href="module-client.sink.WaveformDisplay.html">client.sink.WaveformDisplay</a></li><li><a href="module-client.source.AudioInBuffer.html">client.source.AudioInBuffer</a></li><li><a href="module-client.source.AudioInNode.html">client.source.AudioInNode</a></li><li><a href="module-common.core.BaseLfo.html">common.core.BaseLfo</a></li><li><a href="module-common.operator.Biquad.html">common.operator.Biquad</a></li><li><a href="module-common.operator.Dct.html">common.operator.Dct</a></li><li><a href="module-common.operator.Fft.html">common.operator.Fft</a></li><li><a href="module-common.operator.Magnitude.html">common.operator.Magnitude</a></li><li><a href="module-common.operator.MeanStddev.html">common.operator.MeanStddev</a></li><li><a href="module-common.operator.Mel.html">common.operator.Mel</a></li><li><a href="module-common.operator.Mfcc.html">common.operator.Mfcc</a></li><li><a href="module-common.operator.MinMax.html">common.operator.MinMax</a></li><li><a href="module-common.operator.MovingAverage.html">common.operator.MovingAverage</a></li><li><a href="module-common.operator.MovingMedian.html">common.operator.MovingMedian</a></li><li><a href="module-common.operator.OnOff.html">common.operator.OnOff</a></li><li><a href="module-common.operator.Rms.html">common.operator.Rms</a></li><li><a href="module-common.operator.Segmenter.html">common.operator.Segmenter</a></li><li><a href="module-common.operator.Select.html">common.operator.Select</a></li><li><a href="module-common.operator.Slicer.html">common.operator.Slicer</a></li><li><a href="module-common.operator.Yin.html">common.operator.Yin</a></li><li><a href="module-common.sink.Bridge.html">common.sink.Bridge</a></li><li><a href="module-common.sink.DataRecorder.html">common.sink.DataRecorder</a></li><li><a href="module-common.sink.Logger.html">common.sink.Logger</a></li><li><a href="module-common.sink.SignalRecorder.html">common.sink.SignalRecorder</a></li><li><a href="module-common.source.EventIn.html">common.source.EventIn</a></li><li><a href="module-node.sink.DataToFile.html">node.sink.DataToFile</a></li><li><a href="module-node.source.AudioInFile.html">node.source.AudioInFile</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 26 2016 19:46:03 GMT+0200 (CEST)
+    
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

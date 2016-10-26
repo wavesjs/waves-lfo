@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WavesJS - Low Frequency Operators - Source: client/sink/WaveformDisplay.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/overrides.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- if home page assume a title is already present in README -->
+    
+    <h1 class="page-title">Source: client/sink/WaveformDisplay.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import BaseDisplay from './BaseDisplay';
+import MinMax from '../../common/operator/MinMax';
+import Rms from '../../common/operator/Rms';
+import { getColors } from '../../common/utils/display-utils';
+
+
+const definitions = {
+  colors: {
+    type: 'any',
+    default: getColors('waveform'),
+    metas: { kind: 'dyanmic' },
+  },
+  rms: {
+    type: 'boolean',
+    default: false,
+    metas: { kind: 'dyanmic' },
+  }
+};
+
+/**
+ * Display a waveform (along with optionnal Rms) of a given `signal` input in
+ * a canvas.
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {Array&lt;String>} [options.colors=['waveform', 'rms']] - Array
+ *  containing the color codes for the waveform (index 0) and rms (index 1).
+ *  _dynamic parameter_
+ * @param {Boolean} [options.rms=false] - Set to `true` to display the rms.
+ *  _dynamic parameter_
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
+ *  the canvas. _dynamic parameter_
+ * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.max=1] - Maximum value represented in the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.width=300] - Width of the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.height=150] - Height of the canvas.
+ *  _dynamic parameter_
+ * @param {Element|CSSSelector} [options.container=null] - Container element
+ *  in which to insert the canvas. _constant parameter_
+ * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
+ *  in which to draw. _constant parameter_
+ * @param {Number} [options.referenceTime=null] - Optionnal reference time the
+ *  display should considerer as the origin. Is only usefull when synchronizing
+ *  several display using the `DisplaySync` class.
+ *
+ * @memberof module:client.sink
+ *
+ * @example
+ * import * as lfo from 'waves-lfo/client';
+ *
+ * const audioContext = new window.AudioContext();
+ *
+ * navigator.mediaDevices
+ *   .getUserMedia({ audio: true })
+ *   .then(init)
+ *   .catch((err) => console.error(err.stack));
+ *
+ * function init(stream) {
+ *   const audioIn = audioContext.createMediaStreamSource(stream);
+ *
+ *   const audioInNode = new lfo.source.AudioInNode({
+ *     audioContext: audioContext,
+ *     sourceNode: audioIn,
+ *     frameSize: 512,
+ *   });
+ *
+ *   const waveformDisplay = new lfo.sink.WaveformDisplay({
+ *     canvas: '#waveform',
+ *     duration: 3.5,
+ *     rms: true,
+ *   });
+ *
+ *   audioInNode.connect(waveformDisplay);
+ *   audioInNode.start();
+ * });
+ */
+class WaveformDisplay extends BaseDisplay {
+  constructor(options) {
+    super(definitions, options, true);
+
+    this.minMaxOperator = new MinMax();
+    this.rmsOperator = new Rms();
+  }
+
+  /** @private */
+  processStreamParams(prevStreamParams) {
+    this.prepareStreamParams(prevStreamParams);
+
+    this.minMaxOperator.initStream(this.streamParams);
+    this.rmsOperator.initStream(this.streamParams);
+
+    this.propagateStreamParams();
+  }
+
+  /** @private */
+  processSignal(frame, frameWidth, pixelsSinceLastFrame) {
+    // drop frames that cannot be displayed
+    if (frameWidth &lt; 1) return;
+
+    const colors = this.params.get('colors');
+    const showRms = this.params.get('rms');
+    const ctx = this.ctx;
+    const data = frame.data;
+    const iSamplesPerPixels = Math.floor(data.length / frameWidth);
+
+    for (let index = 0; index &lt; frameWidth; index++) {
+      const start = index * iSamplesPerPixels;
+      const end = index === frameWidth - 1 ? undefined : start + iSamplesPerPixels;
+      const slice = data.subarray(start, end);
+
+      const minMax = this.minMaxOperator.inputSignal(slice);
+      const minY = this.getYPosition(minMax[0]);
+      const maxY = this.getYPosition(minMax[1]);
+
+      ctx.strokeStyle = colors[0];
+      ctx.beginPath();
+      ctx.moveTo(index, minY);
+      ctx.lineTo(index, maxY);
+      ctx.closePath();
+      ctx.stroke();
+
+      if (showRms) {
+        const rms = this.rmsOperator.inputSignal(slice);
+        const rmsMaxY = this.getYPosition(rms);
+        const rmsMinY = this.getYPosition(-rms);
+
+        ctx.strokeStyle = colors[1];
+        ctx.beginPath();
+        ctx.moveTo(index, rmsMinY);
+        ctx.lineTo(index, rmsMaxY);
+        ctx.closePath();
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+export default WaveformDisplay;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-client.sink.BaseDisplay.html">client.sink.BaseDisplay</a></li><li><a href="module-client.sink.BpfDisplay.html">client.sink.BpfDisplay</a></li><li><a href="module-client.sink.MarkerDisplay.html">client.sink.MarkerDisplay</a></li><li><a href="module-client.sink.SignalDisplay.html">client.sink.SignalDisplay</a></li><li><a href="module-client.sink.SpectrumDisplay.html">client.sink.SpectrumDisplay</a></li><li><a href="module-client.sink.TraceDisplay.html">client.sink.TraceDisplay</a></li><li><a href="module-client.sink.VuMeterDisplay.html">client.sink.VuMeterDisplay</a></li><li><a href="module-client.sink.WaveformDisplay.html">client.sink.WaveformDisplay</a></li><li><a href="module-client.source.AudioInBuffer.html">client.source.AudioInBuffer</a></li><li><a href="module-client.source.AudioInNode.html">client.source.AudioInNode</a></li><li><a href="module-common.core.BaseLfo.html">common.core.BaseLfo</a></li><li><a href="module-common.operator.Biquad.html">common.operator.Biquad</a></li><li><a href="module-common.operator.Dct.html">common.operator.Dct</a></li><li><a href="module-common.operator.Fft.html">common.operator.Fft</a></li><li><a href="module-common.operator.Magnitude.html">common.operator.Magnitude</a></li><li><a href="module-common.operator.MeanStddev.html">common.operator.MeanStddev</a></li><li><a href="module-common.operator.Mel.html">common.operator.Mel</a></li><li><a href="module-common.operator.Mfcc.html">common.operator.Mfcc</a></li><li><a href="module-common.operator.MinMax.html">common.operator.MinMax</a></li><li><a href="module-common.operator.MovingAverage.html">common.operator.MovingAverage</a></li><li><a href="module-common.operator.MovingMedian.html">common.operator.MovingMedian</a></li><li><a href="module-common.operator.OnOff.html">common.operator.OnOff</a></li><li><a href="module-common.operator.Rms.html">common.operator.Rms</a></li><li><a href="module-common.operator.Segmenter.html">common.operator.Segmenter</a></li><li><a href="module-common.operator.Select.html">common.operator.Select</a></li><li><a href="module-common.operator.Slicer.html">common.operator.Slicer</a></li><li><a href="module-common.operator.Yin.html">common.operator.Yin</a></li><li><a href="module-common.sink.Bridge.html">common.sink.Bridge</a></li><li><a href="module-common.sink.DataRecorder.html">common.sink.DataRecorder</a></li><li><a href="module-common.sink.Logger.html">common.sink.Logger</a></li><li><a href="module-common.sink.SignalRecorder.html">common.sink.SignalRecorder</a></li><li><a href="module-common.source.EventIn.html">common.source.EventIn</a></li><li><a href="module-node.sink.DataToFile.html">node.sink.DataToFile</a></li><li><a href="module-node.source.AudioInFile.html">node.source.AudioInFile</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 26 2016 19:46:03 GMT+0200 (CEST)
+    
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
