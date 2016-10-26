@@ -19,8 +19,8 @@ const frameSize = config.frameSize;
 // audio
 const loader = new loaders.SuperLoader();
 const assets = loader.load([
-  './assets/ligeti-artikulation.wav',
-  `assets/ligeti-artikulation-mfcc-${config.maxFreq}.json`,
+  './assets/animals.wav',
+  `assets/animals-mfcc-${config.maxFreq}.json`,
 ]);
 
 const audioStream = navigator.mediaDevices.getUserMedia({ audio: true });
