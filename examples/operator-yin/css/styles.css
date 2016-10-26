@@ -6,13 +6,13 @@ html {
 body {
   margin: 0;
   padding: 20px;
+  color: rgba(0, 0, 0, 0.4);
+  font-family: "Courier New", Courier, monospace;
 }
 
 h1 {
   font-size: 2.2rem;
   margin: 0 0 20px 0;
-  color: rgba(0, 0, 0, 0.4);
-  font-family: "Courier New", Courier, monospace;
 }
 
 canvas {

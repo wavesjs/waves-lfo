@@ -16,6 +16,7 @@
       "src/common/operator/MovingMedian.js",
       "src/common/operator/OnOff.js",
       "src/common/operator/RMS.js",
+      "src/common/operator/Segmenter.js",
       "src/common/operator/Select.js",
       "src/common/operator/Slicer.js",
       "src/common/operator/Yin.js",
