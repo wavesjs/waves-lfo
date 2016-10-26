@@ -1,5 +1,46 @@
-import BaseLfo from '../core/base-lfo';
-import MovingAverage from './moving-average';
+import BaseLfo from '../core/BaseLfo';
+import MovingAverage from './MovingAverage';
+
+const min = Math.min;
+const max = Math.max;
+
+const definitions = {
+  logInput: {
+    type: 'boolean',
+    default: false,
+    metas: { kind: 'dyanmic' },
+  },
+  minInput: {
+    type: 'float',
+    default: 0.000000000001,
+    metas: { kind: 'dyanmic' },
+  },
+  filterOrder: {
+    type: 'integer',
+    default: 5,
+    metas: { kind: 'dyanmic' },
+  },
+  threshold: {
+    type: 'float',
+    default: 3,
+    metas: { kind: 'dyanmic' },
+  },
+  offThreshold: {
+    type: 'float',
+    default: -Infinity,
+    metas: { kind: 'dyanmic' },
+  },
+  minInter: {
+    type: 'float',
+    default: 0.050,
+    metas: { kind: 'dyanmic' },
+  },
+  maxDuration: {
+    type: 'float',
+    default: Infinity,
+    metas: { kind: 'dyanmic' },
+  },
+}
 
 /**
  * Create segment based on attacks
@@ -7,15 +48,7 @@ import MovingAverage from './moving-average';
  */
 export default class Segmenter extends BaseLfo {
   constructor(options) {
-    super({
-      logInput: false,
-      minInput: 0.000000000001,
-      filterOrder: 5,
-      threshold: 3,
-      offThreshold: -Infinity,
-      minInter: 0.050,
-      maxDuration: Infinity,
-    }, options);
+    super(definitions, options);
 
     this.insideSegment = false;
     this.onsetTime = -Infinity;
@@ -27,32 +60,57 @@ export default class Segmenter extends BaseLfo {
     this.sumOfSquares = 0;
     this.count = 0;
 
-    const minInput = this.params.minInput;
+    const minInput = this.params.get('minInput');
     let fill = minInput;
 
-    if (this.params.logInput && minInput > 0)
+    if (this.params.get('logInput') && minInput > 0)
       fill = Math.log(minInput);
 
     this.movingAverage = new MovingAverage({
-      order: this.params.filterOrder,
+      order: this.params.get('filterOrder'),
       fill: fill,
     });
 
     this.lastMvavrg = fill;
   }
 
-  // set threshold(value) {
-  //   this.params.threshold = value;
-  // }
+  onParamUpdate(name, value, metas) {
+    super.onParamUpdate(name, value, metas);
 
-  // set offThreshold(value) {
-  //   this.params.offThreshold = value;
-  // }
+    if (name === 'filterOrder')
+        this.movingAverage.params.set('order', value);
+  }
+
+  processStreamParams(prevStreamParams) {
+    this.prepareStreamParams(prevStreamParams);
+
+    this.streamParams.frameType = 'vector';
+    this.streamParams.frameSize = 5;
+    this.streamParams.frameRate = 0;
+    this.streamParams.description = ['duration', 'min', 'max', 'mean', 'stddev'];
+
+
+    this.movingAverage.initStream(prevStreamParams);
+
+    this.propagateStreamParams();
+  }
+
+  resetStream() {
+    super.resetStream();
+    this.movingAverage.resetStream();
+    this.resetSegment();
+  }
+
+  finalizeStream(endTime) {
+    if (this.insideSegment)
+      this.outputSegment(endTime);
+
+    super.finalizeStream(endTime);
+  }
 
   resetSegment() {
     this.insideSegment = false;
     this.onsetTime = -Infinity;
-
     // stats
     this.min = Infinity;
     this.max = -Infinity;
@@ -62,67 +120,49 @@ export default class Segmenter extends BaseLfo {
   }
 
   outputSegment(endTime) {
-    this.outFrame[0] = endTime - this.onsetTime;
-    this.outFrame[1] = this.min;
-    this.outFrame[2] = this.max;
+    const outData = this.frame.data;
+    outData[0] = endTime - this.onsetTime;
+    outData[1] = this.min;
+    outData[2] = this.max;
 
     const norm = 1 / this.count;
     const mean = this.sum * norm;
     const meanOfSquare = this.sumOfSquares * norm;
     const squareOfmean = mean * mean;
 
-    this.outFrame[3] = mean;
-    this.outFrame[4] = 0;
+    outData[3] = mean;
+    outData[4] = 0;
 
     if (meanOfSquare > squareOfmean)
-      this.outFrame[4] = Math.sqrt(meanOfSquare - squareOfmean);
+      outData[4] = Math.sqrt(meanOfSquare - squareOfmean);
 
-    this.output(this.onsetTime);
+    this.frame.time = this.onsetTime;
+
+    this.propagateFrame();
   }
 
-  initialize(inStreamParams) {
-    super.initialize(inStreamParams, {
-      frameSize: 5,
-      description: [
-        'duration',
-        'min',
-        'max',
-        'mean',
-        'std dev',
-      ],
-    });
-
-    this.movingAverage.initialize(inStreamParams);
-  }
-
-  reset() {
-    super.reset();
-    this.movingAverage.reset();
-    this.resetSegment();
-  }
-
-  finalize(endTime) {
-    if (this.insideSegment)
-      this.outputSegment(endTime);
-
-    super.finalize(endTime);
-  }
-
-  process(time, frame, metadata) {
-    const rawValue = frame[0];
-    const minInput = this.params.minInput;
+  processSignal(frame) {
+    const logInput = this.params.get('logInput');
+    const minInput = this.params.get('minInput');
+    const threshold = this.params.get('threshold');
+    const minInter = this.params.get('minInter');
+    const maxDuration = this.params.get('maxDuration');
+    const offThreshold = this.params.get('offThreshold');
+    const rawValue = frame.data[0];
+    const time = frame.time;
     let value = Math.max(rawValue, minInput);
 
-    if (this.params.logInput)
+    if (logInput)
       value = Math.log(value);
 
     const diff = value - this.lastMvavrg;
-    this.lastMvavrg = this.movingAverage.inputScalar({ data: value });
+    this.lastMvavrg = this.movingAverage.inputScalar(value);
 
-    this.metadata = metadata;
+    // update frame metadata
+    this.frame.metadata = frame.metadata;
 
-    if (diff > this.params.threshold && time - this.onsetTime > this.params.minInter) {
-      if(this.insideSegment)
+    if (diff > threshold && time - this.onsetTime > minInter) {
+      if (this.insideSegment)
         this.outputSegment(time);
 
       // start segment
@@ -132,16 +172,22 @@ export default class Segmenter extends BaseLfo {
     }
 
     if (this.insideSegment) {
-      this.min = Math.min(this.min, rawValue);
-      this.max = Math.max(this.max, rawValue);
+      this.min = min(this.min, rawValue);
+      this.max = max(this.max, rawValue);
       this.sum += rawValue;
       this.sumOfSquares += rawValue * rawValue;
       this.count++;
 
-      if (time - this.onsetTime >= this.params.maxDuration || value <= this.params.offThreshold) {
+      if (time - this.onsetTime >= maxDuration || value <= offThreshold) {
         this.outputSegment(time);
         this.insideSegment = false;
       }
     }
+  }
+
+  processFrame(frame) {
+    this.prepareFrame();
+    this.processFunction(frame);
+    // do not propagate here as the frameRate is now zero
   }
 }
