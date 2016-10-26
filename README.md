@@ -88,14 +88,12 @@ The `lfo` modules produce and consume data streams composed of _frames_. This is
 
 _core:_
 
-* [BaseLfo]()
-* [BaseLfoSegmentDescriptor]()
-* [BaseLfoSegmentProducer]()
+* [BaseLfo](http://wavesjs.github.io/waves-lfo/module-common.core.BaseLfo.html)
 
 _operators:_
 
-* [Biquad]() - 
-  [_example 1_](operator-biquad-signal), [_example 2_](operator-biquad-vector)
+* [Biquad](http://wavesjs.github.io/waves-lfo/module-common.operator.Biquad.html) - 
+  [_example 1_](https://rawgit.com/wavesjs/waves-lfo/waves-lfo/examples/operator-biquad-signal/index.html), [_example 2_](https://rawgit.com/wavesjs/waves-lfo/waves-lfo/examples/operator-biquad-vector/index.html)
 * [DCT]() 
 * [FFT]() - 
   [_example_](mosaicking)
