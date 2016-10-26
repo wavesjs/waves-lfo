@@ -12,7 +12,7 @@ const definitions = {
     nullable: true,
     metas: { kind: 'static' },
   },
-  centeredTimeTag: {
+  centeredTimeTags: {
     type: 'boolean',
     default: false,
   }
@@ -29,7 +29,7 @@ const definitions = {
  * @param {Number} [options.frameSize=512] - Frame size of the output signal.
  * @param {Number} [options.hopSize=null] - Number of samples between two
  *  consecutive frames. If null, `hopSize` is set to `frameSize`.
- * @param {Boolean} [options.centeredTimeTag] - Move the time tag to the middle
+ * @param {Boolean} [options.centeredTimeTags] - Move the time tag to the middle
  *  of the frame.
  *
  * @example
@@ -117,7 +117,7 @@ class Slicer extends BaseLfo {
     const block = frame.data;
     const metadata = frame.metadata;
 
-    const centeredTimeTag = this.params.get('centeredTimeTag');
+    const centeredTimeTags = this.params.get('centeredTimeTags');
     const hopSize = this.params.get('hopSize');
     const outFrame = this.frame.data;
     const frameSize = this.streamParams.frameSize;
@@ -157,7 +157,7 @@ class Slicer extends BaseLfo {
         // send frame when completed
         if (frameIndex === frameSize) {
           // define time tag for the outFrame according to configuration
-          if (centeredTimeTag)
+          if (centeredTimeTags)
             this.frame.time = time + (blockIndex - frameSize / 2) * samplePeriod;
           else
             this.frame.time = time + (blockIndex - frameSize) * samplePeriod;

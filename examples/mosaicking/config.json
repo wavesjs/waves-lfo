@@ -1,0 +1,8 @@
+{
+  "frameSize": 2048,
+  "hopSize": 256,
+  "nbrBands": 24,
+  "nbrCoefs": 12,
+  "minFreq": 50,
+  "maxFreq": 8000
+}

@@ -10,6 +10,7 @@ import MovingAverage from './MovingAverage';
 import MovingMedian from './MovingMedian';
 import OnOff from './OnOff';
 import RMS from './RMS';
+import Segmenter from './Segmenter';
 import Select from './Select';
 import Slicer from './Slicer';
 import Yin from './Yin';
@@ -27,6 +28,7 @@ export default {
   MovingMedian,
   OnOff,
   RMS,
+  Segmenter,
   Select,
   Slicer,
   Yin,

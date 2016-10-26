@@ -2,12 +2,24 @@ import BaseLfo from '../core/BaseLfo';
 
 const sqrt = Math.sqrt;
 
+const definitions = {
+  power: {
+    type: 'boolean',
+    default: false,
+    metas: { kind: 'dynamic' },
+  },
+};
+
 /**
  * Compute the Root Mean Square of a `signal`.
  *
  * _support `standalone` usage_
  *
  * @memberof module:common.operator
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {Boolean} [options.power=false] - If `true` remove the "R" of the
+ *  "RMS" and return the squared result (i.e. power).
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
@@ -28,8 +40,7 @@ const sqrt = Math.sqrt;
  */
 class RMS extends BaseLfo {
   constructor(options = {}) {
-    // throw error if trying to set inexistant param
-    super({}, options);
+    super(definitions, options);
   }
 
   /** @private */
@@ -59,6 +70,7 @@ class RMS extends BaseLfo {
    * const results = rms.inputSignal([...values]);
    */
   inputSignal(signal) {
+    const power = this.params.get('power');
     const length = signal.length;
     let rms = 0;
 
@@ -66,7 +78,9 @@ class RMS extends BaseLfo {
       rms += (signal[i] * signal[i]);
 
     rms = rms / length;
-    rms = sqrt(rms);
+
+    if (!power)
+      rms = sqrt(rms);
 
     return rms;
   }

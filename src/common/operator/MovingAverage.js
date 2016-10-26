@@ -13,7 +13,7 @@ const definitions = {
     min: -Infinity,
     max: +Infinity,
     default: 0,
-    metas: { kind: 'dyanmic' },
+    metas: { kind: 'dynamic' },
   },
 };
 
