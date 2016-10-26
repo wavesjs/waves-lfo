@@ -89,12 +89,12 @@ __Stream__ - Succession of frames, the state of the stream at each node is defin
 
 #### common
 
-__core:__
+_core:_
 * [BaseLfo]()
 * [BaseLfoSegmentDescriptor]()
 * [BaseLfoSegmentProducer]()
 
-__operators:__
+_operators:_
 * [Biquad]() - 
   [_example_](operator-biquad)
 * [DCT]() 
@@ -118,11 +118,11 @@ __operators:__
 * [Yin]() - 
   [_example_](operator-yin)
 
-__sources:__
+_sources:_
 * [EventIn]() - 
   [_example_](sink-bridge)
 
-__sinks:__
+_sinks:_
 * [Bridge]() - 
   [_example 1_](sink-bridge), [_example 2_](sink-marker-display)
 * [DataRecorder]() - 
@@ -134,12 +134,12 @@ __sinks:__
 
 #### client only
 
-__sources:__
+_sources:_
 * [AudioInBuffer]()
 * [AudioInNode]() - 
   [_example_](source-audio-in-node)
 
-__sinks:__
+_sinks:_
 * [BaseDisplay]() 
 * [BpfDisplay]() - 
   [_example_](sink-bpf-examples)
@@ -158,10 +158,10 @@ __sinks:__
 
 #### node only
 
-__sources:__
+_sources:_
 * [AudioInFile]()
 
-__sinks:__
+_sinks:_
 * [DataToFile]() 
 
 
