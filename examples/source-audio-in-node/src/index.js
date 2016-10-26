@@ -17,7 +17,7 @@ const signalDisplay = new lfo.sink.SignalDisplay({
 });
 
 audioInNode.connect(signalDisplay);
-
+audioInNode.start();
 
 new controllers.Buttons('', ['start', 'stop'], '#controllers', (value) => {
   if (value === 'start')

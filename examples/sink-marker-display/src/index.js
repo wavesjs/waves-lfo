@@ -15,7 +15,7 @@ const markerDisplay = new lfo.sink.MarkerDisplay({
 });
 
 const bridge = new lfo.sink.Bridge({
-  callback: (frame) => valueController.value = frame.data[0],
+  processFrame: (frame) => valueController.value = frame.data[0],
 });
 
 eventIn.connect(markerDisplay);

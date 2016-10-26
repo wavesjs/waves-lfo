@@ -26,6 +26,7 @@ function init(stream) {
   });
 
   audioInNode.connect(waveformDisplay);
+  audioInNode.start();
 
   new controllers.Buttons('', ['start', 'stop'], '#controllers', (value) => {
     if (value === 'start')

@@ -28,6 +28,8 @@ function init(stream) {
   audioInNode.connect(meanStddev);
   meanStddev.connect(traceDisplay);
 
+  audioInNode.start();
+
   new controllers.Buttons('', ['start', 'stop'], '#controllers', (value) => {
     if (value === 'start')
       audioInNode.start();

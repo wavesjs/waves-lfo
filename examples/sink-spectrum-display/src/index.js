@@ -23,6 +23,7 @@ function init(stream) {
   });
 
   audioInNode.connect(spectrumDisplay);
+  audioInNode.start();
 
   new controllers.Buttons('', ['start', 'stop'], '#controllers', (value) => {
     if (value === 'start')

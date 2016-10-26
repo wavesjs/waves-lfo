@@ -88,6 +88,8 @@ eventIn.connect(signalDisplay);
 const generator = sineGenerator(1, sampleRate, frameSize, eventIn.process.bind(eventIn));
 generator.start();
 
+eventIn.start();
+
 new controllers.Buttons('', ['start', 'stop'], '#controllers', (value) => {
   if (value === 'start')
     eventIn.start();
