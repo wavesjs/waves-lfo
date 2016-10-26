@@ -4,7 +4,7 @@ npm-debug.log
 _NOTES.md
 
 # remove all the following in master branch
-docs
-/client
-/common
-/node
+# docs
+# /client
+# /common
+# /node
