@@ -7,8 +7,8 @@ import config from '../config.json';
 const nbrCoefs = 12;
 
 const cwd = process.cwd();
-const audioFile = path.join(cwd, 'assets/ligeti-artikulation.wav');
-const outputFile = path.join(cwd, `assets/ligeti-artikulation-mfcc-${config.maxFreq}.json`);
+const audioFile = path.join(cwd, 'assets/animals.wav');
+const outputFile = path.join(cwd, `assets/animals-mfcc-${config.maxFreq}.json`);
 
 const audioInFile = new lfo.source.AudioInFile({
   filename: audioFile,
