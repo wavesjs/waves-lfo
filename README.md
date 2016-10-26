@@ -3,14 +3,16 @@
 
 # _Low Frequency Operators_
 
-The `lfo` library provides a simple and efficient graph-based javascript API primarily designed for real-time processing and analysis of arbitrary signal and event data streams such as audio, audio descriptors and motion sensors. A `graph` of `lfo` modules can process data streams online (i.e. processing data from audio inputs or event sources) as well as offline (i.e. iterating over recorded data or synthesizing data) depending on the used `source` and `sink` modules. Many of the operator modules provided by the library (e.g. filters, signal statistics) can also be used for processing data without the `lfo` formalism using an alternative API.
+The `lfo` library provides a simple and efficient graph-based javascript API primarily designed for the processing and analysis of arbitrary signal and event data streams such as audio, audio descriptors and motion sensor data.
 
-The library is divided into two parts: `waves-lfo/client` and `waves-lfo/node`, respectively providing modules to be used in a browser on in a node.js environment. This allows for adapting the library to virtually any context by providing platform adequate `source` and `sink` modules.
+A `graph` of `lfo` modules can process data streams online (i.e. processing data from audio inputs or event sources) as well as offline (e.g. iterating over recorded data) depending on the used `source` and `sink` modules. Many of the operator modules provided by the library (e.g. filters, signal statistics) can also be used for processing data using an alternative API without the `lfo` formalism.
+
+The library is divided into two parts, `waves-lfo/client` and `waves-lfo/node`, respectively providing modules to be used in a browser or in a _Node.js_ environment. This allows for adapting the library to virtually any context and platform by providing adequate `source` and `sink` modules.
 
 The library provides three namespaces:
-- **`source`** modules are responsible for acquiring streams and their properties (`frameType`, `frameRate`, `frameSize`, `sampleRate`).
+- **`source`** modules produce streams and propagate their properties (i.e. `frameRate`, `frameType`, etc.) through the graph.
 - **`sink`** modules are endpoints of the graph such as recorders and visualizers.
-- **`operator`** modules process an incoming stream and propagate the result of the processing to the next operators.
+- **`operator`** modules process an incoming stream and propagate the resulting stream to the next operators.
 
 A `graph` is a combination of at least a `source` and a `sink` with any number of `operator` modules in between:
 
@@ -66,7 +68,7 @@ eventIn.process(0, [2, 1, 3]);
 
 The `lfo` modules produce and consume data streams composed of _frames_. This is the terminology used by the library.
 
-- __stream__ - a succession of _frames_ defined by _stream parameters_
+- __stream__ - a succession of _frames_ described by a set of _stream parameters_
 - __frame__ - an element of a stream that associates a `data` element with a `time` and optional `metadata`
 - __data__ - a generic term to designate the _payload_ of a frame which can be a `vector`, a `signal` or a `scalar`
 - __vector__ - an array of values that correspond to different dimensions such as _[x y z]_ or _[mean stddev min max]_
@@ -92,9 +94,9 @@ _core:_
 
 _operators:_
 
-* [Biquad](http://wavesjs.github.io/waves-lfo/module-common.operator.Biquad.html) - 
+* [Biquad](http://wavesjs.github.io/waves-lfo/module-common.operator.Biquad.html) -
   [_example 1_](https://rawgit.com/wavesjs/waves-lfo/master/examples/operator-biquad-signal/index.html), [_example 2_](https://rawgit.com/wavesjs/waves-lfo/master/examples/operator-biquad-vector/index.html)
-* [DCT](http://wavesjs.github.io/waves-lfo/module-common.operator.DCT.html) 
+* [DCT](http://wavesjs.github.io/waves-lfo/module-common.operator.DCT.html)
 * [FFT](http://wavesjs.github.io/waves-lfo/module-common.operator.FFT.html)
 * [Magnitude](http://wavesjs.github.io/waves-lfo/module-common.operator.Magnitude.html)
 * [MeanStddev](http://wavesjs.github.io/waves-lfo/module-common.operator.MeanStddev.html)
@@ -108,12 +110,12 @@ _operators:_
 * [MovingMedian](http://wavesjs.github.io/waves-lfo/module-common.operator.MovingMedian.html)
 * [OnOff](http://wavesjs.github.io/waves-lfo/module-common.operator.OnOff.html)
   [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-vu-meter-display/index.html)
-* [RMS](http://wavesjs.github.io/waves-lfo/module-common.operator.RMS.html) 
-* [Segmenter](http://wavesjs.github.io/waves-lfo/module-common.operator.Segmenter.html) 
+* [RMS](http://wavesjs.github.io/waves-lfo/module-common.operator.RMS.html)
+* [Segmenter](http://wavesjs.github.io/waves-lfo/module-common.operator.Segmenter.html)
   [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/operator-segmenter/index.html)
-* [Select](http://wavesjs.github.io/waves-lfo/module-common.operator.Select.html) 
-* [Slicer](http://wavesjs.github.io/waves-lfo/module-common.operator.Slicer.html) 
-* [Yin](http://wavesjs.github.io/waves-lfo/module-common.operator.Yin.html) - 
+* [Select](http://wavesjs.github.io/waves-lfo/module-common.operator.Select.html)
+* [Slicer](http://wavesjs.github.io/waves-lfo/module-common.operator.Slicer.html)
+* [Yin](http://wavesjs.github.io/waves-lfo/module-common.operator.Yin.html) -
   [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/operator-yin/index.html)
 
 _sources:_
@@ -221,17 +223,13 @@ class Multiplier extends lfo.core.BaseLfo {
 const multiplier = new Multiplier({ factor: 4 });
 ```
 
-## `PiPo` and `lfo`
+## `lfo` and `PiPo`
 
-The library is heavily based on the concepts implemented in PiPo and try to stay close to the class and parameter names whenever possible.
+The `lfo` library is based on the same concepts and very similar formalisms as [PiPo](http://ismm.ircam.fr/pipo/).
+However, the APIs of `lfo` and `PiPo` defer in many details due to the very different constraints of the Javascript and C/C++ development and runtime environments.
 
 <hr />
-## License
+## License and Acknowledgments
 
-This module is released under the BSD-3-Clause license.
-
-<!--
-Acknowledgments
-
-This code has been developed in the framework of the WAVE and CoSiMa research projects, funded by the French National Research Agency (ANR).
--->
+The library is released under the BSD-3-Clause license.
+It has been developed in the framework of the WAVE and CoSiMa research projects, funded by the French National Research Agency (ANR).
