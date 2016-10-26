@@ -99,7 +99,7 @@ _core:_
 _operators:_
 
 * [Biquad]() - 
-  [_example_](operator-biquad)
+  [_example 1_](operator-biquad-signal), [_example 2_](operator-biquad-vector)
 * [DCT]() 
 * [FFT]() - 
   [_example_](mosaicking)
@@ -116,6 +116,8 @@ _operators:_
 * [OnOff]() 
   [_example_](sink-vu-meter-display)
 * [RMS]() 
+* [Segmenter]() 
+  [_example_](sink-vu-meter-display)
 * [Select]() 
 * [Slicer]() 
 * [Yin]() - 

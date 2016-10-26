@@ -1,13 +1,10 @@
 .DS_Store
 node_modules
 npm-debug.log
-_misc
 _NOTES.md
 
-# remove in master
+# remove all the following in master branch
 docs
-
-# transpiled files
 /client
 /common
 /node

@@ -42,7 +42,6 @@
       "src/node/sink/DataToFile.js",
 
       "src/node/source/AudioInFile.js"
-
     ]
   },
   "plugins": [
@@ -58,6 +57,6 @@
     "default": {
       "useLongnameInNav": true
     },
-    "footer": "custom footer, insert ircam logo etc."
+    "footer": ""
   }
 }
