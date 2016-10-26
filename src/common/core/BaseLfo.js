@@ -26,6 +26,64 @@ let id = 0;
  * <span class="warning">_This class should be considered abstract and only
  * be used to be extended._</span>
  *
+ *
+ * // overview of the behavior of a node
+ *
+ * **processStreamParams(prevStreamParams)**
+ *
+ * `base` class (default implementation)
+ * - call `preprocessStreamParams`
+ * - call `propagateStreamParams`
+ *
+ * `child` class
+ * - call `preprocessStreamParams`
+ * - override some of the inherited `streamParams`
+ * - creates the any related logic buffers
+ * - call `propagateStreamParams`
+ *
+ * _should not call `super.processStreamParams`_
+ *
+ * **prepareStreamParams()**
+ *
+ * - assign prevStreamParams to this.streamParams
+ * - check if the class implements the correct `processInput` method
+ *
+ * _shouldn't be extended, only consumed in `processStreamParams`_
+ *
+ * **propagateStreamParams()**
+ *
+ * - creates the `frameData` buffer
+ * - propagate `streamParams` to children
+ *
+ * _shouldn't be extended, only consumed in `processStreamParams`_
+ *
+ * **processFrame()**
+ *
+ * `base` class (default implementation)
+ * - call `preprocessFrame`
+ * - assign frameTime and frameMetadata to identity
+ * - call the proper function according to inputType
+ * - call `propagateFrame`
+ *
+ * `child` class
+ * - call `preprocessFrame`
+ * - do whatever you want with incomming frame
+ * - call `propagateFrame`
+ *
+ * _should not call `super.processFrame`_
+ *
+ * **prepareFrame()**
+ *
+ * - if `reinit` and trigger `processStreamParams` if needed
+ *
+ * _shouldn't be extended, only consumed in `processFrame`_
+ *
+ * **propagateFrame()**
+ *
+ * - propagate frame to children
+ *
+ * _shouldn't be extended, only consumed in `processFrame`_
+ *
  * @memberof module:common.core
  */
 class BaseLfo {
@@ -53,10 +111,14 @@ class BaseLfo {
      * @property {Number} frameRate - Frame rate at the output of the node.
      * @property {String} frameType - Frame type at the output of the node,
      *  possible values are `signal`, `vector` or `scalar`.
-     * @property {Number} sourceSampleRate - Sample rate of the source of the
-     *  graph. _The value should be defined by sources and never modified_.
      * @property {Array|String} description - If type is `vector`, describe
      *  the dimension(s) of output stream.
+     * @property {Number} sourceSampleRate - Sample rate of the source of the
+     *  graph. _The value should be defined by sources and never modified_.
+     * @property {Number} sourceSampleCount - Number of consecutive discrete
+     *  time values contained in the data frame output by the source.
+     *  _The value should be defined by sources and never modified_.
+     *
      * @name streamParams
      * @instance
      * @memberof module:common.core.BaseLfo
@@ -65,8 +127,9 @@ class BaseLfo {
       frameType: null,
       frameSize: 1,
       frameRate: 0,
-      sourceSampleRate: 0,
       description: null,
+      sourceSampleRate: 0,
+      sourceSampleCount: null,
     };
 
     /**

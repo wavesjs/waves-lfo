@@ -3,16 +3,16 @@
 
 # _Low Frequency Operators_
 
-`lfo` *is an simple and efficient javascript library implementing a graph-based API primarily designed for real-time processing and analysis of arbitrary streams (audio, sensors, etc.). It can as well be used offline and support a standalone mode on most of its `operator`s.*
+`lfo` is an simple and efficient javascript library implementing a graph-based API primarily designed for real-time processing and analysis of arbitrary streams (audio, sensors, etc.). It can as well be used offline and support a standalone mode on most of its __*operators*__.
 
 The library expose two entry points: `waves-lfo/client` and 
-`waves-lfo/node`. This architecture allows to consume the library on virtually any environment by simply providing platform specific `sources` and `sinks`.
+`waves-lfo/node`. This architecture allows to consume the library on virtually any environment by simply providing platform specific __*sources*__ and __*sinks*__.
 
-`lfo` nodes are separated in 3 categories:
+`lfo` nodes are separated in 3 namespaces:
 
-- **`sources`** are responsible for acquering streams and their properties (`frameType`, `frameRate`, `frameSize`, `sampleRate`).
-- **`sinks`** are endpoints of the graph. Such nodes can be recorders, visualizers, etc.
-- **`operators`** process the input stream and propagate results to the next(s) operator(s).
+- **`source`** are responsible for acquering streams and their properties (`frameType`, `frameRate`, `frameSize`, `sampleRate`).
+- **`sink`** are endpoints of the graph. Such nodes can be recorders, visualizers, etc.
+- **`operator`** process the input stream and propagate results to the next(s) operator(s).
 
 A `graph` is a combination of at least a `source`, a `sink` and zero to many `operator`(s) in between:
 
@@ -83,6 +83,7 @@ __Stream__ - Succession of frames, the state of the stream at each node is defin
 - `frameRate`: number of frame per seconds at the output of the node (if `0`, no frame rate)
 - `frameType`: define if the output of the node should be considered as a `signal`, a `vector` or a `scalar` by the next(s) operator(s).
 - `sourceSampleRate`: number of frames per seconds as defined by the source of the graph
+- `sourceSampleCount`: number of consecutive discrete time values contained in the data frame output by the source (e.g. the signal block size of an audio source or 1 for streams of sensor data vectors)
 - `description`: array of strings describing the output dimensions when `frameType` is `vector` or `scalar`.
 
 ## Available nodes and examples
@@ -90,11 +91,13 @@ __Stream__ - Succession of frames, the state of the stream at each node is defin
 #### common
 
 _core:_
+
 * [BaseLfo]()
 * [BaseLfoSegmentDescriptor]()
 * [BaseLfoSegmentProducer]()
 
 _operators:_
+
 * [Biquad]() - 
   [_example_](operator-biquad)
 * [DCT]() 
@@ -119,10 +122,12 @@ _operators:_
   [_example_](operator-yin)
 
 _sources:_
+
 * [EventIn]() - 
   [_example_](sink-bridge)
 
 _sinks:_
+
 * [Bridge]() - 
   [_example 1_](sink-bridge), [_example 2_](sink-marker-display)
 * [DataRecorder]() - 
@@ -135,11 +140,13 @@ _sinks:_
 #### client only
 
 _sources:_
+
 * [AudioInBuffer]()
 * [AudioInNode]() - 
   [_example_](source-audio-in-node)
 
 _sinks:_
+
 * [BaseDisplay]() 
 * [BpfDisplay]() - 
   [_example_](sink-bpf-examples)
@@ -159,9 +166,11 @@ _sinks:_
 #### node only
 
 _sources:_
+
 * [AudioInFile]()
 
 _sinks:_
+
 * [DataToFile]() 
 
 
