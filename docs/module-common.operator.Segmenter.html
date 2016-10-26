@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>WavesJS - Low Frequency Operators - Class: VuMeterDisplay</title>
+    <title>WavesJS - Low Frequency Operators - Class: Segmenter</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,7 +20,7 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Class: VuMeterDisplay</h1>
+    <h1 class="page-title">Class: Segmenter</h1>
     
 
     
@@ -32,9 +32,9 @@
 
 <header>
     
-        <h2>VuMeterDisplay</h2>
+        <h2>Segmenter</h2>
         
-            <div class="class-description"><p>Simple VU-Meter to used on a <code>signal</code> stream.</p></div>
+            <div class="class-description"><p>Create segments based on attacks.</p></div>
         
     
 </header>
@@ -48,7 +48,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="VuMeterDisplay"><span class="type-signature"></span>new VuMeterDisplay<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Segmenter"><span class="type-signature"></span>new Segmenter<span class="signature">(options)</span><span class="type-signature"></span></h4>
 
     
 
@@ -103,7 +103,7 @@
 
             
 
-            <td class="description last"><p>Override defaults parameters.</p>
+            <td class="description last"><p>Override default parameters.</p>
                 <h6>Properties</h6>
                 
 
@@ -133,7 +133,46 @@
 
         <tr>
             
-                <td class="name"><code>offset</code></td>
+                <td class="name"><code>logInput</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Apply log on the input.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>minInput</code></td>
             
 
             <td class="type">
@@ -160,19 +199,20 @@
             
                 <td class="default">
                 
-                    -14
+                    0.000000000001
                 
                 </td>
             
 
-            <td class="description last"><p>dB offset applied to the signal.</p></td>
+            <td class="description last"><p>Minimum value to use as
+ input.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>min</code></td>
+                <td class="name"><code>filterOrder</code></td>
             
 
             <td class="type">
@@ -199,19 +239,20 @@
             
                 <td class="default">
                 
-                    -80
+                    5
                 
                 </td>
             
 
-            <td class="description last"><p>Minimum displayed value (in dB).</p></td>
+            <td class="description last"><p>Order of the internally used moving
+ average.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>max</code></td>
+                <td class="name"><code>threshold</code></td>
             
 
             <td class="type">
@@ -238,19 +279,20 @@
             
                 <td class="default">
                 
-                    6
+                    3
                 
                 </td>
             
 
-            <td class="description last"><p>Maximum displayed value (in dB).</p></td>
+            <td class="description last"><p>Threshold that triggers a segment
+ start.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>width</code></td>
+                <td class="name"><code>offThreshold</code></td>
             
 
             <td class="type">
@@ -277,19 +319,20 @@
             
                 <td class="default">
                 
-                    6
+                    -Infinity
                 
                 </td>
             
 
-            <td class="description last"><p>Width of the display (in pixels).</p></td>
+            <td class="description last"><p>Threshold that triggers
+ a segment end.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>height</code></td>
+                <td class="name"><code>minInter</code></td>
             
 
             <td class="type">
@@ -316,28 +359,25 @@
             
                 <td class="default">
                 
-                    150
+                    0.050
                 
                 </td>
             
 
-            <td class="description last"><p>Height of the canvas.</p></td>
+            <td class="description last"><p>Minimum delay between two semgents.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>container</code></td>
+                <td class="name"><code>maxDuration</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Element</span>
-|
-
-<span class="param-type">CSSSelector</span>
+<span class="param-type">Number</span>
 
 
             
@@ -358,56 +398,12 @@
             
                 <td class="default">
                 
-                    null
+                    Infinity
                 
                 </td>
             
 
-            <td class="description last"><p>Container element
- in which to insert the canvas.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>canvas</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Element</span>
-|
-
-<span class="param-type">CSSSelector</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p>Canvas element
- in which to draw.</p></td>
+            <td class="description last"><p>Maximum duration of a segment.</p></td>
         </tr>
 
     
@@ -455,7 +451,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client_sink_VuMeterDisplay.js.html">client/sink/VuMeterDisplay.js</a>, <a href="client_sink_VuMeterDisplay.js.html#line71">line 71</a>
+        <a href="common_operator_Segmenter.js.html">common/operator/Segmenter.js</a>, <a href="common_operator_Segmenter.js.html#line100">line 100</a>
     </li></ul></dd>
     
 
@@ -482,30 +478,41 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>import * as lfo from 'waves-lfo/client';
+    <pre class="prettyprint"><code>// assuming a stream from the microphone
+const source = audioContext.createMediaStreamSource(stream);
 
-const audioContext = new window.AudioContext();
+const audioInNode = new lfo.source.AudioInNode({
+  sourceNode: source,
+  audioContext: audioContext,
+});
 
-navigator.mediaDevices
-  .getUserMedia({ audio: true })
-  .then(init)
-  .catch((err) => console.error(err.stack));
+const slicer = new lfo.operator.Slicer({
+  frameSize: frameSize,
+  hopSize: hopSize,
+  centeredTimeTags: true
+});
 
-function init(stream) {
-  const source = audioContext.createMediaStreamSource(stream);
+const power = new lfo.operator.RMS({
+  power: true,
+});
 
-  const audioInNode = new lfo.source.AudioInNode({
-    audioContext: audioContext,
-    sourceNode: source,
-  });
+const segmenter = new lfo.operator.Segmenter({
+  logInput: true,
+  filterOrder: 5,
+  threshold: 3,
+  offThreshold: -Infinity,
+  minInter: 0.050,
+  maxDuration: 0.050,
+});
 
-  const vuMeter = new lfo.sink.VuMeterDisplay({
-    canvas: '#vu-meter',
-  });
+const logger = new lfo.sink.Logger({ time: true });
 
-  audioInNode.connect(vuMeter);
-  audioInNode.start();
-}</code></pre>
+audioInNode.connect(slicer);
+slicer.connect(power);
+power.connect(segmenter);
+segmenter.connect(logger);
+
+audioInNode.start();</code></pre>
 
 
 
