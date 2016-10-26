@@ -1,7 +1,7 @@
 import BaseLfo from '../core/BaseLfo';
-import FFT from './FFT';
+import Fft from './Fft';
 import Mel from './Mel';
-import DCT from './DCT';
+import Dct from './Dct';
 
 
 const definitions = {
@@ -30,9 +30,9 @@ const definitions = {
 
 
 /**
- * Compute the MFCC of the incomming `signal`. Is basically a wrapper around
- * [`FFT`]{@link module:common.operator.FFT}, [`Mel`]{@link module:common.operator.Mel}
- * and [`DCT`]{@link module:common.operator.DCT}.
+ * Compute the Mfcc of the incomming `signal`. Is basically a wrapper around
+ * [`Fft`]{@link module:common.operator.Fft}, [`Mel`]{@link module:common.operator.Mel}
+ * and [`Dct`]{@link module:common.operator.Dct}.
  *
  * _support `standalone` usage_
  *
@@ -42,9 +42,9 @@ const definitions = {
  * @param {nbrBands} [options.nbrBands=24] - Number of Mel bands.
  * @param {nbrCoefs} [options.nbrCoefs=12] - Number of output coefs.
  *
- * @see {@link module:common.operator.FFT}
+ * @see {@link module:common.operator.Fft}
  * @see {@link module:common.operator.Mel}
- * @see {@link module:common.operator.DCT}
+ * @see {@link module:common.operator.Dct}
  *
  * @example
  * import lfo from 'waves-lfo/node'
@@ -58,7 +58,7 @@ const definitions = {
  *   frameSize: 256,
  * });
  *
- * const mfcc = new lfo.operator.MFCC({
+ * const mfcc = new lfo.operator.Mfcc({
  *   nbrBands: 24,
  *   nbrCoefs: 12,
  * });
@@ -71,7 +71,7 @@ const definitions = {
  *
  * audioInFile.start();
  */
-class MFCC extends BaseLfo {
+class Mfcc extends BaseLfo {
   constructor(options) {
     super(definitions, options);
   }
@@ -93,7 +93,7 @@ class MFCC extends BaseLfo {
     this.streamParams.frameType = 'vector';
     this.streamParams.description = [];
 
-    this.fft = new FFT({
+    this.fft = new Fft({
       window: 'hann',
       mode: 'power',
       norm: 'power',
@@ -108,7 +108,7 @@ class MFCC extends BaseLfo {
       maxFreq: maxFreq,
     });
 
-    this.dct = new DCT({
+    this.dct = new Dct({
       order: nbrCoefs,
     });
 
@@ -138,13 +138,13 @@ class MFCC extends BaseLfo {
   }
 
   /**
-   * Use the `MFCC` operator in `standalone` mode (i.e. outside of a graph).
+   * Use the `Mfcc` operator in `standalone` mode (i.e. outside of a graph).
    *
    * @param {Array} data - Signal chunk to analyse.
-   * @return {Array} - MFCC coefficients.
+   * @return {Array} - Mfcc coefficients.
    *
    * @example
-   * const mfcc = new lfo.operator.MFCC();
+   * const mfcc = new lfo.operator.Mfcc();
    * // mandatory for use in standalone mode
    * mfcc.initStream({ frameSize: 256, frameType: 'vector' });
    * mfcc.inputSignal(signal);
@@ -170,4 +170,4 @@ class MFCC extends BaseLfo {
   }
 }
 
-export default MFCC;
+export default Mfcc;
