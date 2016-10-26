@@ -1,6 +1,7 @@
-![logo](file:///Users/matuszewski/dev/wavesjs/lib/waves-lfo/resources/logo.png)
 
-# `lfo` - Low Frequency Operators
+![logo](https://rawgit.com/wavesjs/waves-lfo/develop/resources/logo.png)
+
+# _Low Frequency Operators_
 
 `lfo` *is an simple and efficient javascript library implementing a graph-based API primarily designed for real-time processing and analysis of arbitrary streams (audio, sensors, etc.). It can as well be used offline and support a standalone mode on most of its `operator`s.*
 
