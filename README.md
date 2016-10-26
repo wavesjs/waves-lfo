@@ -3,19 +3,16 @@
 
 # _Low Frequency Operators_
 
-`lfo` is an simple and efficient javascript library implementing a graph-based API primarily designed for real-time processing and analysis of arbitrary streams (audio, sensors, etc.). It can as well be used offline and support a standalone mode on most of its __*operators*__.
+The `lfo` library provides a simple and efficient graph-based javascript API primarily designed for real-time processing and analysis of arbitrary signal and event data streams such as audio, audio descriptors and motion sensors. A `graph` of `lfo` modules can process data streams online (i.e. processing data from audio inputs or event sources) as well as offline (i.e. iterating over recorded data or synthesizing data) depending on the used `source` and `sink` modules. Many of the operator modules provided by the library (e.g. filters, signal statistics) can also be used for processing data without the `lfo` formalism using an alternative API.
 
-The library expose two entry points: `waves-lfo/client` and 
-`waves-lfo/node`. This architecture allows to consume the library on virtually any environment by simply providing platform specific __*sources*__ and __*sinks*__.
+The library is divided into two parts: `waves-lfo/client` and `waves-lfo/node`, respectively providing modules to be used in a browser on in a node.js environment. This allows for adapting the library to virtually any context by providing platform adequate `source` and `sink` modules.
 
-`lfo` nodes are separated in 3 namespaces:
+The library provides three namespaces:
+- **`source`** modules are responsible for acquiring streams and their properties (`frameType`, `frameRate`, `frameSize`, `sampleRate`).
+- **`sink`** modules are endpoints of the graph such as recorders and visualizers.
+- **`operator`** modules process an incoming stream and propagate the result of the processing to the next operators.
 
-- **`source`** are responsible for acquering streams and their properties (`frameType`, `frameRate`, `frameSize`, `sampleRate`).
-- **`sink`** are endpoints of the graph. Such nodes can be recorders, visualizers, etc.
-- **`operator`** process the input stream and propagate results to the next(s) operator(s).
-
-A `graph` is a combination of at least a `source`, a `sink` and zero to many `operator`(s) in between:
-
+A `graph` is a combination of at least a `source` and a `sink` with any number of `operator` modules in between:
 
 ![scheme](https://dl.dropboxusercontent.com/u/606131/lfo.png)
 
@@ -23,7 +20,7 @@ A `graph` is a combination of at least a `source`, a `sink` and zero to many `op
 
 [http://wavesjs.github.io/waves-lfo](http://wavesjs.github.io/waves-lfo)
 
-_Note: in the documentation, all nodes in the `common` namespace are platform independant._
+_Note: in the documentation, all nodes in the `common` namespace are platform independent._
 
 ## Usage
 
@@ -48,9 +45,9 @@ import * as lfo from 'waves-lfo/node';
 ```js
 import * as lfo from 'waves-lfo/client';
 
-const eventIn = new lfo.source.EventIn({ 
-  frameType: 'vector' 
-  frameSize: 3, 
+const eventIn = new lfo.source.EventIn({
+  frameType: 'vector'
+  frameSize: 3,
   frameRate: 1,
 });
 
@@ -67,24 +64,23 @@ eventIn.process(0, [2, 1, 3]);
 
 ## Terminology
 
-__Scalar__ - Single value, can be considered as a `vector` as well as a `signal`
+The `lfo` modules produce and consume data streams composed of _frames_. This is the terminology used by the library.
 
-__Vector__ - Array of values in different dimensions, each dimension is 
-bound to a specific index in each frame
-
-__Signal__ - Array of values in time domain, fragment of a signal
-
-__Data__ - Generic term to designate a `vector` a `signal` or a `scalar`
-
-__Frame__ - Object associating a time tag, data, and optionnal metadatas.
-
-__Stream__ - Succession of frames, the state of the stream at each node is defined in the `streamParams` attribute. The `streamParams` object contains the following properties:
-- `frameSize`: number of values in the frame at the output of the node
-- `frameRate`: number of frame per seconds at the output of the node (if `0`, no frame rate)
-- `frameType`: define if the output of the node should be considered as a `signal`, a `vector` or a `scalar` by the next(s) operator(s).
-- `sourceSampleRate`: number of frames per seconds as defined by the source of the graph
-- `sourceSampleCount`: number of consecutive discrete time values contained in the data frame output by the source (e.g. the signal block size of an audio source or 1 for streams of sensor data vectors)
-- `description`: array of strings describing the output dimensions when `frameType` is `vector` or `scalar`.
+- __stream__ - a succession of _frames_ defined by _stream parameters_
+- __frame__ - an element of a stream that associates a `data` element with a `time` and optional `metadata`
+- __data__ - a generic term to designate the _payload_ of a frame which can be a `vector`, a `signal` or a `scalar`
+- __vector__ - an array of values that correspond to different dimensions such as _[x y z]_ or _[mean stddev min max]_
+- __signal__ - an array of time-domain values corresponding to a fragment of a signal
+- __scalar__ - a single value that can be arbitrarily considered as a one-dimensional `vector` or one sample of a `signal`
+- __time__ - a timestamp associating each frame in a stream to a point in time regarding an arbitrary reference common to all modules in a graph
+- __metadata__ - additional description data associated to a frame by a module
+- __stream parameters__ - parameters defining the nature of a stream at the output of a module (attribute `streamParams`) that may depend on the stream parameters of the incoming stream
+  - `frameSize`: number of values in the frame data
+  - `frameRate`: number of frames per seconds for regularly sampled streams, `0` otherwise
+  - `frameType`: type of frame data (`vector`, `signal` or `scalar`)
+  - `sourceSampleRate`: number of frames per seconds output by the graph's `source`
+  - `sourceSampleCount`: number of consecutive discrete time values contained in the data frame output by the graph's `source` (e.g. the signal block size of an audio source or 1 for streams of sensor data vectors)
+  - `description`: an array of strings describing the output dimensions of `vector` or `scalar` frames (e.g. `['mean', 'stddev', 'min', 'max']`)
 
 ## Available nodes and examples
 
@@ -104,16 +100,16 @@ _operators:_
 * [FFT]() - 
   [_example_](mosaicking)
 * [Magnitude]()
-* [MeanStddev]() 
-* [Mel]() 
-* [MFCC]() - 
+* [MeanStddev]()
+* [Mel]()
+* [MFCC]() -
   [_example_](mosaicking)
-* [MinMax]() - 
+* [MinMax]() -
   [example](sink-waveform-display)
-* [MovingAverage]() - 
+* [MovingAverage]() -
   [_example (graphical)_](sink-bridge)
-* [MovingMedian]() 
-* [OnOff]() 
+* [MovingMedian]()
+* [OnOff]()
   [_example_](sink-vu-meter-display)
 * [RMS]() 
 * [Segmenter]() 
@@ -125,17 +121,17 @@ _operators:_
 
 _sources:_
 
-* [EventIn]() - 
+* [EventIn]() -
   [_example_](sink-bridge)
 
 _sinks:_
 
-* [Bridge]() - 
+* [Bridge]() -
   [_example 1_](sink-bridge), [_example 2_](sink-marker-display)
-* [DataRecorder]() - 
+* [DataRecorder]() -
   [_example_](mosaicking)
-* [Logger]() 
-* [SignalRecorder]() - 
+* [Logger]()
+* [SignalRecorder]() -
   [_example_](sink-signal-recorder)
 
 
@@ -144,25 +140,25 @@ _sinks:_
 _sources:_
 
 * [AudioInBuffer]()
-* [AudioInNode]() - 
+* [AudioInNode]() -
   [_example_](source-audio-in-node)
 
 _sinks:_
 
-* [BaseDisplay]() 
-* [BpfDisplay]() - 
+* [BaseDisplay]()
+* [BpfDisplay]() -
   [_example_](sink-bpf-examples)
-* [MarkerDisplay]() - 
+* [MarkerDisplay]() -
   [_example_](sink-marker-display)
-* [SignalDisplay]() - 
+* [SignalDisplay]() -
   [_example_](sink-signal-display)
-* [SpectrumDisplay]() - 
+* [SpectrumDisplay]() -
   [_example_](sink-spectrum-display)
-* [TraceDisplay]() - 
+* [TraceDisplay]() -
   [_example_](sink-trace-display)
-* [VuMeterDisplay]() - 
+* [VuMeterDisplay]() -
   [_example 1_]((sink-vu-meter-display), [_example 2_](sink-signal-recorder)
-* [WaveformDisplay]() - 
+* [WaveformDisplay]() -
   [_example_](sink-waveform-display)
 
 #### node only
@@ -173,7 +169,7 @@ _sources:_
 
 _sinks:_
 
-* [DataToFile]() 
+* [DataToFile]()
 
 
 ## Standalone usage
@@ -212,14 +208,14 @@ class Multiplier extends lfo.core.BaseLfo {
     super(parameters, options);
   }
 
-  // implementing this method allow the node to handle incomming 
+  // implementing this method allow the node to handle incomming
   // `vector` frames
   processVector(frame) {
     const frameSize = this.streamParams.frameSize;
     const factor = this.getParam('factor');
 
     // transfert data from `frame` (output of previous node)
-    // to the current node, data of the incomming frame should 
+    // to the current node, data of the incomming frame should
     // never be modifed
     for (let i = 0; i < frameSize; i++)
       this.frame.data[i] = frame.data[i] * factor;
@@ -231,7 +227,7 @@ const multiplier = new Multiplier({ factor: 4 });
 
 ## `PiPo` and `lfo`
 
-The library is heavily based on the concepts implemented in PiPo and try to stay close to the class and parameter names whenever possible. 
+The library is heavily based on the concepts implemented in PiPo and try to stay close to the class and parameter names whenever possible.
 
 <hr />
 ## License
