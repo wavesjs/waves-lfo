@@ -3,7 +3,7 @@ import initWindow from '../utils/windows';
 
 // https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js
 /*
- * Free FFT and convolution (JavaScript)
+ * Free Fft and convolution (JavaScript)
  *
  * Copyright (c) 2014 Project Nayuki
  * http://www.nayuki.io/page/free-small-fft-in-multiple-languages
@@ -35,7 +35,7 @@ import initWindow from '../utils/windows';
  *
  * @private
  */
-function FFTNayuki(n) {
+function FftNayuki(n) {
 
   this.n = n;
   this.levels = -1;
@@ -84,7 +84,7 @@ function FFTNayuki(n) {
       }
     }
 
-    // Cooley-Tukey decimation-in-time radix-2 FFT
+    // Cooley-Tukey decimation-in-time radix-2 Fft
     for (var size = 2; size <= n; size *= 2) {
       var halfsize = size / 2;
       var tablestep = n / size;
@@ -169,7 +169,7 @@ const definitions = {
 /**
  * Compute the Fast Fourier Transform of an incomming `signal`.
  *
- * FFT implementation by [Nayuki](https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js).
+ * Fft implementation by [Nayuki](https://code.soundsoftware.ac.uk/projects/js-dsp-test/repository/entry/fft/nayuki-obj/fft.js).
  *
  * _support `standalone` usage_
  *
@@ -197,7 +197,7 @@ const definitions = {
  *   frameSize: 256,
  * });
  *
- * const fft = new FFT({
+ * const fft = new Fft({
  *   mode: 'power',
  *   window: 'hann',
  *   norm: 'power',
@@ -214,7 +214,7 @@ const definitions = {
  * @todo - check if 'rectangle' and 'none' windows are not redondant.
  * @todo - check default values for all params.
  */
-class FFT extends BaseLfo {
+class Fft extends BaseLfo {
   constructor(options = {}) {
     super(definitions, options);
 
@@ -284,19 +284,19 @@ class FFT extends BaseLfo {
 
     this.real = new Float32Array(fftSize);
     this.imag = new Float32Array(fftSize);
-    this.fft = new FFTNayuki(fftSize);
+    this.fft = new FftNayuki(fftSize);
 
     this.propagateStreamParams();
   }
 
   /**
-   * Use the `FFT` operator in `standalone` mode (i.e. outside of a graph).
+   * Use the `Fft` operator in `standalone` mode (i.e. outside of a graph).
    *
    * @param {Array} signal - Input values.
-   * @return {Array} - FFT of the input signal.
+   * @return {Array} - Fft of the input signal.
    *
    * @example
-   * const fft = new lfo.operator.FFT({ size: 512, window: 'hann' });
+   * const fft = new lfo.operator.Fft({ size: 512, window: 'hann' });
    * // mandatory for use in standalone mode
    * fft.initStream({ frameSize: 256, frameType: 'signal' });
    * fft.inputSignal(signal);
@@ -374,4 +374,4 @@ class FFT extends BaseLfo {
   }
 }
 
-export default FFT;
+export default Fft;

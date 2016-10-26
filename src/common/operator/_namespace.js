@@ -1,15 +1,15 @@
 import Biquad from './Biquad';
-import DCT from './DCT';
-import FFT from './FFT';
+import Dct from './Dct';
+import Fft from './Fft';
 import Magnitude from './Magnitude';
 import MeanStddev from './MeanStddev';
 import Mel from './Mel';
-import MFCC from './MFCC';
+import Mfcc from './Mfcc';
 import MinMax from './MinMax';
 import MovingAverage from './MovingAverage';
 import MovingMedian from './MovingMedian';
 import OnOff from './OnOff';
-import RMS from './RMS';
+import Rms from './Rms';
 import Segmenter from './Segmenter';
 import Select from './Select';
 import Slicer from './Slicer';
@@ -17,17 +17,17 @@ import Yin from './Yin';
 
 export default {
   Biquad,
-  DCT,
-  FFT,
+  Dct,
+  Fft,
   Magnitude,
   MeanStddev,
   Mel,
-  MFCC,
+  Mfcc,
   MinMax,
   MovingAverage,
   MovingMedian,
   OnOff,
-  RMS,
+  Rms,
   Segmenter,
   Select,
   Slicer,

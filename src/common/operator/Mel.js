@@ -46,7 +46,7 @@ function getMelBandWeights(nbrBins, nbrBands, sampleRate, minFreq, maxFreq, type
   }
 
   const melBandDescriptions = new Array(nbrBands);
-  // center frequencies of FFT bins
+  // center frequencies of Fft bins
   const fftFreqs = new Float32Array(nbrBins);
   // center frequencies of mel bands - uniformly spaced in mel domain between
   // limits, there are 2 more frequencies than the actual number of filters in
@@ -169,7 +169,7 @@ const definitions = {
  *   hopSize: 256,
  * });
  *
- * const fft = new lfo.operator.FFT({
+ * const fft = new lfo.operator.Fft({
  *   size: 1024,
  *   window: 'hann',
  *   mode: 'power',
@@ -221,7 +221,7 @@ class Mel extends BaseLfo {
   /**
    * Use the `Mel` operator in `standalone` mode (i.e. outside of a graph).
    *
-   * @param {Array} spectrum - FFT bins.
+   * @param {Array} spectrum - Fft bins.
    * @return {Array} - Mel bands.
    *
    * @example

@@ -25,7 +25,7 @@ function init(stream) {
     centeredTimeTags: true
   });
 
-  const power = new lfo.operator.RMS({
+  const power = new lfo.operator.Rms({
     power: true,
   });
 

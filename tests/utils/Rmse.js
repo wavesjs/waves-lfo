@@ -21,7 +21,7 @@ const definitions = {
   },
 };
 
-class RMSE extends BaseLfo {
+class Rmse extends BaseLfo {
   constructor(options) {
     super(definitions, options);
 
@@ -65,7 +65,7 @@ class RMSE extends BaseLfo {
 
     t.equal(data.length, expected.length, 'frames should have same size');
 
-    // compute RMSE
+    // compute Rmse
     let sum = 0;
 
     for (let i = startIndex; i < len; i++) {
@@ -88,4 +88,4 @@ class RMSE extends BaseLfo {
   }
 }
 
-export default RMSE;
+export default Rmse;

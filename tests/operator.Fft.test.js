@@ -5,10 +5,10 @@ import * as utils from './utils/utils';
 
 import AudioInFile from '../src/node/source/AudioInFile';
 import Slicer from '../src/common/operator/Slicer';
-import FFT from '../src/common/operator/FFT';
-import RMSE from './utils/RMSE';
+import Fft from '../src/common/operator/Fft';
+import Rmse from './utils/Rmse';
 
-tape('FFT', (t) => {
+tape('Fft', (t) => {
   const tolerance = 3e-5;
 
   t.comment('compare against "./data/pipo-fft.txt"');
@@ -39,14 +39,14 @@ tape('FFT', (t) => {
     hopSize: 512,
   });
 
-  const fft = new FFT({
+  const fft = new Fft({
     size: 1024,
     window: 'hann',
     mode: 'magnitude',
     norm: 'linear',
   });
 
-  const rmse = new RMSE({
+  const rmse = new Rmse({
     expectedFrames: expectedFrames,
     asserter: t,
     tolerance: tolerance,
@@ -58,4 +58,3 @@ tape('FFT', (t) => {
 
   audioInFile.start();
 });
-
