@@ -1,5 +1,5 @@
 import BaseDisplay from './BaseDisplay';
-import RMS from '../../common/operator/RMS';
+import Rms from '../../common/operator/Rms';
 
 const log10 = Math.log10;
 
@@ -72,7 +72,7 @@ class VuMeterDisplay extends BaseDisplay {
   constructor(options = {}) {
     super(definitions, options, false);
 
-    this.rmsOperator = new RMS();
+    this.rmsOperator = new Rms();
 
     this.lastDB = 0;
     this.peak = {

@@ -5,9 +5,9 @@ import * as utils from './utils/utils';
 
 import AudioInFile from '../src/node/source/AudioInFile';
 import Slicer from '../src/common/operator/Slicer';
-import FFT from '../src/common/operator/FFT';
+import Fft from '../src/common/operator/Fft';
 import Mel from '../src/common/operator/Mel';
-import RMSE from './utils/RMSE';
+import Rmse from './utils/Rmse';
 
 // results from librosa
 // > librosa.mel_frequencies(n_mels=26, htk=True, fmin=0, fmax=22050);
@@ -90,7 +90,7 @@ tape('Mel', (t) => {
     hopSize: 256,
   });
 
-  const fft = new FFT({
+  const fft = new Fft({
     size: 1024,
     window: 'hann',
     mode: 'power',
@@ -102,7 +102,7 @@ tape('Mel', (t) => {
     nbrBands: 24,
   });
 
-  const rmse = new RMSE({
+  const rmse = new Rmse({
     expectedFrames: expectedFrames,
     asserter: t,
     tolerance: tolerance,

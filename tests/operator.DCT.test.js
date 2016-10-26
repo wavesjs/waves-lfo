@@ -5,10 +5,10 @@ import * as utils from './utils/utils';
 
 import AudioInFile from '../src/node/source/AudioInFile';
 import Slicer from '../src/common/operator/Slicer';
-import DCT from '../src/common/operator/DCT';
-import RMSE from './utils/RMSE';
+import Dct from '../src/common/operator/Dct';
+import Rmse from './utils/Rmse';
 
-tape('DCT', (t) => {
+tape('Dct', (t) => {
   const tolerance = 1e-5;
 
   t.comment('compare against "./data/pipo-dct.txt"');
@@ -37,11 +37,11 @@ tape('DCT', (t) => {
     hopSize: 512,
   });
 
-  const dct = new DCT({
+  const dct = new Dct({
     order: 12,
   });
 
-  const rmse = new RMSE({
+  const rmse = new Rmse({
     expectedFrames: expectedFrames,
     asserter: t,
     tolerance: tolerance,

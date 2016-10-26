@@ -19,7 +19,7 @@ const definitions = {
  *
  * @param {Object} options - Override default parameters.
  * @param {Boolean} [options.power=false] - If `true` remove the "R" of the
- *  "RMS" and return the squared result (i.e. power).
+ *  "Rms" and return the squared result (i.e. power).
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
@@ -30,7 +30,7 @@ const definitions = {
  *   frameSize: 512,
  * });
  *
- * const rms = new lfo.operator.RMS();
+ * const rms = new lfo.operator.Rms();
  * const logger = new lfo.sink.Logger({ data: true });
  *
  * audioInBuffer.connect(rms);
@@ -38,7 +38,7 @@ const definitions = {
  *
  * audioInBuffer.start();
  */
-class RMS extends BaseLfo {
+class Rms extends BaseLfo {
   constructor(options = {}) {
     super(definitions, options);
   }
@@ -55,7 +55,7 @@ class RMS extends BaseLfo {
   }
 
   /**
-   * Allows for the use of a `RMS` outside a graph (e.g. inside
+   * Allows for the use of a `Rms` outside a graph (e.g. inside
    * another node). Return the rms of the given signal block.
    *
    * @param {Number} signal - Signal block to be computed.
@@ -64,7 +64,7 @@ class RMS extends BaseLfo {
    * @example
    * import * as lfo from 'waves-lfo/client';
    *
-   * const rms = new lfo.operator.RMS();
+   * const rms = new lfo.operator.Rms();
    * rms.initStream({ frameType: 'signal', frameSize: 1000 });
    *
    * const results = rms.inputSignal([...values]);
@@ -91,4 +91,4 @@ class RMS extends BaseLfo {
   }
 }
 
-export default RMS;
+export default Rms;

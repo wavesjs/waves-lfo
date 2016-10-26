@@ -5,19 +5,19 @@ import * as utils from './utils/utils';
 
 import AudioInFile from '../src/node/source/AudioInFile';
 import Slicer from '../src/common/operator/Slicer';
-import FFT from '../src/common/operator/FFT';
+import Fft from '../src/common/operator/Fft';
 import Mel from '../src/common/operator/Mel';
-import DCT from '../src/common/operator/DCT';
-import MFCC from '../src/common/operator/MFCC';
+import Dct from '../src/common/operator/Dct';
+import Mfcc from '../src/common/operator/Mfcc';
 import DataToFile from '../src/node/sink/DataToFile';
-import RMSE from './utils/RMSE';
+import Rmse from './utils/Rmse';
 
 // notes on testing
 // error between each frames while large is stable if we take all cepstrum bins
 // => does it have something to do with the dct modification ?
 // lokks like yes because if we drop the first bin results are far far better...
 
-tape('MFCC Manual', (t) => {
+tape('Mfcc Manual', (t) => {
   const tolerance = 5e-3;
   const compareFile = './data/pipo-mfcc.txt';
   const audioFile = './audio/cherokee.wav';
@@ -56,7 +56,7 @@ tape('MFCC Manual', (t) => {
     // hopSize: 512,
   });
 
-  const fft = new FFT({
+  const fft = new Fft({
     mode: 'power',
     window: 'hann',
     norm: 'power',
@@ -70,11 +70,11 @@ tape('MFCC Manual', (t) => {
     minFreq: 0,
   });
 
-  const dct = new DCT({
+  const dct = new Dct({
     order: 12,
   });
 
-  const rmse = new RMSE({
+  const rmse = new Rmse({
     asserter: t,
     expectedFrames: expectedFrames,
     tolerance: 2,
@@ -97,7 +97,7 @@ tape('MFCC Manual', (t) => {
 });
 
 
-tape('MFCC Packed', (t) => {
+tape('Mfcc Packed', (t) => {
   const tolerance = 5e-3;
   const compareFile = './data/pipo-mfcc.txt';
   const audioFile = './audio/cherokee.wav';
@@ -136,12 +136,12 @@ tape('MFCC Packed', (t) => {
     // hopSize: 512,
   });
 
-  const mfcc = new MFCC({
+  const mfcc = new Mfcc({
     nbrBands: 24,
     nbrCoefs: 12,
   });
 
-  const rmse = new RMSE({
+  const rmse = new Rmse({
     asserter: t,
     expectedFrames: expectedFrames,
     tolerance: 2,

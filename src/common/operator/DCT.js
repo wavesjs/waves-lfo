@@ -4,8 +4,8 @@ const sqrt = Math.sqrt;
 const cos = Math.cos;
 const PI = Math.PI;
 
-// DCT Type 2 - orthogonal matrix scaling
-function getDCTWeights(order, N, type = 'htk') {
+// Dct Type 2 - orthogonal matrix scaling
+function getDctWeights(order, N, type = 'htk') {
   const weights = new Float32Array(N * order);
   const piOverN = PI / N;
   const scale0 = 1 / sqrt(2);
@@ -55,7 +55,7 @@ const definitions = {
  *   hopSize: 512,
  * });
  *
- * const dct = new DCT({
+ * const dct = new Dct({
  *   order: 12,
  * });
  *
@@ -67,7 +67,7 @@ const definitions = {
  *
  * source.start();
  */
-class DCT extends BaseLfo {
+class Dct extends BaseLfo {
   constructor(options = {}) {
     super(definitions, options);
   }
@@ -83,19 +83,19 @@ class DCT extends BaseLfo {
     this.streamParams.frameType = 'vector';
     this.streamParams.description = [];
 
-    this.weightMatrix = getDCTWeights(order, inFrameSize);
+    this.weightMatrix = getDctWeights(order, inFrameSize);
 
     this.propagateStreamParams();
   }
 
   /**
-   * Use the `DCT` operator in `standalone` mode (i.e. outside of a graph).
+   * Use the `Dct` operator in `standalone` mode (i.e. outside of a graph).
    *
    * @param {Array} values - Input values.
-   * @return {Array} - DCT of the input array.
+   * @return {Array} - Dct of the input array.
    *
    * @example
-   * const dct = new lfo.operator.DCT({ order: 12 });
+   * const dct = new lfo.operator.Dct({ order: 12 });
    * // mandatory for use in standalone mode
    * dct.initStream({ frameSize: 512, frameType: 'signal' });
    * dct.inputSignal(data);
@@ -128,4 +128,4 @@ class DCT extends BaseLfo {
   }
 }
 
-export default DCT;
+export default Dct;
