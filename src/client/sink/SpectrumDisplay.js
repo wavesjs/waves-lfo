@@ -1,5 +1,5 @@
 import BaseDisplay from './BaseDisplay';
-import FFT from '../../common/operator/FFT';
+import Fft from '../../common/operator/Fft';
 import { getColors } from '../../common/utils/display-utils';
 
 
@@ -84,7 +84,7 @@ class SpectrumDisplay extends BaseDisplay {
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
-    this.fft = new FFT({
+    this.fft = new Fft({
       size: this.streamParams.frameSize,
       window: 'hann',
       norm: 'linear',

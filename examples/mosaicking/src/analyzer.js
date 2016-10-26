@@ -25,7 +25,7 @@ export default {
         hopSize: this.config.hopSize,
       });
 
-      const mfcc = new lfo.operator.MFCC({
+      const mfcc = new lfo.operator.Mfcc({
         nbrBands: this.config.nbrBands,
         nbrCoefs: this.config.nbrCoefs,
         minFreq: this.config.minFreq,
