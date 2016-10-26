@@ -29,7 +29,7 @@ const definitions = {
 
 
 /**
- * Display the spectrum of the incomming input of type `signal`.
+ * Display the spectrum of the incomming `signal` input.
  *
  * @memberof module:client.sink
  *

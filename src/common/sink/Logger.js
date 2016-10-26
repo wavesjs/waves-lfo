@@ -30,7 +30,7 @@ const definitions = {
 
 /**
  * Log `frame.time`, `frame.data`, `frame.metadata` and/or
- * `streamAttributes` of any node.
+ * `streamAttributes` of any node in the console.
  *
  * This sink can handle any type if input (`signal`, `vector`, `scalar`)
  *

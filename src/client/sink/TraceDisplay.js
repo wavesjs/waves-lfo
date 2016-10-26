@@ -16,7 +16,7 @@ const definitions = {
 };
 
 /**
- * Display a mean value and a range value aroune this mean (for example mean
+ * Display a range value around a mean value (for example mean
  * and standart deviation).
  *
  * This sink can handle input of type `vector` of frameSize >= 2.

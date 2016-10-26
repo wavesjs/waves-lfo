@@ -138,7 +138,7 @@ const definitions = {
 
 /**
  * Compute the mel bands spectrum from a given spectrum (`vector` type).
- * _Use the `htk` mel band style._
+ * _Implement the `htk` mel band style._
  *
  * _support `standalone` usage_
  *

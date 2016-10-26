@@ -21,7 +21,7 @@ const definitions = {
 
 
 /**
- * Break Point Function, display a stream of type `vector`.
+ * Breakpoint Function, display a stream of type `vector`.
  *
  * @memberof module:client.sink
  *

@@ -31,7 +31,8 @@ const definitions = {
 
 /**
  * Compute the MFCC of the incomming `signal`. Is basically a wrapper around
- * `FFT`, `Mel` and `DCT`.
+ * [`FFT`]{@link module:common.operator.FFT}, [`Mel`]{@link module:common.operator.Mel}
+ * and [`DCT`]{@link module:common.operator.DCT}.
  *
  * _support `standalone` usage_
  *
@@ -40,6 +41,10 @@ const definitions = {
  * @param {Object} options - Override default parameters.
  * @param {nbrBands} [options.nbrBands=24] - Number of Mel bands.
  * @param {nbrCoefs} [options.nbrCoefs=12] - Number of output coefs.
+ *
+ * @see {@link module:common.operator.FFT}
+ * @see {@link module:common.operator.Mel}
+ * @see {@link module:common.operator.DCT}
  *
  * @example
  * import lfo from 'waves-lfo/node'

@@ -54,9 +54,9 @@ class RMS extends BaseLfo {
    * import * as lfo from 'waves-lfo/client';
    *
    * const rms = new lfo.operator.RMS();
-   * rms.initParam({ frameType: 'signal', frameSize: 256 });
+   * rms.initStream({ frameType: 'signal', frameSize: 1000 });
    *
-   * rms.inputSignal(signal);
+   * const results = rms.inputSignal([...values]);
    */
   inputSignal(signal) {
     const length = signal.length;

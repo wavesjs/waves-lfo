@@ -16,8 +16,13 @@ const definitions = {
 };
 
 /**
- * Record input frames from a graph.
- * This sink can handle `signal`, `vector` or `scalar` inputs.
+ * Record input frames from a graph. This sink can handle `signal`, `vector`
+ * or `scalar` inputs.
+ *
+ * When the recording is stopped (either by calling `stop` on the node or when
+ * the stream is finalized), the callback given as parameter is executed with
+ * the recorder data as argument.
+ *
  *
  * @param {Object} options - Override default parameters.
  * @param {Boolean} [options.separateArrays=false] - Format of the retrieved
@@ -30,7 +35,7 @@ const definitions = {
  *
  * @todo - Add auto record param.
  *
- * @memberof module:client.sink
+ * @memberof module:common.sink
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

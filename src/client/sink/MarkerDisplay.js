@@ -22,8 +22,7 @@ const definitions = {
 };
 
 /**
- * Display a marker according to the input frame.
- * This sink can handle input of type `vector`.
+ * Display a marker according to a `vector` input frame.
  *
  * @memberof module:client.sink
  *

@@ -21,16 +21,16 @@
       "src/common/operator/Yin.js",
 
       "src/common/sink/Bridge.js",
+      "src/common/sink/DataRecorder.js",
       "src/common/sink/Logger.js",
+      "src/common/sink/SignalRecorder.js",
 
       "src/common/source/EventIn.js",
 
       "src/client/sink/BaseDisplay.js",
       "src/client/sink/BpfDisplay.js",
-      "src/client/sink/DataRecorder.js",
       "src/client/sink/MarkerDisplay.js",
       "src/client/sink/SignalDisplay.js",
-      "src/client/sink/SignalRecorder.js",
       "src/client/sink/SpectrumDisplay.js",
       "src/client/sink/TraceDisplay.js",
       "src/client/sink/VuMeterDisplay.js",

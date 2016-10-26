@@ -36,8 +36,8 @@ const definitions = {
  *
  * When recording is stopped (either when the `stop` method is called, the
  * defined duration has been recorded, or the source of the graph finalized
- * the stream), the `Promise` returned by the `retrieve` method is fullfilled
- * with the `AudioBuffer` or `Float32Array` containing the recorded signal.
+ * the stream), the callback given as parameter is executed  with the
+ * `AudioBuffer` or `Float32Array` containing the recorded signal as argument.
  *
  * @todo - add option to return only the Float32Array and not an audio buffer
  *  (node compliant) `retrieveAudioBuffer: false`
@@ -57,7 +57,7 @@ const definitions = {
  *  in order to create the final audio buffer.
  *  (works only in browser)
  *
- * @memberof module:client.sink
+ * @memberof module:common.sink
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

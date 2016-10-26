@@ -89,16 +89,36 @@ const definitions = {
  * @memberof module:common.operator
  *
  * @param {Object} options - Override default values.
- * @param {String} [type='lowpass'] - Type of the filter. Available filters are:
- *  'lowpass', 'highpass', 'bandpass_constant_skirt', 'bandpass_constant_peak',
- *  'notch', 'allpass', 'peaking', 'lowshelf', 'highshelf'.
- * @param {Number} [f0=1] - Cutoff or center frequency of the filter according
- *  to its type.
- * @param {Number} [gain=1] - Gain of the filter.
- * @param {Number} [q=1] - Quality factor of the filter.
+ * @param {String} [options.type='lowpass'] - Type of the filter. Available
+ *  filters: 'lowpass', 'highpass', 'bandpass_constant_skirt', 'bandpass_constant_peak'
+ *  (alias 'bandpass'), 'notch', 'allpass', 'peaking', 'lowshelf', 'highshelf'.
+ * @param {Number} [options.f0=1] - Cutoff or center frequency of the filter
+ *  according to its type.
+ * @param {Number} [options.gain=1] - Gain of the filter (in dB).
+ * @param {Number} [options.q=1] - Quality factor of the filter.
  *
  * @example
- * // todo
+ * import * as lfo from 'waves-lfo/client';
+ *
+ * const audioInBuffer = new lfo.source.AudioInBuffer({
+ *   audioBuffer: buffer,
+ * });
+ *
+ * const biquad = new lfo.operator.Biquad({
+ *   type: 'lowpass',
+ *   f0: 2000,
+ *   gain: 3,
+ *   q: 12,
+ * });
+ *
+ * const spectrumDisplay = new lfo.sink.SpectrumDisplay({
+ *   canvas: '#spectrum',
+ * });
+ *
+ * audioInBuffer.connect(biquad);
+ * biquad.connect(spectrumDisplay);
+ *
+ * audioInBuffer.start();
  */
 class Biquad extends BaseLfo {
   constructor(options = {}) {
@@ -289,8 +309,6 @@ class Biquad extends BaseLfo {
       state.y2 = state.y1;
       state.y1 = y;
     }
-
-    // console.log(this.frame.data);
   }
 }
 
