@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WavesJS - Low Frequency Operators - Source: common/operator/Dct.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/overrides.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- if home page assume a title is already present in README -->
+    
+    <h1 class="page-title">Source: common/operator/Dct.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import BaseLfo from '../core/BaseLfo';
+
+const sqrt = Math.sqrt;
+const cos = Math.cos;
+const PI = Math.PI;
+
+// Dct Type 2 - orthogonal matrix scaling
+function getDctWeights(order, N, type = 'htk') {
+  const weights = new Float32Array(N * order);
+  const piOverN = PI / N;
+  const scale0 = 1 / sqrt(2);
+  const scale = sqrt(2 / N);
+
+  for (let k = 0; k &lt; order; k++) {
+    const s = (k === 0) ? (scale0 * scale) : scale;
+    // const s = scale; // rta doesn't apply k=0 scaling
+
+    for (let n = 0; n &lt; N; n++)
+      weights[k * N + n] = s * cos(k * (n + 0.5) * piOverN);
+  }
+
+  return weights;
+}
+
+const definitions = {
+  order: {
+    type: 'integer',
+    default: 12,
+    metas: { kind: 'static' },
+  },
+};
+
+/**
+ * Compute the Discrete Cosine Transform of an input `signal` or `vector`.
+ * (HTK style weighting).
+ *
+ * _support `standalone` usage_
+ *
+ * @memberof module:common.operator
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {Number} [options.order=12] - Number of computed bins.
+ *
+ * @example
+ * import * as lfo from 'waves-lfo/client';
+ *
+ * // assuming some audio buffer
+ * const source = new AudioInBuffer({
+ *   audioBuffer: audioBuffer,
+ *   useWorker: false,
+ * });
+ *
+ * const slicer = new Slicer({
+ *   frameSize: 512,
+ *   hopSize: 512,
+ * });
+ *
+ * const dct = new Dct({
+ *   order: 12,
+ * });
+ *
+ * const logger = new lfo.sink.Logger({ data: true });
+ *
+ * source.connect(slicer);
+ * slicer.connect(dct);
+ * dct.connect(logger);
+ *
+ * source.start();
+ */
+class Dct extends BaseLfo {
+  constructor(options = {}) {
+    super(definitions, options);
+  }
+
+  /** @private */
+  processStreamParams(prevStreamParams) {
+    this.prepareStreamParams(prevStreamParams);
+
+    const order = this.params.get('order');
+    const inFrameSize = prevStreamParams.frameSize;
+
+    this.streamParams.frameSize = order;
+    this.streamParams.frameType = 'vector';
+    this.streamParams.description = [];
+
+    this.weightMatrix = getDctWeights(order, inFrameSize);
+
+    this.propagateStreamParams();
+  }
+
+  /**
+   * Use the `Dct` operator in `standalone` mode (i.e. outside of a graph).
+   *
+   * @param {Array} values - Input values.
+   * @return {Array} - Dct of the input array.
+   *
+   * @example
+   * const dct = new lfo.operator.Dct({ order: 12 });
+   * // mandatory for use in standalone mode
+   * dct.initStream({ frameSize: 512, frameType: 'signal' });
+   * dct.inputSignal(data);
+   */
+  inputSignal(values) {
+    const order = this.params.get('order');
+    const frameSize = values.length;
+    const outFrame = this.frame.data;
+    const weights = this.weightMatrix;
+
+    for (let k = 0; k &lt; order; k++) {
+      const offset = k * frameSize;
+      outFrame[k] = 0;
+
+      for (let n = 0; n &lt; frameSize; n++)
+        outFrame[k] += values[n] * weights[offset + n];
+    }
+
+    return outFrame;
+  }
+
+  /** @private */
+  processSignal(frame) {
+    this.inputSignal(frame.data);
+  }
+
+  /** @private */
+  processVector(frame) {
+    this.inputSignal(frame.data);
+  }
+}
+
+export default Dct;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-client.sink.BaseDisplay.html">client.sink.BaseDisplay</a></li><li><a href="module-client.sink.BpfDisplay.html">client.sink.BpfDisplay</a></li><li><a href="module-client.sink.MarkerDisplay.html">client.sink.MarkerDisplay</a></li><li><a href="module-client.sink.SignalDisplay.html">client.sink.SignalDisplay</a></li><li><a href="module-client.sink.SpectrumDisplay.html">client.sink.SpectrumDisplay</a></li><li><a href="module-client.sink.TraceDisplay.html">client.sink.TraceDisplay</a></li><li><a href="module-client.sink.VuMeterDisplay.html">client.sink.VuMeterDisplay</a></li><li><a href="module-client.sink.WaveformDisplay.html">client.sink.WaveformDisplay</a></li><li><a href="module-client.source.AudioInBuffer.html">client.source.AudioInBuffer</a></li><li><a href="module-client.source.AudioInNode.html">client.source.AudioInNode</a></li><li><a href="module-common.core.BaseLfo.html">common.core.BaseLfo</a></li><li><a href="module-common.operator.Biquad.html">common.operator.Biquad</a></li><li><a href="module-common.operator.Dct.html">common.operator.Dct</a></li><li><a href="module-common.operator.Fft.html">common.operator.Fft</a></li><li><a href="module-common.operator.Magnitude.html">common.operator.Magnitude</a></li><li><a href="module-common.operator.MeanStddev.html">common.operator.MeanStddev</a></li><li><a href="module-common.operator.Mel.html">common.operator.Mel</a></li><li><a href="module-common.operator.Mfcc.html">common.operator.Mfcc</a></li><li><a href="module-common.operator.MinMax.html">common.operator.MinMax</a></li><li><a href="module-common.operator.MovingAverage.html">common.operator.MovingAverage</a></li><li><a href="module-common.operator.MovingMedian.html">common.operator.MovingMedian</a></li><li><a href="module-common.operator.OnOff.html">common.operator.OnOff</a></li><li><a href="module-common.operator.Rms.html">common.operator.Rms</a></li><li><a href="module-common.operator.Segmenter.html">common.operator.Segmenter</a></li><li><a href="module-common.operator.Select.html">common.operator.Select</a></li><li><a href="module-common.operator.Slicer.html">common.operator.Slicer</a></li><li><a href="module-common.operator.Yin.html">common.operator.Yin</a></li><li><a href="module-common.sink.Bridge.html">common.sink.Bridge</a></li><li><a href="module-common.sink.DataRecorder.html">common.sink.DataRecorder</a></li><li><a href="module-common.sink.Logger.html">common.sink.Logger</a></li><li><a href="module-common.sink.SignalRecorder.html">common.sink.SignalRecorder</a></li><li><a href="module-common.source.EventIn.html">common.source.EventIn</a></li><li><a href="module-node.sink.DataToFile.html">node.sink.DataToFile</a></li><li><a href="module-node.source.AudioInFile.html">node.source.AudioInFile</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Thu Oct 27 2016 12:02:43 GMT+0200 (CEST)
+    
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
