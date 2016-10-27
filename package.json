@@ -30,7 +30,7 @@
   "dependencies": {
     "av": "^0.4.9",
     "babel-runtime": "^6.6.1",
-    "parameters": "ircam-jstools/parameters#v1.0.0"
+    "parameters": "ircam-jstools/parameters#v1.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",
