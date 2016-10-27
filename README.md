@@ -234,5 +234,5 @@ However, the APIs of `lfo` and `PiPo` defer in many details due to the very diff
 The library is released under the BSD-3-Clause license.
 It has been developed in the framework of the WAVE and CoSiMa research projects, funded by the French National Research Agency (ANR).
 
-Concept and design: Norbert Schnell and Benjamin Matuszewski
-Development: Benjamin Matuszewski (based on a first version developped by Victor Saiz)
+- Concept and design: Norbert Schnell and Benjamin Matuszewski
+- Development: Benjamin Matuszewski (based on a first version developped by Victor Saiz)
