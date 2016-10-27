@@ -229,7 +229,10 @@ The `lfo` library is based on the same concepts and very similar formalisms as [
 However, the APIs of `lfo` and `PiPo` defer in many details due to the very different constraints of the Javascript and C/C++ development and runtime environments.
 
 <hr />
-## License and Acknowledgments
+## License and Credits
 
 The library is released under the BSD-3-Clause license.
 It has been developed in the framework of the WAVE and CoSiMa research projects, funded by the French National Research Agency (ANR).
+
+Concept and design: Norbert Schnell and Benjamin Matuszewski
+Development: Benjamin Matuszewski (based on a first version developped by Victor Saiz)
