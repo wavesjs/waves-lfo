@@ -54,7 +54,7 @@ const eventIn = new lfo.source.EventIn({
 });
 
 const rms = new lfo.operator.Rms();
-const logger = new lfo.sinks.Logger({ data: true });
+const logger = new lfo.sink.Logger({ data: true });
 
 eventIn.connect(rms);
 rms.connect(logger);
