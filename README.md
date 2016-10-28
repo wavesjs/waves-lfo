@@ -210,7 +210,7 @@ class Multiplier extends lfo.core.BaseLfo {
   // `vector` frames
   processVector(frame) {
     const frameSize = this.streamParams.frameSize;
-    const factor = this.getParam('factor');
+    const factor = this.params.get('factor');
 
     // transfert data from `frame` (output of previous node)
     // to the current node, data of the incomming frame should
