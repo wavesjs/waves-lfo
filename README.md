@@ -3,7 +3,7 @@
 
 # _Low Frequency Operators_
 
-The `lfo` library provides a simple and efficient graph-based javascript API primarily designed for the processing and analysis of arbitrary signal and event data streams such as audio, audio descriptors and motion sensor data.
+The `lfo` library provides a simple and efficient graph-based javascript API primarily designed for the processing and analysis of signal and event data streams such as audio, audio descriptors and motion sensor data.
 
 A `graph` of `lfo` modules can process data streams online (i.e. processing data from audio inputs or event sources) as well as offline (e.g. iterating over recorded data) depending on the used `source` and `sink` modules. Many of the operator modules provided by the library (e.g. filters, signal statistics) can also be used for processing data using an alternative API without the `lfo` formalism.
 
