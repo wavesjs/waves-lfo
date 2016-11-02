@@ -3,6 +3,8 @@ node_modules
 npm-debug.log
 _NOTES.md
 
+examples/test-worker
+
 # remove all the following in master branch
 # docs
 # /client

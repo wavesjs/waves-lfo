@@ -17,7 +17,21 @@ const definitions = {
     default: 0,
     constant: true,
   },
+  progressCallback: {
+    type: 'any',
+    default: null,
+    nullable: true,
+    constant: true,
+  },
+  progressCallback: {
+    type: 'any',
+    default: null,
+    nullable: true,
+    constant: true,
+  },
 };
+
+const noop = function() {};
 
 /**
  * Slice an `AudioBuffer` into signal blocks and propagate the resulting frames
@@ -27,6 +41,8 @@ const definitions = {
  * @param {AudioBuffer} [options.audioBuffer] - Audio buffer to process.
  * @param {Number} [options.frameSize=512] - Size of the output blocks.
  * @param {Number} [options.channel=0] - Number of the channel to process.
+ * @param {Number} [options.progressCallback=null] - Callback to be excuted on each
+ *  frame output, receive as argument the current progress ratio.
  *
  * @memberof module:client.source
  *
@@ -113,23 +129,32 @@ class AudioInBuffer extends BaseLfo {
   processFrame(buffer) {
     const sampleRate = this.streamParams.sourceSampleRate;
     const frameSize = this.streamParams.frameSize;
+    const progressCallback = this.params.get('progressCallback') || noop;
     const length = buffer.length;
     const nbrFrames = Math.ceil(buffer.length / frameSize);
     const data = this.frame.data;
+    const that = this;
+    let i = 0;
 
-    for (let i = 0; i < nbrFrames; i++) {
+    (function slice() {
       const offset = i * frameSize;
       const nbrCopy = Math.min(length - offset, frameSize);
 
       for (let j = 0; j < frameSize; j++)
         data[j] = j < nbrCopy ? buffer[offset + j] : 0;
 
-      this.frame.time = offset / sampleRate;
-      this.endTime = this.frame.time + nbrCopy / sampleRate;
-      this.propagateFrame();
-    }
+      that.frame.time = offset / sampleRate;
+      that.endTime = that.frame.time + nbrCopy / sampleRate;
+      that.propagateFrame();
 
-    this.finalizeStream(this.endTime);
+      i += 1;
+      progressCallback(i / nbrFrames);
+
+      if (i < nbrFrames)
+        setTimeout(slice, 0);
+      else
+        that.finalizeStream(that.endTime);
+    }());
   }
 }
 

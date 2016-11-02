@@ -24,7 +24,9 @@ class Asserter extends BaseLfo {
     const data = frame.data;
 
     const sampleIndex = this.frameIndex * this.frameSize;
-    const expectedValues = this.buffer.subarray(sampleIndex, sampleIndex + this.frameSize);
+    const extract = this.buffer.subarray(sampleIndex, sampleIndex + this.frameSize);
+    const expectedValues = new Float32Array(this.frameSize);
+    expectedValues.set(extract);
     const expectedTime = sampleIndex / this.sampleRate;
 
     this.asserter.equal(time.toFixed(9), this.expectedTime.toFixed(9), 'Should have same time');
@@ -36,7 +38,35 @@ class Asserter extends BaseLfo {
 }
 
 tape('AudioInBuffer', (t) => {
-  t.plan(2134);
+  t.plan(2444);
+
+  // ----------------------------------------------------
+  // simple test
+  // ----------------------------------------------------
+
+  t.comment('frame size 2');
+
+  const buffer = new Float32Array([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+  const frameSize = 2;
+
+  const audioBuffer = {
+    sampleRate: 44100,
+    getChannelData: () => buffer,
+  };
+
+  const audioInBuffer = new AudioInBuffer({
+    audioBuffer: audioBuffer,
+    frameSize: frameSize,
+  });
+
+  const asserter = new Asserter(t, 44100, frameSize, buffer);
+
+  audioInBuffer.connect(asserter);
+  audioInBuffer.start();
+
+  // ----------------------------------------------------
+  // test real audio file
+  // ----------------------------------------------------
 
   const file = './audio/drum-loop.wav';
   const asset = av.Asset.fromFile(path.join(__dirname, file));
@@ -56,10 +86,16 @@ tape('AudioInBuffer', (t) => {
     t.comment('frame size 512');
 
     frameSize = 512;
+    const nbrFrames = Math.ceil(buffer.length / frameSize);
+    let i = 0;
 
     audioInBuffer = new AudioInBuffer({
       audioBuffer: audioBuffer,
       frameSize: frameSize,
+      progressCallback: (ratio) => {
+        i += 1;
+        t.equal(i / nbrFrames, ratio, 'should call progressCallback with proper ratio');
+      }
     });
 
     asserter = new Asserter(t, audioBuffer.sampleRate, frameSize, buffer);
