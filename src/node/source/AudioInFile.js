@@ -18,7 +18,15 @@ const definitions = {
     default: 0,
     constant: true,
   },
+  progressCallback: {
+    type: 'any',
+    default: null,
+    nullable: true,
+    constant: true,
+  },
 };
+
+const noop = function() {};
 
 /**
  * Read a file and propagate raw signal into the graph.
@@ -30,6 +38,8 @@ const definitions = {
  * @param {String} [options.filename=null] - Path to the file.
  * @param {Number} [options.frameSize=512] - Size of output frame.
  * @param {Number} [options.channel=0] - Channel number of the input file.
+ * @param {Number} [options.progressCallback=null] - Callback to be excuted on each
+ *  frame output, receive as argument the current progress ratio.
  *
  * @todo - define which channel should be loaded.
  *
@@ -113,6 +123,7 @@ class AudioInFile extends BaseLfo {
   processFrame(buffer) {
     const frameSize = this.params.get('frameSize');
     const channel = this.params.get('channel');
+    const progressCallback = this.params.get('progressCallback') || noop;
     const sampleRate = this.streamParams.sourceSampleRate;
     const channelsPerFrame = this.channelsPerFrame;
     const length = buffer.length;
@@ -121,11 +132,13 @@ class AudioInFile extends BaseLfo {
     const frameDuration = frameSize / sampleRate;
     const endTime = length / (channelsPerFrame * sampleRate);
     const data = this.frame.data;
+    const that = this;
 
     let sourceIndex = 0;
+    let frameIndex = 0;
 
     // input buffer is interleaved, pick only values according to `channel`
-    for (let frameIndex = 0; frameIndex < nbrFrames; frameIndex++) {
+    (function slice() {
       for (let i = 0; i < frameSize; i++) {
         const index = sourceIndex + channel;
         data[i] = sourceIndex < length ? buffer[index] : 0;
@@ -133,13 +146,19 @@ class AudioInFile extends BaseLfo {
         sourceIndex += channelsPerFrame;
       }
 
-      this.frame.time = frameIndex * frameDuration;
-      this.endTime = Math.min(this.frame.time + frameDuration, endTime);
+      that.frame.time = frameIndex * frameDuration;
+      that.endTime = Math.min(that.frame.time + frameDuration, endTime);
+      that.propagateFrame();
 
-      this.propagateFrame();
-    }
+      frameIndex += 1;
+      progressCallback(frameIndex / nbrFrames);
 
-    this.finalizeStream(this.endTime);
+      if (frameIndex < nbrFrames)
+        setTimeout(slice, 0);
+      else
+        that.finalizeStream(that.endTime);
+    }());
+
   }
 }
 
