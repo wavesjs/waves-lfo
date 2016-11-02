@@ -54,7 +54,7 @@ const eventIn = new lfo.source.EventIn({
 });
 
 const rms = new lfo.operator.Rms();
-const logger = new lfo.sinks.Logger({ data: true });
+const logger = new lfo.sink.Logger({ data: true });
 
 eventIn.connect(rms);
 rms.connect(logger);
@@ -210,7 +210,7 @@ class Multiplier extends lfo.core.BaseLfo {
   // `vector` frames
   processVector(frame) {
     const frameSize = this.streamParams.frameSize;
-    const factor = this.getParam('factor');
+    const factor = this.params.get('factor');
 
     // transfert data from `frame` (output of previous node)
     // to the current node, data of the incomming frame should
@@ -238,3 +238,4 @@ The formalisms and API of the library has been designed in the framework of the 
 The library has been developed by Benjamin Matuszewski in the framework of the CoSiMa research project funded by the French National Research Agency (ANR).
 
 A first version of the library has been developed by Victor Saiz in the framework of the WAVE ANR research project coordinated by Samuel Goldszmidt.
+
