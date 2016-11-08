@@ -7,7 +7,7 @@ import config from '../config.json';
 const nbrCoefs = 12;
 
 const cwd = process.cwd();
-const audioFile = path.join(cwd, 'assets/animals.wav');
+const audioFile = path.join(cwd, 'assets/animals.mp3');
 const outputFile = path.join(cwd, `assets/animals-mfcc-${config.maxFreq}.json`);
 
 const audioInFile = new lfo.source.AudioInFile({

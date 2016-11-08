@@ -1,5 +1,5 @@
 
-![logo](https://rawgit.com/wavesjs/waves-lfo/develop/resources/logo.png)
+![logo](https://cdn.rawgit.com/wavesjs/waves-lfo/develop/resources/logo.png)
 
 # _Low Frequency Operators_
 
@@ -95,43 +95,43 @@ _core:_
 _operators:_
 
 * [Biquad](http://wavesjs.github.io/waves-lfo/module-common.operator.Biquad.html) -
-  [_example 1_](https://rawgit.com/wavesjs/waves-lfo/master/examples/operator-biquad-signal/index.html), [_example 2_](https://rawgit.com/wavesjs/waves-lfo/master/examples/operator-biquad-vector/index.html)
+  [_example 1_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/operator-biquad-signal/index.html), [_example 2_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/operator-biquad-vector/index.html)
 * [Dct](http://wavesjs.github.io/waves-lfo/module-common.operator.Dct.html)
 * [Fft](http://wavesjs.github.io/waves-lfo/module-common.operator.Fft.html)
 * [Magnitude](http://wavesjs.github.io/waves-lfo/module-common.operator.Magnitude.html)
 * [MeanStddev](http://wavesjs.github.io/waves-lfo/module-common.operator.MeanStddev.html)
 * [Mel](http://wavesjs.github.io/waves-lfo/module-common.operator.Mel.html)
 * [Mfcc](http://wavesjs.github.io/waves-lfo/module-common.operator.Mfcc.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/mosaicking/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/mosaicking/index.html)
 * [MinMax](http://wavesjs.github.io/waves-lfo/module-common.operator.MinMax.html) -
-  [example](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-waveform-display/index.html)
+  [example](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-waveform-display/index.html)
 * [MovingAverage](http://wavesjs.github.io/waves-lfo/module-common.operator.MovingAverage.html) -
-  [_example (graphical)_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-bridge/index.html)
+  [_example (graphical)_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-bridge/index.html)
 * [MovingMedian](http://wavesjs.github.io/waves-lfo/module-common.operator.MovingMedian.html)
 * [OnOff](http://wavesjs.github.io/waves-lfo/module-common.operator.OnOff.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-vu-meter-display/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-vu-meter-display/index.html)
 * [Rms](http://wavesjs.github.io/waves-lfo/module-common.operator.Rms.html)
 * [Segmenter](http://wavesjs.github.io/waves-lfo/module-common.operator.Segmenter.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/operator-segmenter/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/operator-segmenter/index.html)
 * [Select](http://wavesjs.github.io/waves-lfo/module-common.operator.Select.html)
 * [Slicer](http://wavesjs.github.io/waves-lfo/module-common.operator.Slicer.html)
 * [Yin](http://wavesjs.github.io/waves-lfo/module-common.operator.Yin.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/operator-yin/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/operator-yin/index.html)
 
 _sources:_
 
 * [EventIn](http://wavesjs.github.io/waves-lfo/module-common.source.EventIn.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-bridge/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-bridge/index.html)
 
 _sinks:_
 
 * [Bridge](http://wavesjs.github.io/waves-lfo/module-common.sink.Bridge.html) -
-  [_example 1_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-bridge/index.html), [_example 2_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-marker-display/index.html)
+  [_example 1_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-bridge/index.html), [_example 2_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-marker-display/index.html)
 * [DataRecorder](http://wavesjs.github.io/waves-lfo/module-common.sink.DataRecorder.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/mosaicking/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/mosaicking/index.html)
 * [Logger](http://wavesjs.github.io/waves-lfo/module-common.sink.Logger.html)
 * [SignalRecorder](http://wavesjs.github.io/waves-lfo/module-common.sink.SignalRecorder.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-signal-recorder/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-signal-recorder/index.html)
 
 
 #### client only
@@ -140,25 +140,25 @@ _sources:_
 
 * [AudioInBuffer](http://wavesjs.github.io/waves-lfo/module-client.source.AudioInBuffer.html)
 * [AudioInNode](http://wavesjs.github.io/waves-lfo/module-client.source.AudioInNode.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/source-audio-in-node/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/source-audio-in-node/index.html)
 
 _sinks:_
 
 * [BaseDisplay](http://wavesjs.github.io/waves-lfo/module-client.sink.BaseDisplay.html)
 * [BpfDisplay](http://wavesjs.github.io/waves-lfo/module-client.sink.BpfDisplay.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-bpf-display/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-bpf-display/index.html)
 * [MarkerDisplay](http://wavesjs.github.io/waves-lfo/module-client.sink.MarkerDisplay.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-marker-display/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-marker-display/index.html)
 * [SignalDisplay](http://wavesjs.github.io/waves-lfo/module-client.sink.SignalDisplay.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-signal-display/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-signal-display/index.html)
 * [SpectrumDisplay](http://wavesjs.github.io/waves-lfo/module-client.sink.SpectrumDisplay.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-spectrum-display/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-spectrum-display/index.html)
 * [TraceDisplay](http://wavesjs.github.io/waves-lfo/module-client.sink.TraceDisplay.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-trace-display/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-trace-display/index.html)
 * [VuMeterDisplay](http://wavesjs.github.io/waves-lfo/module-client.sink.VuMeterDisplay.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-vu-meter-display/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-vu-meter-display/index.html)
 * [WaveformDisplay](http://wavesjs.github.io/waves-lfo/module-client.sink.WaveformDisplay.html) -
-  [_example_](https://rawgit.com/wavesjs/waves-lfo/master/examples/sink-waveform-display/index.html)
+  [_example_](https://cdn.rawgit.com/wavesjs/waves-lfo/master/examples/sink-waveform-display/index.html)
 
 #### node only
 
