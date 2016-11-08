@@ -19,7 +19,7 @@ const frameSize = config.frameSize;
 // audio
 const loader = new loaders.SuperLoader();
 const assets = loader.load([
-  './assets/animals.wav',
+  './assets/animals.mp3',
   `assets/animals-mfcc-${config.maxFreq}.json`,
 ]);
 
