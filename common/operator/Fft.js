@@ -296,9 +296,9 @@ var Fft = function (_BaseLfo) {
       this.normalizeCoefs // object populated with the normalization coefs
       );
 
-      var _normalizeCoefs = this.normalizeCoefs;
-      var linear = _normalizeCoefs.linear;
-      var power = _normalizeCoefs.power;
+      var _normalizeCoefs = this.normalizeCoefs,
+          linear = _normalizeCoefs.linear,
+          power = _normalizeCoefs.power;
 
 
       switch (norm) {

@@ -154,9 +154,9 @@ var DataToFile = function (_BaseLfo) {
           this.file.write('[\n');
           break;
         case 'csv':
-          var _streamParams = this.streamParams;
-          var description = _streamParams.description;
-          var frameSize = _streamParams.frameSize;
+          var _streamParams = this.streamParams,
+              description = _streamParams.description,
+              frameSize = _streamParams.frameSize;
 
 
           var header = 'time';

@@ -285,9 +285,9 @@ var Mel = function (_BaseLfo) {
       if (log) scale *= nbrBands;
 
       for (var i = 0; i < nbrBands; i++) {
-        var _melBandDescriptions$ = this.melBandDescriptions[i];
-        var startIndex = _melBandDescriptions$.startIndex;
-        var weights = _melBandDescriptions$.weights;
+        var _melBandDescriptions$ = this.melBandDescriptions[i],
+            startIndex = _melBandDescriptions$.startIndex,
+            weights = _melBandDescriptions$.weights;
 
         var value = 0;
 
