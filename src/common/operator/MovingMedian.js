@@ -120,8 +120,12 @@ class MovingMedian extends BaseLfo {
     super.resetStream();
 
     const fill = this.params.get('fill');
+    const ringBuffer = this.ringBuffer;
+    const ringLength = ringBuffer.length;
 
-    this.ringBuffer.fill(fill);
+    for (let i = 0; i < ringLength; i++)
+      this.ringBuffer[i] = fill;
+
     this.ringIndex = 0;
   }
 

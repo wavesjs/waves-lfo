@@ -114,15 +114,21 @@ class MovingAverage extends BaseLfo {
 
     const order = this.params.get('order');
     const fill = this.params.get('fill');
+    const ringBuffer = this.ringBuffer;
+    const ringLength = ringBuffer.length;
 
-    this.ringBuffer.fill(fill);
+    for (let i = 0; i < ringLength; i++)
+      ringBuffer[i] = fill;
 
     const fillSum = order * fill;
+    const frameSize = this.streamParams.frameSize;
 
-    if (this.streamParams.frameSize > 1)
-      this.sum.fill(fillSum);
-    else
+    if (frameSize > 1) {
+      for (let i = 0; i < frameSize; i++)
+        this.sum[i] = fillSum;
+    } else {
       this.sum = fillSum;
+    }
 
     this.ringIndex = 0;
   }

@@ -150,7 +150,6 @@ class Yin extends BaseLfo {
     this.buffer = new Float32Array(downFrameSize);
     // autocorrelation buffer
     this.yinBuffer = new Float32Array(this.halfBufferSize);
-    this.yinBuffer.fill(0);
 
     this.propagateStreamParams();
   }

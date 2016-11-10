@@ -308,8 +308,13 @@ class BaseLfo {
       this.nextOps[i].resetStream();
 
     // no buffer for `scalar` type or sink node
-    if (this.streamParams.frameType !== 'scalar' && this.frame.data !== null)
-      this.frame.data.fill(0);
+    if (this.streamParams.frameType !== 'scalar' && this.frame.data !== null) {
+      const frameSize = this.streamParams.frameSize;
+      const data = this.frame.data;
+
+      for (let i = 0; i < frameSize; i++)
+        data[i] = 0;
+    }
   }
 
   /**
