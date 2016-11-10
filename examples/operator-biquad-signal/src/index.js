@@ -4,15 +4,17 @@ import * as loaders from 'waves-loaders';
 
 const AudioContext = (window.AudioContext || window.webkitAudioContext);
 const audioContext = new AudioContext();
+let audioStream;
 
-// const loader = new loaders.AudioBufferLoader();
-// loader
-//   .load('./assets/dirac-1-sample-impulse-44.1hkz-1sec.wav')
-//   .then(init)
-//   .catch((err) => console.error(err.stack));
+try {
+  audioStream = navigator.mediaDevices.getUserMedia({ audio: true });
+} catch (err) {
+  const msg = `This navigator doesn't support getUserMedia or implement a deprecated API`;
+  alert(msg);
+  throw new Error(msg);
+}
 
-navigator.mediaDevices
-  .getUserMedia({ audio: true })
+audioStream
   .then(init)
   .catch((err) => console.error(err.stack));
 

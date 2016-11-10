@@ -3,9 +3,17 @@ import * as controllers from 'waves-basic-controllers';
 
 const AudioContext = (window.AudioContext ||  window.webkitAudioContext);
 const audioContext = new AudioContext();
+let audioStream;
 
-navigator.mediaDevices
-  .getUserMedia({ audio: true })
+try {
+  audioStream = navigator.mediaDevices.getUserMedia({ audio: true });
+} catch (err) {
+  const msg = `This navigator doesn't support getUserMedia or implement a deprecated API`;
+  alert(msg);
+  throw new Error(msg);
+}
+
+audioStream
   .then(init)
   .catch((err) => console.error(err.stack));
 
