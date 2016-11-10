@@ -1,5 +1,7 @@
 import BaseLfo from '../../common/core/BaseLfo';
 
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+
 /**
  * Create a function that returns time in seconds according to the current
  * environnement (node or browser).
