@@ -45,7 +45,9 @@ smooth.initStream({ frameSize: 2, frameType: 'vector' });
 
 // pull values from graph at `requestAnimationFrame` interval
 (function draw() {
-  const [x, y] = smooth.inputVector(bridge.frame.data);
+  const smoothedValues = smooth.inputVector(bridge.frame.data);
+  const x = smoothedValues[0];
+  const y = smoothedValues[1];
   const opacity = simpleDisplay ? 0.2 : 1;
 
   ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;

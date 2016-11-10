@@ -7,7 +7,6 @@ import analyzer from './analyzer';
 import config from '../config.json';
 import Synth from './Synth';
 
-console.log(config);
 // globals
 const audioContext = audio.audioContext;
 const sampleRate = audioContext.sampleRate;
@@ -23,7 +22,16 @@ const assets = loader.load([
   `assets/animals-mfcc-${config.maxFreq}.json`,
 ]);
 
-const audioStream = navigator.mediaDevices.getUserMedia({ audio: true });
+let audioStream;
+
+try {
+  audioStream = navigator.mediaDevices.getUserMedia({ audio: true });
+} catch (err) {
+  const msg = `This navigator doesn't support getUserMedia or implement a deprecated API`;
+  alert(msg);
+  throw new Error(msg);
+}
+
 const rand = Math.random;
 
 Promise.all([assets, audioStream])

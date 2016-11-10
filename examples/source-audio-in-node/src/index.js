@@ -1,6 +1,7 @@
 import * as lfo from 'waves-lfo/client';
 import * as controllers from 'waves-basic-controllers';
 
+const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
 const sine = audioContext.createOscillator();
 sine.frequency.value = 2;
