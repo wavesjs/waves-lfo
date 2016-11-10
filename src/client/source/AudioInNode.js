@@ -1,5 +1,7 @@
 import BaseLfo from '../../common/core/BaseLfo';
 
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+
 const definitions = {
   frameSize: {
     type: 'integer',
@@ -73,8 +75,11 @@ class AudioInNode extends BaseLfo {
     if (!sourceNode || !(sourceNode instanceof AudioNode))
       throw new Error('Invalid `sourceNode` parameter');
 
+    this.sourceNode = sourceNode;
     this._channel = this.params.get('channel');
     this._blockDuration = null;
+
+    this.processFrame = this.processFrame.bind(this);
   }
 
   /**
@@ -90,6 +95,14 @@ class AudioInNode extends BaseLfo {
 
     const audioContext = this.params.get('audioContext');
     this.frame.time = 0;
+
+    const frameSize = this.params.get('frameSize');
+
+    // @note: recreate each time because of a firefox weird behavior
+    this.scriptProcessor = audioContext.createScriptProcessor(frameSize, 1, 1);
+    this.scriptProcessor.onaudioprocess = this.processFrame;
+
+    this.sourceNode.connect(this.scriptProcessor);
     this.scriptProcessor.connect(audioContext.destination);
   }
 
@@ -101,6 +114,9 @@ class AudioInNode extends BaseLfo {
    */
   stop() {
     this.finalizeStream(this.frame.time);
+
+
+    this.sourceNode.disconnect();
     this.scriptProcessor.disconnect();
   }
 
@@ -108,7 +124,6 @@ class AudioInNode extends BaseLfo {
   processStreamParams() {
     const audioContext = this.params.get('audioContext');
     const frameSize = this.params.get('frameSize');
-    const sourceNode = this.params.get('sourceNode');
     const sampleRate = audioContext.sampleRate;
 
     this.streamParams.frameSize = frameSize;
@@ -118,11 +133,6 @@ class AudioInNode extends BaseLfo {
     this.streamParams.sourceSampleCount = frameSize;
 
     this._blockDuration = frameSize / sampleRate;
-
-    // prepare audio graph
-    this.scriptProcessor = audioContext.createScriptProcessor(frameSize, 1, 1);
-    this.scriptProcessor.onaudioprocess = this.processFrame.bind(this);
-    sourceNode.connect(this.scriptProcessor);
 
     this.propagateStreamParams();
   }
