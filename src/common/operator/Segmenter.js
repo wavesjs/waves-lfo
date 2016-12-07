@@ -129,7 +129,7 @@ class Segmenter extends BaseLfo {
     super.onParamUpdate(name, value, metas);
 
     if (name === 'filterOrder')
-        this.movingAverage.params.set('order', value);
+      this.movingAverage.params.set('order', value);
   }
 
   processStreamParams(prevStreamParams) {
