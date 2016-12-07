@@ -1,5 +1,5 @@
 import BaseDisplay from './BaseDisplay';
-import { getColors, getHue, hexToRGB } from '../../common/utils/display-utils';
+import { getColors, getHue, hexToRGB } from '../utils/display-utils';
 
 
 const definitions = {

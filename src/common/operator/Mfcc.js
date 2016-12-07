@@ -1,4 +1,4 @@
-import BaseLfo from '../core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 import Fft from './Fft';
 import Mel from './Mel';
 import Dct from './Dct';

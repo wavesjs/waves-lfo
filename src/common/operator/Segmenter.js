@@ -1,4 +1,4 @@
-import BaseLfo from '../core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 import MovingAverage from './MovingAverage';
 
 const min = Math.min;

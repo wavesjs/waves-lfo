@@ -1,8 +1,10 @@
+// common
 import Bridge from '../../common/sink/Bridge';
 import Logger from '../../common/sink/Logger';
 import DataRecorder from '../../common/sink/DataRecorder';
 import SignalRecorder from '../../common/sink/SignalRecorder';
 
+// client only
 import BaseDisplay from './BaseDisplay';
 import BpfDisplay from './BpfDisplay';
 import MarkerDisplay from './MarkerDisplay';

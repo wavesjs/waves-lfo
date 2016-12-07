@@ -1,4 +1,4 @@
-import BaseLfo from '../../common/core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 // http://stackoverflow.com/questions/17575790/environment-detection-node-js-or-browser
 const isNode = new Function('try { return this === global; } catch(e) { return false }');
