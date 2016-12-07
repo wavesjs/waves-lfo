@@ -16,8 +16,8 @@ eventIn.connect(bpf);
 eventIn.start();
 
 let time = 0;
-const dt = 0.1;
 let index = 0;
+const dt = 0.1;
 
 (function generateData() {
   eventIn.process(time, [Math.random() * 2 - 1, Math.random() * 2 - 1]);
@@ -26,76 +26,65 @@ let index = 0;
   setTimeout(generateData, dt * 1000);
 }());
 
-
-new controllers.Slider({
+const controls = controllers.create('#controllers', [{
+  id: 'radius',
   label: 'radius',
+  type: 'slider',
   min: 0,
   max: 10,
   step: 1,
   default: 0,
   size: 'default',
-  container: '#controllers',
-  callback: (value) => bpf.params.set('radius', value),
-});
-
-new controllers.Toggle({
+}, {
+  id: 'line',
   label: 'line',
+  type: 'toggle',
   active: true,
-  container: '#controllers',
-  callback: (value) => bpf.params.set('line', value),
-});
-
-new controllers.Slider({
+}, {
+  id: 'min',
   label: 'min',
+  type: 'slider',
   min: -10,
   max: 0,
   step: 0.01,
   default: -1,
   size: 'default',
-  container: '#controllers',
-  callback: (value) => bpf.params.set('min', value),
-});
-
-new controllers.Slider({
+}, {
+  id: 'max',
   label: 'max',
+  type: 'slider',
   min: 0,
   max: 10,
   step: 0.01,
   default: 1,
   size: 'default',
-  container: '#controllers',
-  callback: (value) => bpf.params.set('max', value),
-});
-
-new controllers.Slider({
+}, {
+  id: 'duration',
   label: 'duration',
+  type: 'slider',
   min: 1,
   max: 20,
   step: 0.1,
   default: 3,
   size: 'default',
-  container: '#controllers',
-  callback: (value) => bpf.params.set('duration', value),
-});
-
-new controllers.Slider({
+}, {
+  id: 'width',
   label: 'width',
+  type: 'slider',
   min: 300,
   max: 400,
   step: 1,
   default: 300,
   size: 'default',
-  container: '#controllers',
-  callback: (value) => bpf.params.set('width', value),
-});
-
-new controllers.Slider({
+}, {
+  id: 'height',
   label: 'height',
+  type: 'slider',
   min: 150,
   max: 200,
   step: 1,
   default: 150,
   size: 'default',
-  container: '#controllers',
-  callback: (value) => bpf.params.set('height', value),
-});
+}]);
+
+controls.addListener((id, value) => bpf.params.set(id, value));
