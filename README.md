@@ -7,7 +7,7 @@ The `lfo` library provides a simple and efficient graph-based javascript API pri
 
 A `graph` of `lfo` modules can process data streams online (i.e. processing data from audio inputs or event sources) as well as offline (e.g. iterating over recorded data) depending on the used `source` and `sink` modules. Many of the operator modules provided by the library (e.g. filters, signal statistics) can also be used for processing data using an alternative API without the `lfo` formalism.
 
-The library exposes two main entry points, `waves-lfo/client` and `waves-lfo/node`, respectively providing modules to be used in a browser or in a _Node.js_ environment. This allows for adapting the library to virtually any context and platform by providing adequate `source` and `sink` modules.
+The library exposes two main entry points, `waves-lfo/client` and `waves-lfo/node`, that respectively provide modules to be used in a browser or in a _Node.js_ environment. This architecture allows for adapting the library to virtually any context and platform by only providing adequate `source` and `sink` modules.
 
 The library provides three namespaces:
 - **`source`** modules produce streams and propagate their properties (i.e. `frameRate`, `frameType`, etc.) through the graph.
@@ -34,7 +34,7 @@ $ npm install [--save] wavesjs/waves-lfo
 
 ### Import the library
 
-To use the library in browser or in node, import the corresponding entry point to be able to use platform specific sources and sinks.
+To use the library in browser or in node, import the corresponding entry point. These different access allow to use sources and sinks specific to the platform:
 
 ```js
 // in browser
@@ -44,7 +44,7 @@ import * as lfo from 'waves-lfo/client';
 import * as lfo from 'waves-lfo/node';
 ```
 
-To create a script that aimed to be used in both environnements (i.e if no platform specific source or sink are used), you can use the `common` entry point: 
+To create a script that targets any possible environnements (i.e. if no platform specific `source` or `sink` is used), the `common` entry point can be used: 
 
 ```js
 import * as lfo from 'waves-lfo/common';
