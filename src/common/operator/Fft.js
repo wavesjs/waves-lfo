@@ -190,14 +190,16 @@ const definitions = {
  *  a `power` normalizetion is applied on the power spectrum.
  *
  * @example
- * // assuming an `audioBuffer` exists
- * const source = new AudioInBuffer({ audioBuffer });
+ * import * as lfo from 'waves-lfo/client';
  *
- * const slicer = new Slicer({
+ * // assuming an `audioBuffer` exists
+ * const source = new lfo.source.AudioInBuffer({ audioBuffer });
+ *
+ * const slicer = new lfo.operator.Slicer({
  *   frameSize: 256,
  * });
  *
- * const fft = new Fft({
+ * const fft = new lfo.operator.Fft({
  *   mode: 'power',
  *   window: 'hann',
  *   norm: 'power',

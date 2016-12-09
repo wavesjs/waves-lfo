@@ -61,6 +61,8 @@ const definitions = {
  * @param {Number} [options.maxDuration=Infinity] - Maximum duration of a segment.
  *
  * @example
+ * import * as lfo from 'waves-lfo/client';
+ *
  * // assuming a stream from the microphone
  * const source = audioContext.createMediaStreamSource(stream);
  *

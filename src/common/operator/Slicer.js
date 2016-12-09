@@ -33,7 +33,7 @@ const definitions = {
  *  of the frame.
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const eventIn = new lfo.source.EventIn({
  *   frameType: 'signal',

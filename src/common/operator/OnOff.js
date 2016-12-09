@@ -23,7 +23,7 @@ const definitions = {
  * @param {String} [options.state='on'] - Default state.
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const frames = [
  *   { time: 0, data: [1, 2] },

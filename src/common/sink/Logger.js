@@ -47,7 +47,7 @@ const definitions = {
  * @memberof module:common.sink
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const logger = new lfo.sink.Logger({ data: true });
  * whateverOperator.connect(logger);
