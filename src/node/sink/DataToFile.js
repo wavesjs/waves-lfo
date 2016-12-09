@@ -1,4 +1,4 @@
-import BaseLfo from '../../common/core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 import fse from 'fs-extra';
 import fs from 'fs';
 import util from 'util';

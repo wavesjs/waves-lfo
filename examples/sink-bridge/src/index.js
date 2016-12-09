@@ -1,5 +1,5 @@
 import * as lfo from 'waves-lfo/client';
-import * as controllers from 'waves-basic-controllers';
+import * as controllers from 'basic-controllers';
 
 const _2PI = Math.PI * 2;
 const $scene = document.querySelector('#scene');
@@ -71,8 +71,11 @@ smooth.initStream({ frameSize: 2, frameType: 'vector' });
   requestAnimationFrame(draw);
 }());
 
-new controllers.Toggle('alternative display', false, '#controllers', (value) => {
-  simpleDisplay = !value;
+new controllers.Toggle({
+  label: 'alternative display',
+  default: false,
+  container: '#controllers',
+  callback: (value) => simpleDisplay = !value,
 });
 
 

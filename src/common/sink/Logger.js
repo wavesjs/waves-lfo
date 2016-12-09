@@ -1,4 +1,4 @@
-import BaseLfo from '../../common/core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 const definitions = {
   time: {
@@ -47,7 +47,7 @@ const definitions = {
  * @memberof module:common.sink
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const logger = new lfo.sink.Logger({ data: true });
  * whateverOperator.connect(logger);

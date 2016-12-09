@@ -1,4 +1,4 @@
-import BaseLfo from '../core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 const sqrt = Math.sqrt;
 
@@ -29,7 +29,7 @@ const definitions = {
  * @memberof module:common.operator
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const eventIn = new lfo.source.EventIn({ frameSize: 2, frameType: 'vector' });
  * const magnitude = new lfo.operator.Magnitude();

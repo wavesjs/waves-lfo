@@ -1,9 +1,12 @@
+// common
+import EventIn from '../../common/source/EventIn';
+// client only
 import AudioInBuffer from './AudioInBuffer';
 import AudioInNode from './AudioInNode';
-import EventIn from '../../common/source/EventIn';
 
 export default {
+  EventIn,
+
   AudioInBuffer,
   AudioInNode,
-  EventIn,
 };

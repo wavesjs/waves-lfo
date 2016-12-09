@@ -1,5 +1,5 @@
 import * as lfo from 'waves-lfo/client';
-import * as controllers from 'waves-basic-controllers';
+import * as controllers from 'basic-controllers';
 
 const AudioContext = (window.AudioContext || window.webkitAudioContext);
 const audioContext = new AudioContext();
@@ -37,10 +37,15 @@ function init(stream) {
   onOff.connect(vuMeter);
   audioInNode.start();
 
-  new controllers.Buttons('', ['start', 'stop'], '#controllers', (value) => {
-    if (value === 'start')
-      onOff.setState('on');
-    else
-      onOff.setState('off');
+  new controllers.TriggerButtons({
+    label:'',
+    options: ['start', 'stop'],
+    container: '#controllers',
+    callback: (value) => {
+      if (value === 'start')
+        onOff.setState('on');
+      else
+        onOff.setState('off');
+    }
   });
 }

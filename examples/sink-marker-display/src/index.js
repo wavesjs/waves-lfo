@@ -1,7 +1,12 @@
 import * as lfo from 'waves-lfo/client';
-import * as controllers from 'waves-basic-controllers';
+import * as controllers from 'basic-controllers';
 
-const valueController = new controllers.Text('frame.data[0]', '', true, '#controllers');
+const valueController = new controllers.Text({
+  label: 'frame.data[0]',
+  default: '',
+  readonly: true,
+  container: '#controllers'
+});
 
 // Markers
 const eventIn = new lfo.source.EventIn({
@@ -32,19 +37,46 @@ const period = 1;
   setTimeout(generateData, period * 1000);
 }());
 
-
-new controllers.Slider('threshold', 0, 1, 0.001, 0, '', 'default', '#controllers', (value) => {
-  markerDisplay.params.set('threshold', value);
+new controllers.Slider({
+  label: 'threshold',
+  min: 0,
+  max: 1,
+  step: 0.001,
+  default: 0,
+  size: 'default',
+  container: '#controllers',
+  callback: (value) => markerDisplay.params.set('threshold', value),
 });
 
-new controllers.Slider('duration', 1, 20, 0.1, 1, '', 'default', '#controllers', (value) => {
-  markerDisplay.params.set('duration', value);
+new controllers.Slider({
+  label: 'duration',
+  min: 1,
+  max: 20,
+  step: 0.1,
+  default: 1,
+  size: 'default',
+  container: '#controllers',
+  callback: (value) => markerDisplay.params.set('duration', value),
 });
 
-new controllers.Slider('width', 300, 400, 1, 300, '', 'default', '#controllers', (value) => {
-  markerDisplay.params.set('width', value);
+new controllers.Slider({
+  label: 'width',
+  min: 300,
+  max: 400,
+  step: 1,
+  default: 300,
+  size: 'default',
+  container: '#controllers',
+  callback: (value) => markerDisplay.params.set('width', value),
 });
 
-new controllers.Slider('height', 150, 200, 1, 150, '', 'default', '#controllers', (value) => {
-  markerDisplay.params.set('height', value);
+new controllers.Slider({
+  label: 'height',
+  min: 150,
+  max: 200,
+  step: 1,
+  default: 150,
+  size: 'default',
+  container: '#controllers',
+  callback: (value) => markerDisplay.params.set('height', value),
 });

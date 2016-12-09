@@ -1,4 +1,4 @@
-import BaseLfo from '../core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 const definitions = {
   index: {
@@ -27,7 +27,7 @@ const definitions = {
  *  frame, if defined, take precedance over `option.index`.
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const eventIn = new lfo.source.EventIn({
  *   frameType: 'vector',

@@ -7,7 +7,7 @@ The `lfo` library provides a simple and efficient graph-based javascript API pri
 
 A `graph` of `lfo` modules can process data streams online (i.e. processing data from audio inputs or event sources) as well as offline (e.g. iterating over recorded data) depending on the used `source` and `sink` modules. Many of the operator modules provided by the library (e.g. filters, signal statistics) can also be used for processing data using an alternative API without the `lfo` formalism.
 
-The library is divided into two parts, `waves-lfo/client` and `waves-lfo/node`, respectively providing modules to be used in a browser or in a _Node.js_ environment. This allows for adapting the library to virtually any context and platform by providing adequate `source` and `sink` modules.
+The library exposes two main entry points, `waves-lfo/client` and `waves-lfo/node`, respectively providing modules to be used in a browser or in a _Node.js_ environment. This allows for adapting the library to virtually any context and platform by providing adequate `source` and `sink` modules.
 
 The library provides three namespaces:
 - **`source`** modules produce streams and propagate their properties (i.e. `frameRate`, `frameType`, etc.) through the graph.
@@ -22,7 +22,7 @@ A `graph` is a combination of at least a `source` and a `sink` with any number o
 
 [http://wavesjs.github.io/waves-lfo](http://wavesjs.github.io/waves-lfo)
 
-_Note: in the documentation, all nodes in the `common` namespace are platform independent._
+_**Important**: in the documentation, all nodes in the `common` and `core` namespaces are platform independent and can be used client-side as well as in node (aka from entry points `waves-lfo/client` and `waves-lfo/node`)._
 
 ## Usage
 
@@ -34,6 +34,8 @@ $ npm install [--save] wavesjs/waves-lfo
 
 ### Import the library
 
+To use the library in browser or in node, import the corresponding entry point to be able to use platform specific sources and sinks.
+
 ```js
 // in browser
 import * as lfo from 'waves-lfo/client';
@@ -42,10 +44,16 @@ import * as lfo from 'waves-lfo/client';
 import * as lfo from 'waves-lfo/node';
 ```
 
+To create a script that aimed to be used in both environnements (i.e if no platform specific source or sink are used), you can use the `common` entry point: 
+
+```js
+import * as lfo from 'waves-lfo/common';
+```
+
 ### Create a graph
 
 ```js
-import * as lfo from 'waves-lfo/client';
+import * as lfo from 'waves-lfo/common';
 
 const eventIn = new lfo.source.EventIn({
   frameType: 'vector'
@@ -175,7 +183,7 @@ _sinks:_
 Most of the operators can be used in a `standalone` mode which allow to consume the implemented algorithm without the burden of creating a whole graph.
 
 ```js
-import * as lfo from 'waves-lfo/client';
+import * as lfo from 'waves-lfo/common';
 
 const rms = new lfo.operator.Rms();
 rms.initStream({ frameType: 'signal', frameSize: 1000 });
@@ -191,7 +199,10 @@ const results = rms.inputSignal([...values]);
 
 ## Implementation of an `lfo` operator
 
+To create a new operator, the `BaseLfo` must be extended, the class is available in the `waves-lfo/core` entry point.
+
 ```js
+import { BaseLfo } from 'waves-lfo/core';
 // define class parameters
 const parameters = {
   factor: {

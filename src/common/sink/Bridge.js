@@ -1,4 +1,4 @@
-import BaseLfo from '../../common/core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 const definitions = {
   processFrame: {
@@ -33,7 +33,7 @@ const definitions = {
  * @see {@link module:common.core.BaseLfo#processStreamParams}
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const frames = [
  *  { time: 0, data: [0, 1] },

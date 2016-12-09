@@ -1,6 +1,6 @@
 import * as lfo from 'waves-lfo/client';
 import * as loaders from 'waves-loaders';
-import * as controllers from 'waves-basic-controllers';
+import * as controllers from 'basic-controllers';
 import * as audio from 'waves-audio';
 import createKDTree from 'static-kdtree';
 import analyzer from './analyzer';
@@ -103,31 +103,45 @@ function init([loaded, stream]) {
   // gui
   const $controllers = document.querySelector('#controllers');
 
-  new controllers.Buttons('', ['record', 'stop'], $controllers, (value) => {
-    if (value === 'record') {
-      if (!recorder.isRecording) {
-        audioInNode.start();
-        recorder.start();
+  new controllers.TriggerButtons({
+    label: '',
+    options: ['record', 'stop'],
+    container: $controllers,
+    callback: (value) => {
+      if (value === 'record') {
+        if (!recorder.isRecording) {
+          audioInNode.start();
+          recorder.start();
+        } else {
+          console.log('already recording');
+        }
       } else {
-        console.log('already recording');
+        audioInNode.stop();
       }
-    } else {
-      audioInNode.stop();
     }
   });
 
   // replay source
-  new controllers.Buttons('', ['replay recording'], $controllers, (value) => {
-    if (currentBuffer) {
-      const source = audioContext.createBufferSource();
-      source.connect(audioContext.destination);
-      source.buffer = currentBuffer;
-      source.start();
+  new controllers.TriggerButtons({
+    label: '',
+    options: ['replay recording'],
+    container: $controllers,
+    callback: (value) => {
+      if (currentBuffer) {
+        const source = audioContext.createBufferSource();
+        source.connect(audioContext.destination);
+        source.buffer = currentBuffer;
+        source.start();
+      }
     }
   });
 
-  new controllers.Buttons('', ['replay synth'], $controllers, (value) => {
-    synth.start();
+  // replay source
+  new controllers.TriggerButtons({
+    label: '',
+    options: ['replay synth'],
+    container: $controllers,
+    callback: (value) => synth.start(),
   });
 
   // drag and drop a new file

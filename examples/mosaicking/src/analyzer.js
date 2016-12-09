@@ -1,4 +1,4 @@
-import * as lfo from 'waves-lfo/client';
+import * as lfo from 'waves-lfo/common';
 
 export default {
   init(config, source) {

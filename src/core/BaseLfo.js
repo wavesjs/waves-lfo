@@ -84,7 +84,7 @@ let id = 0;
  *
  * _shouldn't be extended, only consumed in `processFrame`_
  *
- * @memberof module:common.core
+ * @memberof module:core
  */
 class BaseLfo {
   constructor(definitions = {}, options = {}) {

@@ -3,7 +3,7 @@
  *
  * @param {...BaseDisplay} views - List of the display to synchronize.
  *
- * @memberof module:utils
+ * @memberof module:client.utils
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

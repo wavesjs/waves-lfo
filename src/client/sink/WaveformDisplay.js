@@ -1,7 +1,7 @@
 import BaseDisplay from './BaseDisplay';
 import MinMax from '../../common/operator/MinMax';
 import Rms from '../../common/operator/Rms';
-import { getColors } from '../../common/utils/display-utils';
+import { getColors } from '../utils/display-utils';
 
 
 const definitions = {

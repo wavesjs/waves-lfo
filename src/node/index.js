@@ -1,6 +1,8 @@
 export const version = '%version%';
 
-export { default as core } from '../common/core/_namespace';
+import * as _core from '../core';
+export const core = _core;
+
 export { default as operator } from '../common/operator/_namespace';
 export { default as utils } from '../common/utils/_namespace';
 

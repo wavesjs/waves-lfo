@@ -1,4 +1,4 @@
-import BaseLfo from '../../common/core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 
 const definitions = {
@@ -38,7 +38,7 @@ const definitions = {
  * @memberof module:common.sink
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const eventIn = new lfo.source.EventIn({
  *  frameType: 'vector',

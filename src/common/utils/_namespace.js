@@ -1,5 +1,7 @@
-import DisplaySync from './DisplaySync';
+// export { default as initWindow } from './windows';
+
+import initWindow from './windows';
 
 export default {
-  DisplaySync,
+  initWindow,
 };

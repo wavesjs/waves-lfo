@@ -1,4 +1,4 @@
-import BaseLfo from '../core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 const definitions = {
   order: {
@@ -36,7 +36,7 @@ const definitions = {
  * @todo - Implement `processSignal`
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const eventIn = new lfo.source.EventIn({
  *   frameSize: 2,

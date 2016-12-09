@@ -1,6 +1,7 @@
-import BaseLfo from '../../common/core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
-const AudioContext = window.AudioContext || window.webkitAudioContext;
+// http://stackoverflow.com/questions/17575790/environment-detection-node-js-or-browser
+const isNode = new Function('try { return this === global; } catch(e) { return false }');
 
 /**
  * Create a function that returns time in seconds according to the current
@@ -15,14 +16,16 @@ const AudioContext = window.AudioContext || window.webkitAudioContext;
  * @private
  */
 function getTimeFunction(audioContext = null) {
-  if (typeof window === 'undefined') {
+  if (isNode()) {
     return () => {
       const t = process.hrtime();
       return t[0] + t[1] * 1e-9;
     }
   } else {
-    if (audioContext === null || (!audioContext instanceof AudioContext))
+    if (audioContext === null || (!audioContext instanceof AudioContext)) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
       audioContext = new AudioContext();
+    }
 
     return () => audioContext.currentTime;
   }

@@ -117,6 +117,8 @@ function initRectangleWindow(buffer, size, normCoefs) {
 /**
  * Create a buffer with window signal.
  *
+ * @memberof module:common.utils
+ *
  * @param {String} name - Name of the window.
  * @param {Float32Array} buffer - Buffer to be populated with the window signal.
  * @param {Number} size - Size of the buffer.

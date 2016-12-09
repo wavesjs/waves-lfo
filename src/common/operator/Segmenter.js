@@ -1,4 +1,4 @@
-import BaseLfo from '../core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 import MovingAverage from './MovingAverage';
 
 const min = Math.min;
@@ -61,6 +61,8 @@ const definitions = {
  * @param {Number} [options.maxDuration=Infinity] - Maximum duration of a segment.
  *
  * @example
+ * import * as lfo from 'waves-lfo/client';
+ *
  * // assuming a stream from the microphone
  * const source = audioContext.createMediaStreamSource(stream);
  *
@@ -129,7 +131,7 @@ class Segmenter extends BaseLfo {
     super.onParamUpdate(name, value, metas);
 
     if (name === 'filterOrder')
-        this.movingAverage.params.set('order', value);
+      this.movingAverage.params.set('order', value);
   }
 
   processStreamParams(prevStreamParams) {

@@ -15,7 +15,7 @@
   "homepage": "https://github.com/wavesjs/lfo",
   "scripts": {
     "bundle": "node ./bin/runner --bundle",
-    "docs": "jsdoc -c jsdoc.json",
+    "doc": "jsdoc -c jsdoc.json",
     "test": "babel-tape-runner tests/**.test.js",
     "transpile": "node ./bin/runner --transpile",
     "prewatch": "npm run transpile",

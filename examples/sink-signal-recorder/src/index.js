@@ -1,5 +1,5 @@
 import * as lfo from 'waves-lfo/client';
-import * as controllers from 'waves-basic-controllers';
+import * as controllers from 'basic-controllers';
 
 const AudioContext = (window.AudioContext || window.webkitAudioContext);
 const audioContext = new AudioContext();
@@ -46,10 +46,15 @@ function init(stream) {
   audioInNode.connect(vuMeterDisplay);
   audioInNode.start();
 
-  new controllers.Buttons('', ['record', 'stop'], '#controllers', (value) => {
-    if (value === 'record')
-      signalRecorder.start();
-    else
-      signalRecorder.stop();
+  new controllers.TriggerButtons({
+    label: '',
+    options: ['record', 'stop'],
+    container: '#controllers',
+    callback: (value) => {
+      if (value === 'record')
+        signalRecorder.start();
+      else
+        signalRecorder.stop();
+    }
   });
 }

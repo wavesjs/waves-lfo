@@ -1,4 +1,4 @@
-import BaseLfo from '../core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 /**
  * Find minimun and maximum values of a given `signal`.
@@ -8,7 +8,7 @@ import BaseLfo from '../core/BaseLfo';
  * @memberof module:common.operator
  *
  * @example
- * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/common';
  *
  * const eventIn = new lfo.source.EventIn({
  *   frameSize: 512,

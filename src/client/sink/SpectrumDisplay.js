@@ -1,6 +1,6 @@
 import BaseDisplay from './BaseDisplay';
 import Fft from '../../common/operator/Fft';
-import { getColors } from '../../common/utils/display-utils';
+import { getColors } from '../utils/display-utils';
 
 
 const definitions = {

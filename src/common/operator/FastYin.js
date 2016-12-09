@@ -1,4 +1,4 @@
-import BaseLfo from '../core/BaseLfo';
+import BaseLfo from '../../core/BaseLfo';
 
 /**
  * This implementation needs to be reviewed before being exposed in the library.
