@@ -1,4 +1,4 @@
-import BaseLfo from '../src/common/core/BaseLfo';
+import BaseLfo from '../src/core/BaseLfo';
 import EventIn from '../src/common/source/EventIn';
 import tape from 'tape';
 

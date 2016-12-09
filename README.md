@@ -22,7 +22,7 @@ A `graph` is a combination of at least a `source` and a `sink` with any number o
 
 [http://wavesjs.github.io/waves-lfo](http://wavesjs.github.io/waves-lfo)
 
-_Note: in the documentation, all nodes in the `common` namespace are platform independent._
+_Note: in the documentation, all nodes in the `common` and `core` namespaces are platform independent._
 
 ## Usage
 

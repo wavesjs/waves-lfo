@@ -1,5 +1,5 @@
 import * as lfo from 'waves-lfo/client';
-import * as controllers from 'waves-basic-controllers';
+import * as controllers from 'basic-controllers';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
@@ -20,33 +20,80 @@ const signalDisplay = new lfo.sink.SignalDisplay({
 audioInNode.connect(signalDisplay);
 audioInNode.start();
 
-new controllers.Buttons('', ['start', 'stop'], '#controllers', (value) => {
-  if (value === 'start')
-    audioInNode.start();
-  else
-    audioInNode.stop();
+new controllers.TriggerButtons({
+  label: '',
+  options: ['start', 'stop'],
+  container: '#controllers',
+  callback: (value) => {
+    if (value === 'start')
+      audioInNode.start();
+    else
+      audioInNode.stop();
+  }
 });
 
-new controllers.Slider('frequency', 1, 50, 1, 2, '', 'default', '#controllers', (value) => {
-  sine.frequency.value = value;
+new controllers.Slider({
+  label: 'frequency',
+  min: 1,
+  max: 50,
+  step: 1,
+  default: 2,
+  size: 'medium',
+  container: '#controllers',
+  callback: (value) => sine.frequency.value = value,
 });
 
-new controllers.Slider('min', -10, 0, 0.01, -1, '', 'default', '#controllers', (value) => {
-  signalDisplay.params.set('min', value);
+new controllers.Slider({
+  label: 'min',
+  min: -10,
+  max: 0,
+  step: 0.01,
+  default:  -1,
+  size: 'medium',
+  container: '#controllers',
+  callback: (value) => signalDisplay.params.set('min', value),
 });
 
-new controllers.Slider('max', 0, 10, 0.01, 1, '', 'default', '#controllers', (value) => {
-  signalDisplay.params.set('max', value);
+new controllers.Slider({
+  label: 'max',
+  min: 0,
+  max: 10,
+  step: 0.01,
+  default: 1,
+  size: 'medium',
+  container: '#controllers',
+  callback: (value) => signalDisplay.params.set('max', value),
 });
 
-new controllers.Slider('duration', 1, 10, 0.1, 1, '', 'default', '#controllers', (value) => {
-  signalDisplay.params.set('duration', value);
+new controllers.Slider({
+  label: 'duration',
+  min: 1,
+  max: 10,
+  step: 0.1,
+  default: 1,
+  size: 'medium',
+  container: '#controllers',
+  callback: (value) => signalDisplay.params.set('duration', value),
 });
 
-new controllers.Slider('width', 300, 400, 1, 300, '', 'default', '#controllers', (value) => {
-  signalDisplay.params.set('width', value);
+new controllers.Slider({
+  label: 'width',
+  min: 300,
+  max: 400,
+  step: 1,
+  default: 300,
+  size: 'medium',
+  container: '#controllers',
+  callback: (value) => signalDisplay.params.set('width', value),
 });
 
-new controllers.Slider('height', 150, 200, 1, 150, '', 'default', '#controllers', (value) => {
-  signalDisplay.params.set('height', value);
+new controllers.Slider({
+  label: 'height',
+  min: 150,
+  max: 200,
+  step: 1,
+  default: 150,
+  size: 'medium',
+  container: '#controllers',
+  callback: (value) => signalDisplay.params.set('height', value),
 });
