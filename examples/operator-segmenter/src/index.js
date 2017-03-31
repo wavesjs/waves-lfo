@@ -32,10 +32,10 @@ function init(stream) {
   const segmenter = new lfo.operator.Segmenter({
     logInput: true,
     filterOrder: 5,
-    threshold: 3,
+    threshold: 4,
     offThreshold: -Infinity,
-    minInter: 0.050,
-    maxDuration: 0.050,
+    minInter: 0.100,
+    maxDuration: 0.020,
   });
 
   const waveformDisplay = new lfo.sink.WaveformDisplay({
