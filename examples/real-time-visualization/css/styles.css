@@ -1,0 +1,47 @@
+html {
+  font-size: 62.5%;
+  font-family: arial;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin: 0 0 20px 0;
+  color: rgba(0, 0, 0, 0.4);
+  font-family: "Courier New", Courier, monospace;
+}
+
+.main-wrapper {
+  position: relative;
+  width: 380px;
+  height: 150px;
+}
+
+.wrapper {
+  position: relative;
+  width: 300px;
+  height: 150px;
+}
+
+#waveform, #markers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  outline: 1px solid #cdcdcd;
+}
+
+#dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+#vu-meter {
+  position: absolute;
+  top: -1px;
+  left: 301px;
+}
