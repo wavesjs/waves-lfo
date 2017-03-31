@@ -46,8 +46,6 @@ const noop = function() {};
  *
  * @memberof module:client.source
  *
- * @todo - Allow to pass raw buffer and sampleRate (simplified use server-side)
- *
  * @example
  * import * as lfo from 'waves-lfo/client';
  *

@@ -176,8 +176,8 @@ const definitions = {
  * @memberof module:common.operator
  *
  * @param {Object} options - Override default parameters.
- * @param {Number} [options.size=1024] - Size of the fft, should be a power of
- *  2. If the frame size of the incomming signal is lower than this value,
+ * @param {Number} [options.size=1024] - Size of the fft, should be a power of 2.
+ *  If the frame size of the incomming signal is lower than this value,
  *  it is zero padded to match the fft size.
  * @param {String} [options.window='none'] - Name of the window applied on the
  *  incomming signal. Available windows are: 'none', 'hann', 'hanning',
@@ -187,7 +187,7 @@ const definitions = {
  * @param {String} [options.norm='auto'] - Type of normalization applied on the
  *  output. Possible values are 'auto', 'none', 'linear', 'power'. When set to
  *  `auto`, a `linear` normalization is applied on the magnitude spectrum, while
- *  a `power` normalizetion is applied on the power spectrum.
+ *  a `power` normalization is applied on the power spectrum.
  *
  * @example
  * import * as lfo from 'waves-lfo/client';

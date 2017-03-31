@@ -227,7 +227,7 @@ class Mel extends BaseLfo {
    * @example
    * const mel = new lfo.operator.Mel({ nbrBands: 24 });
    * // mandatory for use in standalone mode
-   * mel.initStream({ frameSize: 256, frameType: 'vector' });
+   * mel.initStream({ frameSize: 256, frameType: 'vector', sourceSampleRate: 44100 });
    * mel.inputVector(fftBins);
    */
   inputVector(bins) {
