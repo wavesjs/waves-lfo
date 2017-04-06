@@ -20,7 +20,7 @@ function render() {
     numFrameActive += 1;
   }
 
-  if (numFrameActive > 100) {
+  if (numFrameActive > 3) {
     numFrameActive = 0;
     active = false;
   }
