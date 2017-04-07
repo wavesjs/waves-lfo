@@ -33,11 +33,19 @@ canvas {
   /*outline: 1px solid #cdcdcd;*/
 }
 
+#container {
+  position: relative;
+}
+
 #controllers {
-  /*position: absolute;
-  right: 0;
-  top: 0;*/
   width: 400px;
+  display: inline-block;
+}
+
+#visualization {
+  position: absolute;
+  top: 4px;
+  left: 420px;
 }
 
 #drop {
@@ -64,8 +72,12 @@ canvas {
 }
 
 #track-1, #track-2 {
-  width: 1000px;
-  height: 150px;
-  margin-bottom: 20px;
+  width: 700px;
+  height: 100px;
   border: 1px solid #cdcdcd;
 }
+
+#track-1 {
+  margin-bottom: 12px;
+}
+
