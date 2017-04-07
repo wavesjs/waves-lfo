@@ -29,6 +29,10 @@ const definitions = {
     nullable: true,
     constant: true,
   },
+  async: {
+    type: 'boolean',
+    default: false,
+  },
 };
 
 const noop = function() {};
@@ -125,6 +129,7 @@ class AudioInBuffer extends BaseLfo {
 
   /** @private */
   processFrame(buffer) {
+    const async = this.params.get('async');
     const sampleRate = this.streamParams.sourceSampleRate;
     const frameSize = this.streamParams.frameSize;
     const progressCallback = this.params.get('progressCallback') || noop;
@@ -134,7 +139,7 @@ class AudioInBuffer extends BaseLfo {
     const that = this;
     let i = 0;
 
-    (function slice() {
+    function slice() {
       const offset = i * frameSize;
       const nbrCopy = Math.min(length - offset, frameSize);
 
@@ -148,11 +153,17 @@ class AudioInBuffer extends BaseLfo {
       i += 1;
       progressCallback(i / nbrFrames);
 
-      if (i < nbrFrames)
-        setTimeout(slice, 0);
-      else
+      if (i < nbrFrames) {
+        if (async)
+          setTimeout(slice, 0);
+        else
+          slice();
+      } else {
         that.finalizeStream(that.endTime);
-    }());
+      }
+    };
+
+    setTimeout(slice, 0);
   }
 }
 

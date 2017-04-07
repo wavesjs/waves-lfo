@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "babel-runtime": "^6.9.2",
+    "basic-controllers": "ircam-jstools/basic-controllers#v1.0.0",
     "waves-lfo": "wavesjs/waves-lfo",
-    "waves-loaders": "wavesjs/waves-loaders",
     "waves-ui": "wavesjs/waves-ui"
   },
   "devDependencies": {

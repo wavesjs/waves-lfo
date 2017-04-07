@@ -15,33 +15,45 @@ h1 {
   font-family: "Courier New", Courier, monospace;
 }
 
-.main-wrapper {
+
+#real-time {
+  display: inline-block;
   position: relative;
-  width: 380px;
+  width: 54px;
   height: 150px;
 }
 
-.wrapper {
-  position: relative;
-  width: 300px;
-  height: 150px;
-}
-
-#waveform, #markers {
-  position: absolute;
-  top: 0;
-  left: 0;
-  outline: 1px solid #cdcdcd;
-}
-
-#dot {
+#real-time #dot {
   position: absolute;
   bottom: 0;
   right: 0;
 }
 
-#vu-meter {
+#real-time #vu-meter {
   position: absolute;
-  top: -1px;
-  left: 301px;
+  top: 0px;
+  left: 0px;
+}
+
+#offline {
+  display: inline-block;
+  position: relative;
+  width: 800px;
+  height: 150px;
+  margin-left: 20px;
+}
+
+#offline #record {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+#offline #signal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 800px;
+  height: 150px;
 }

@@ -3,20 +3,21 @@
   <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
-      <title>Real-time segmentation</title>
+      <title>Real-time / offline segmentation</title>
       <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
-    <h1>Real-time segmentation</h1>
+    <h1>Real-time / offline segmentation</h1>
 
-    <div class="main-wrapper">
-      <div class="wrapper">
-        <canvas id="waveform"></canvas>
-        <canvas id="markers"></canvas>
-      </div>
+    <div id="real-time">
       <canvas id="vu-meter"></canvas>
-
       <canvas id="dot"></canvas>
+    </div>
+
+    <div id="offline">
+      <button id="record">Record</button>
+      <div id="track"></div>
+      <canvas id="signal"></canvas>
     </div>
 
     <script src="./bundle.js"></script>
