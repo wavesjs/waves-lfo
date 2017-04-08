@@ -10,9 +10,7 @@
  *
  * @example
  * class MySource extends SourceMixin(BaseLfo) {
- *   start() {}
- *   stop() {}
- *   init() {}
+ *   // ...
  * }
  */
  const SourceMixin = (superclass) => class extends superclass {
