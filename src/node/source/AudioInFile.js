@@ -1,4 +1,5 @@
 import BaseLfo from '../../core/BaseLfo';
+import SourceMixin from '../../core/SourceMixin';
 import av from 'av';
 
 
@@ -23,6 +24,10 @@ const definitions = {
     default: null,
     nullable: true,
     constant: true,
+  },
+  async: {
+    type: 'boolean',
+    default: false,
   },
 };
 
@@ -63,11 +68,33 @@ const noop = function() {};
  * audioInFile.connect(logger);
  * audioInFile.start();
  */
-class AudioInFile extends BaseLfo {
+class AudioInFile extends SourceMixin(BaseLfo) {
   constructor(options) {
     super(definitions, options);
 
+    this.buffer = null;
     this.processStreamParams = this.processStreamParams.bind(this);
+  }
+
+  initModule() {
+    const promises = this.nextModules.map((module) => {
+      return module.initModule();
+    });
+
+    const decoded = new Promise((resolve, reject) => {
+      const filename = this.params.get('filename');
+      this.asset = av.Asset.fromFile(filename);
+      this.asset.on('error', (err) => console.log(err.stack));
+      // call `processStreamParams` because sampleRate is only available
+      this.asset.decodeToBuffer((buffer) => {
+        this.buffer = buffer;
+        resolve();
+      });
+    });
+
+    promises.push(decoded);
+
+    return Promise.all(promises);
   }
 
   /**
@@ -78,14 +105,14 @@ class AudioInFile extends BaseLfo {
    * @see {@link module:node.source.AudioInFile#stop}
    */
   start() {
-    const filename = this.params.get('filename');
-    this.asset = av.Asset.fromFile(filename);
-    this.asset.on('error', (err) => console.log(err.stack));
-    // call `processStreamParams` because sampleRate is only available
-    this.asset.decodeToBuffer((buffer) => {
-      this.initStream();
-      this.processFrame(buffer);
-    });
+    if (!this.initialized) {
+      this.initialized = this.init();
+      this.initialized.then(() => this.start(startTime));
+      return;
+    }
+
+    this.ready = true;
+    this.processFrame(this.buffer);
   }
 
   /**
@@ -96,6 +123,7 @@ class AudioInFile extends BaseLfo {
    */
   stop() {
     this.finalizeStream(this.endTime);
+    this.ready = false;
   }
 
   /** @private */
@@ -121,6 +149,7 @@ class AudioInFile extends BaseLfo {
 
   /** @private */
   processFrame(buffer) {
+    const async = this.params.get('async');
     const frameSize = this.params.get('frameSize');
     const channel = this.params.get('channel');
     const progressCallback = this.params.get('progressCallback') || noop;
@@ -138,7 +167,7 @@ class AudioInFile extends BaseLfo {
     let frameIndex = 0;
 
     // input buffer is interleaved, pick only values according to `channel`
-    (function slice() {
+    function slice() {
       for (let i = 0; i < frameSize; i++) {
         const index = sourceIndex + channel;
         data[i] = sourceIndex < length ? buffer[index] : 0;
@@ -153,12 +182,21 @@ class AudioInFile extends BaseLfo {
       frameIndex += 1;
       progressCallback(frameIndex / nbrFrames);
 
-      if (frameIndex < nbrFrames)
-        setTimeout(slice, 0);
-      else
+      if (frameIndex < nbrFrames) {
+        if (async)
+          setTimeout(slice, 0);
+        else
+          slice();
+      } else {
         that.finalizeStream(that.endTime);
-    }());
+      }
+    }
 
+    // allow the following to do the expected thing:
+    // audioIn.connect(recorder);
+    // audioIn.start();
+    // recorder.start();
+    setTimeout(slice, 0);
   }
 }
 

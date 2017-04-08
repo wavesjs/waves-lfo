@@ -1,4 +1,5 @@
 import BaseLfo from '../../core/BaseLfo';
+import SourceMixin from '../../core/SourceMixin';
 import { wsServerFactory } from '../utils/wsServerFactory';
 import * as wsUtils from '../../common/utils/wsUtils';
 
@@ -23,7 +24,7 @@ const parameters = {
  *
  *
  */
-class WebSocket extends BaseLfo {
+class WebSocket extends SourceMixin(BaseLfo) {
   constructor(options = {}) {
     super(parameters, options);
 
@@ -94,8 +95,10 @@ class WebSocket extends BaseLfo {
     console.log('[opcode]', opcode);
 
     switch (opcode) {
+      case 0: // PING
+        // const
       // processStreamParams :   [1 byte for opcode, x bytes for payload]
-      case 0:
+      case 1: // PONG
         const payload = new Uint16Array(ab.slice(2));
         const prevStreamParams = wsUtils.Uint16Array2json(payload);
         this.processStreamParams(prevStreamParams);

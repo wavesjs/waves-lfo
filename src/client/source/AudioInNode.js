@@ -1,4 +1,5 @@
 import BaseLfo from '../../core/BaseLfo';
+import SourceMixin from '../../core/SourceMixin';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -62,7 +63,7 @@ const definitions = {
  * sine.start();
  * audioInNode.start();
  */
-class AudioInNode extends BaseLfo {
+class AudioInNode extends SourceMixin(BaseLfo) {
   constructor(options = {}) {
     super(definitions, options);
 
@@ -91,17 +92,21 @@ class AudioInNode extends BaseLfo {
    * @see {@link module:client.source.AudioInNode#stop}
    */
   start() {
-    this.initStream();
+    if (!this.initialized) {
+      this.initialized = this.init();
+      this.initialized.then(() => this.start(startTime));
+      return;
+    }
 
     const audioContext = this.params.get('audioContext');
-    this.frame.time = 0;
-
     const frameSize = this.params.get('frameSize');
 
+    this.frame.time = 0;
     // @note: recreate each time because of a firefox weird behavior
     this.scriptProcessor = audioContext.createScriptProcessor(frameSize, 1, 1);
     this.scriptProcessor.onaudioprocess = this.processFrame;
 
+    this.ready = true;
     this.sourceNode.connect(this.scriptProcessor);
     this.scriptProcessor.connect(audioContext.destination);
   }
@@ -114,8 +119,7 @@ class AudioInNode extends BaseLfo {
    */
   stop() {
     this.finalizeStream(this.frame.time);
-
-
+    this.ready = false;
     this.sourceNode.disconnect();
     this.scriptProcessor.disconnect();
   }
@@ -142,6 +146,9 @@ class AudioInNode extends BaseLfo {
    * @private
    */
   processFrame(e) {
+    if (this.ready === false)
+      return;
+
     this.frame.data = e.inputBuffer.getChannelData(this._channel);
     this.propagateFrame();
 

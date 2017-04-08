@@ -152,28 +152,28 @@ class BaseLfo {
 
     /**
      * List of nodes connected to the ouput of the node (lower in the graph).
-     * At each frame, the node forward its `frame` to to all its `nextOps`.
+     * At each frame, the node forward its `frame` to to all its `nextModules`.
      *
      * @type {Array<BaseLfo>}
-     * @name nextOps
+     * @name nextModules
      * @instance
      * @memberof module:common.core.BaseLfo
      * @see {@link module:common.core.BaseLfo#connect}
      * @see {@link module:common.core.BaseLfo#disconnect}
      */
-    this.nextOps = [];
+    this.nextModules = [];
 
     /**
      * The node from which the node receive the frames (upper in the graph).
      *
      * @type {BaseLfo}
-     * @name prevOp
+     * @name prevModule
      * @instance
      * @memberof module:common.core.BaseLfo
      * @see {@link module:common.core.BaseLfo#connect}
      * @see {@link module:common.core.BaseLfo#disconnect}
      */
-    this.prevOp = null;
+    this.prevModule = null;
 
     /**
      * Is set to true when a static parameter is updated. On the next input
@@ -222,7 +222,7 @@ class BaseLfo {
   }
 
   /**
-   * Connect the current node (`prevOp`) to another node (`nextOp`).
+   * Connect the current node (`prevModule`) to another node (`nextOp`).
    * A given node can be connected to several operators and propagate the
    * stream to each of them.
    *
@@ -237,26 +237,26 @@ class BaseLfo {
     if (this.streamParams === null ||next.streamParams === null)
       throw new Error('Invalid connection: cannot connect a dead node');
 
-    this.nextOps.push(next);
-    next.prevOp = this;
+    this.nextModules.push(next);
+    next.prevModule = this;
 
     if (this.streamParams.frameType !== null) // graph has already been started
       next.processStreamParams(this.streamParams);
   }
 
   /**
-   * Remove the given operator from its previous operators' `nextOps`.
+   * Remove the given operator from its previous operators' `nextModules`.
    *
    * @param {BaseLfo} [next=null] - The operator to disconnect from the current
    *  operator. If `null` disconnect all the next operators.
    */
   disconnect(next = null) {
     if (next === null) {
-      this.nextOps.forEach((next) => this.disconnect(next));
+      this.nextModules.forEach((next) => this.disconnect(next));
     } else {
-      const index = this.nextOps.indexOf(this);
-      this.nextOps.splice(index, 1);
-      next.prevOp = null;
+      const index = this.nextModules.indexOf(this);
+      this.nextModules.splice(index, 1);
+      next.prevModule = null;
     }
   }
 
@@ -269,47 +269,41 @@ class BaseLfo {
    */
   destroy() {
     // destroy all chidren
-    let index = this.nextOps.length;
+    let index = this.nextModules.length;
 
     while (index--)
-      this.nextOps[index].destroy();
+      this.nextModules[index].destroy();
 
     // disconnect itself from the previous operator
-    if (this.prevOp)
-      this.prevOp.disconnect(this);
+    if (this.prevModule)
+      this.prevModule.disconnect(this);
 
     // mark the object as dead
     this.streamParams = null;
   }
 
-  // /**
-  //  * Maybe in sources only (source mixin ?)
-  //  *
-  //  * @todo - Add source mixin (init, start, stop)
-  //  */
-  // init() {
-  //   this.initGraph();
-  //   this.initStream();
+  /**
+   * Return a promise that resolve when the module is ready to be consumed.
+   * Some modules have an async behavior at initialization and thus could
+   * be not ready to be consumed when the graph starts.
+   * A module should be consider as initialized when all next modules (children)
+   * are themselves initialized. The event bubbles up from sinks to sources.
+   * When all its next operators are ready, a source can consider the whole graph
+   * as ready and then accept incoming.
+   * The default implementation resolves when all next operators are resolved
+   * themselves.
+   * An operator relying on external async API must override this method to
+   * resolve only when its dependecy is ready.
+   *
+   * @return Promise
+   */
+  initModule() {
+    const nextPromises = this.nextModules.map((module) => {
+      return module.initModule();
+    });
 
-  //   return Promise();
-  // }
-
-  // *
-  //  * Return a promise that resolve when the module is ready to be consumed.
-  //  * Some modules have an async behavior at initialization and thus could
-  //  * be not ready to be consumed when the graph starts.
-  //  *
-  //  * @example
-  //  * source.init().then()
-  //  *
-  //  *
-  //  * @return Promise
-
-  // initModule() {
-
-
-  //   return Promise();
-  // }
+    return Promise.all(nextPromises);
+  }
 
   /**
    * Helper to initialize the stream in standalone mode.
@@ -333,8 +327,8 @@ class BaseLfo {
    */
   resetStream() {
     // buttom up
-    for (let i = 0, l = this.nextOps.length; i < l; i++)
-      this.nextOps[i].resetStream();
+    for (let i = 0, l = this.nextModules.length; i < l; i++)
+      this.nextModules[i].resetStream();
 
     // no buffer for `scalar` type or sink node
     // @note - this should be reviewed
@@ -354,8 +348,8 @@ class BaseLfo {
    * @param {Number} endTime - Logical time at which the graph is stopped.
    */
   finalizeStream(endTime) {
-    for (let i = 0, l = this.nextOps.length; i < l; i++)
-      this.nextOps[i].finalizeStream(endTime);
+    for (let i = 0, l = this.nextModules.length; i < l; i++)
+      this.nextModules[i].finalizeStream(endTime);
   }
 
   /**
@@ -441,8 +435,8 @@ class BaseLfo {
   propagateStreamParams() {
     this.frame.data = new Float32Array(this.streamParams.frameSize);
 
-    for (let i = 0, l = this.nextOps.length; i < l; i++)
-      this.nextOps[i].processStreamParams(this.streamParams);
+    for (let i = 0, l = this.nextModules.length; i < l; i++)
+      this.nextModules[i].processStreamParams(this.streamParams);
   }
 
   /**
@@ -488,7 +482,7 @@ class BaseLfo {
    */
   prepareFrame() {
     if (this._reinit === true) {
-      const streamParams = this.prevOp !== null ? this.prevOp.streamParams : {};
+      const streamParams = this.prevModule !== null ? this.prevModule.streamParams : {};
       this.initStream(streamParams);
       this._reinit = false;
     }
@@ -501,10 +495,9 @@ class BaseLfo {
    * @see {@link module:common.core.BaseLfo#processFrame}
    */
   propagateFrame() {
-    for (let i = 0, l = this.nextOps.length; i < l; i++)
-      this.nextOps[i].processFrame(this.frame);
+    for (let i = 0, l = this.nextModules.length; i < l; i++)
+      this.nextModules[i].processFrame(this.frame);
   }
 }
 
 export default BaseLfo;
-

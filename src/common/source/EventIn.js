@@ -1,4 +1,5 @@
 import BaseLfo from '../../core/BaseLfo';
+import SourceMixin from '../../core/SourceMixin';
 
 // http://stackoverflow.com/questions/17575790/environment-detection-node-js-or-browser
 const isNode = new Function('try { return this === global; } catch(e) { return false }');
@@ -127,13 +128,13 @@ const definitions = {
  *   eventIn.processFrame(frame);
  * }, false);
  */
-class EventIn extends BaseLfo {
+class EventIn extends SourceMixin(BaseLfo) {
   constructor(options = {}) {
     super(definitions, options);
 
     const audioContext = this.params.get('audioContext');
     this._getTime = getTimeFunction(audioContext);
-    this._isStarted = false;
+    this.ready = false;
     this._startTime = null;
     this._systemTime = null;
     this._absoluteTime = this.params.get('absoluteTime');
@@ -149,12 +150,16 @@ class EventIn extends BaseLfo {
    * @see {@link module:common.source.EventIn#stop}
    */
   start(startTime = null) {
-    this.initStream();
+    if (!this.initialized) {
+      this.initialized = this.init();
+      this.initialized.then(() => this.start(startTime));
+      return;
+    }
 
     this._startTime = startTime;
-    this._isStarted = true;
-    // values set in the first `process` call
-    this._systemTime = null;
+    this._systemTime = null; // value set in the first `process` call
+
+    this.ready = true;
   }
 
   /**
@@ -165,12 +170,12 @@ class EventIn extends BaseLfo {
    * @see {@link module:common.source.EventIn#start}
    */
   stop() {
-    if (this._isStarted && this._startTime !== null) {
+    if (this.ready && this._startTime !== null) {
       const currentTime = this._getTime();
       const endTime = this.frame.time + (currentTime - this._systemTime);
 
       this.finalizeStream(endTime);
-      this._isStarted = false;
+      this.ready = false;
     }
   }
 
@@ -258,7 +263,7 @@ class EventIn extends BaseLfo {
    * eventIn.processFrame({ time: 1, data: [0, 1, 2] });
    */
   processFrame(frame) {
-    if (!this._isStarted) return;
+    if (!this.ready) return;
 
     this.prepareFrame();
     this.processFunction(frame);
