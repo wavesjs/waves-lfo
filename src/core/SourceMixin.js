@@ -60,13 +60,13 @@
    * @example
    * // basic `start` implementation
    * start() {
-   * if (this.initialized === false) {
-   *   if (this.initPromise === null) // init has not yet been called
-   *     this.initPromise = this.init();
+   *   if (this.initialized === false) {
+   *     if (this.initPromise === null) // init has not yet been called
+   *       this.initPromise = this.init();
    *
-   *   this.initPromise.then(() => this.start(startTime));
-   *   return;
-   * }
+   *     this.initPromise.then(() => this.start(startTime));
+   *     return;
+   *   }
    *
    *   this.started = true;
    * }
