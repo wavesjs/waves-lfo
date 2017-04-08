@@ -91,10 +91,12 @@
    *
    * @example
    * // basic `processFrame` implementation
-   * if (this.started === true) {
-   *   this.prepareFrame();
-   *   this.processFunction(frame);
-   *   this.propagateFrame();
+   * processFrame(frame) {
+   *   if (this.started === true) {
+   *     this.prepareFrame();
+   *     this.processFunction(frame);
+   *     this.propagateFrame();
+   *   }
    * }
    */
   processFrame(frame) {}
