@@ -9,9 +9,7 @@
  * is set to `true`.
  *
  * @example
- * class MySource extends SourceMixin(BaseLfo) {
- *   // ...
- * }
+ * class MySource extends SourceMixin(BaseLfo) {}
  */
  const SourceMixin = (superclass) => class extends superclass {
   constructor(...args) {
