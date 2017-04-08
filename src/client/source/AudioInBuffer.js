@@ -1,4 +1,5 @@
 import BaseLfo from '../../core/BaseLfo';
+import SourceMixin from '../../core/SourceMixin';
 
 
 const definitions = {
@@ -68,7 +69,7 @@ const noop = function() {};
  * audioInBuffer.connect(waveform);
  * audioInBuffer.start();
  */
-class AudioInBuffer extends BaseLfo {
+class AudioInBuffer extends SourceMixin(BaseLfo) {
   constructor(options = {}) {
     super(definitions, options);
 
@@ -90,12 +91,17 @@ class AudioInBuffer extends BaseLfo {
    * @see {@link module:client.source.AudioInBuffer#stop}
    */
   start() {
-    this.initStream();
+    if (!this.initialized) {
+      this.initialized = this.init();
+      this.initialized.then(() => this.start(startTime));
+      return;
+    }
 
     const channel = this.params.get('channel');
     const audioBuffer = this.params.get('audioBuffer');
     const buffer = audioBuffer.getChannelData(channel);
     this.endTime = 0;
+    this.ready = true;
 
     this.processFrame(buffer);
   }
@@ -109,6 +115,7 @@ class AudioInBuffer extends BaseLfo {
    */
   stop() {
     this.finalizeStream(this.endTime);
+    this.ready = false;
   }
 
   /** @private */

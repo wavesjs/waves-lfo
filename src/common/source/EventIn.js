@@ -150,9 +150,9 @@ class EventIn extends SourceMixin(BaseLfo) {
    * @see {@link module:common.source.EventIn#stop}
    */
   start(startTime = null) {
-    if (!this._initPromise) {
-      this._initPromise = this.init();
-      this._initPromise.then(() => this.start(startTime));
+    if (!this.initialized) {
+      this.initialized = this.init();
+      this.initialized.then(() => this.start(startTime));
       return;
     }
 
