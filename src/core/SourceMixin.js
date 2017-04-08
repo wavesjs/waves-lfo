@@ -85,7 +85,8 @@
   stop() {}
 
   /**
-   * Never allow incomming frames if `this.started` is not `true`.
+   * The implementation should never allow incomming frames
+   * if `this.started` is not `true`.
    *
    * @param {Object} frame
    *
