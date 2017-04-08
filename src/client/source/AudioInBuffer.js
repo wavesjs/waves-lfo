@@ -163,6 +163,10 @@ class AudioInBuffer extends BaseLfo {
       }
     };
 
+    // allow the following to do the expected thing:
+    // audioIn.connect(recorder);
+    // audioIn.start();
+    // recorder.start();
     setTimeout(slice, 0);
   }
 }

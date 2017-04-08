@@ -282,7 +282,7 @@ class BaseLfo {
     this.streamParams = null;
   }
 
-  /*
+  /**
    * Return a promise that resolve when the module is ready to be consumed.
    * Some modules have an async behavior at initialization and thus could
    * be not ready to be consumed when the graph starts.
@@ -290,15 +290,19 @@ class BaseLfo {
    * are themselves initialized. The event bubbles up from sinks to sources.
    * When all its next operators are ready, a source can consider the whole graph
    * as ready and then accept incoming.
-   * The default implementation only resolve when all next operators resolved
+   * The default implementation resolves when all next operators are resolved
    * themselves.
+   * An operator relying on external async API must override this method to
+   * resolve only when its dependecy is ready.
    *
    * @return Promise
    */
   initModule() {
-    const nextPromises = this.nextModules.map((op) =>)
+    const nextPromises = this.nextModules.map((module) => {
+      return module.initModule();
+    });
 
-    return Promise();
+    return Promise.all(nextPromises);
   }
 
   /**
@@ -497,4 +501,3 @@ class BaseLfo {
 }
 
 export default BaseLfo;
-
