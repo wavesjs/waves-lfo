@@ -18,6 +18,9 @@
     this.initialized = false;
     this.initPromise = null;
     this.started = false;
+
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
   }
 
   /**
@@ -60,7 +63,7 @@
    *     if (this.initPromise === null) // init has not yet been called
    *       this.initPromise = this.init();
    *
-   *     this.initPromise.then(() => this.start(startTime));
+   *     this.initPromise.then(this.start);
    *     return;
    *   }
    *

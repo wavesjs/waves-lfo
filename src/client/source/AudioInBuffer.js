@@ -95,7 +95,7 @@ class AudioInBuffer extends SourceMixin(BaseLfo) {
       if (this.initPromise === null) // init has not yet been called
         this.initPromise = this.init();
 
-      this.initPromise.then(() => this.start(startTime));
+      this.initPromise.then(this.start);
       return;
     }
 

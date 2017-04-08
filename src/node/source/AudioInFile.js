@@ -83,6 +83,8 @@ class AudioInFile extends SourceMixin(BaseLfo) {
 
     const decoded = new Promise((resolve, reject) => {
       const filename = this.params.get('filename');
+
+      // @todo - replace for http://www.mega-nerd.com/libsndfile/
       this.asset = av.Asset.fromFile(filename);
       this.asset.on('error', (err) => console.log(err.stack));
       // call `processStreamParams` because sampleRate is only available
@@ -109,7 +111,7 @@ class AudioInFile extends SourceMixin(BaseLfo) {
       if (this.initPromise === null) // init has not yet been called
         this.initPromise = this.init();
 
-      this.initPromise.then(() => this.start(startTime));
+      this.initPromise.then(this.start);
       return;
     }
 

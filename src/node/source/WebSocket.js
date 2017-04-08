@@ -37,6 +37,18 @@ class WebSocket extends SourceMixin(BaseLfo) {
     // this.wss.on('disconnect', this._onDisconnect); // doesn't exists ?
   }
 
+  start() {
+    if (this.initialized === false) {
+      if (this.initPromise === null) // init has not yet been called
+        this.initPromise = this.init();
+
+      this.initPromise.then(this.start);
+      return;
+    }
+
+    this.started = true;
+  }
+
   processStreamParams(prevStreamParams) {
     super.processStreamParams(prevStreamParams);
     console.log('processStreamParams');
@@ -48,8 +60,8 @@ class WebSocket extends SourceMixin(BaseLfo) {
   }
 
   finalizeStream(endTime) {
-    console.log('finalizeStream', endTime);
     super.finalizeStream(endTime);
+    console.log('finalizeStream', endTime);
   }
 
   // process any type
