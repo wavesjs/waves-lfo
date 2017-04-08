@@ -6,6 +6,7 @@ import createKDTree from 'static-kdtree';
 import analyzer from './analyzer';
 import config from '../config.json';
 import Synth from './Synth';
+import WaveformTrack from './WaveformTrack';
 
 // globals
 const audioContext = audio.audioContext;
@@ -69,6 +70,27 @@ function init([loaded, stream]) {
   synth.setSearchSpace(kdTree, range);
   synth.setBuffer(audioSourceBuffer);
 
+  // visualizations
+  const targetWaveform = new WaveformTrack('#track-1');
+  targetWaveform.setAudioBuffer(audioSourceBuffer);
+
+  const sourceWaveform = new WaveformTrack('#track-2');
+
+  synth.setStartCallback((grainDuration) => {
+    targetWaveform.initSegment(grainDuration);
+    sourceWaveform.initSegment(grainDuration);
+  });
+
+  synth.setAdvanceCallback((sourceTime, targetTime) => {
+    targetWaveform.updateSegment(targetTime);
+    sourceWaveform.updateSegment(sourceTime);
+  });
+
+  synth.setClearCallback(() => {
+    targetWaveform.clearSegment();
+    sourceWaveform.clearSegment();
+  });
+
   // enable record
   const source = audioContext.createMediaStreamSource(stream);
 
@@ -83,6 +105,8 @@ function init([loaded, stream]) {
     audioContext: audioContext,
     callback: (buffer) => {
       currentBuffer = buffer; // store buffer for replay
+      // display
+      sourceWaveform.setAudioBuffer(buffer);
 
       const audioInBuffer = new lfo.source.AudioInBuffer({
         audioBuffer: buffer,
@@ -126,7 +150,7 @@ function init([loaded, stream]) {
     label: '',
     options: ['replay recording'],
     container: $controllers,
-    callback: (value) => {
+    callback: () => {
       if (currentBuffer) {
         const source = audioContext.createBufferSource();
         source.connect(audioContext.destination);
@@ -141,7 +165,7 @@ function init([loaded, stream]) {
     label: '',
     options: ['replay synth'],
     container: $controllers,
-    callback: (value) => synth.start(),
+    callback: () => synth.start(),
   });
 
   // drag and drop a new file
@@ -167,11 +191,13 @@ function init([loaded, stream]) {
         audioContext
           .decodeAudioData(e.target.result)
           .then((buffer) => {
+            targetWaveform.setAudioBuffer(buffer);
+
             const audioInBuffer = new lfo.source.AudioInBuffer({
               audioBuffer: buffer,
             });
 
-            analyzer.init(config, audioInBuffer)
+            analyzer.init(config, audioInBuffer);
             analyzer.run()
               .then((description) => {
                 $drop.classList.remove('process');
@@ -186,5 +212,11 @@ function init([loaded, stream]) {
 
       reader.readAsArrayBuffer(file);
     }
+  });
+
+  // trigger with space bar
+  document.addEventListener('keypress', (e) => {
+    if (e.charCode === 32)
+      synth.start();
   });
 }

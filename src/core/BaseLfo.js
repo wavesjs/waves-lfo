@@ -282,10 +282,39 @@ class BaseLfo {
     this.streamParams = null;
   }
 
+  // /**
+  //  * Maybe in sources only (source mixin ?)
+  //  *
+  //  * @todo - Add source mixin (init, start, stop)
+  //  */
+  // init() {
+  //   this.initGraph();
+  //   this.initStream();
+
+  //   return Promise();
+  // }
+
+  // *
+  //  * Return a promise that resolve when the module is ready to be consumed.
+  //  * Some modules have an async behavior at initialization and thus could
+  //  * be not ready to be consumed when the graph starts.
+  //  *
+  //  * @example
+  //  * source.init().then()
+  //  *
+  //  *
+  //  * @return Promise
+
+  // initModule() {
+
+
+  //   return Promise();
+  // }
+
   /**
    * Helper to initialize the stream in standalone mode.
    *
-   * @param {Object} [streamParams={}] - Stream parameters to be used.
+   * @param {Object} [streamParams={}] - Parameters of the stream.
    *
    * @see {@link module:common.core.BaseLfo#processStreamParams}
    * @see {@link module:common.core.BaseLfo#resetStream}
@@ -308,6 +337,7 @@ class BaseLfo {
       this.nextOps[i].resetStream();
 
     // no buffer for `scalar` type or sink node
+    // @note - this should be reviewed
     if (this.streamParams.frameType !== 'scalar' && this.frame.data !== null) {
       const frameSize = this.streamParams.frameSize;
       const data = this.frame.data;

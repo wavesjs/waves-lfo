@@ -1,6 +1,12 @@
 import BaseLfo from '../../core/BaseLfo';
 
 const definitions = {
+  processStreamParams: {
+    type: 'any',
+    default: null,
+    nullable: true,
+    metas: { kind: 'dynamic' },
+  },
   processFrame: {
     type: 'any',
     default: null,
@@ -71,6 +77,12 @@ class Bridge extends BaseLfo {
   /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
+
+    const processStreamParamsCallback = this.params.get('processStreamParams');
+
+    if (processStreamParamsCallback !== null)
+      processStreamParamsCallback(this.streamParams);
+
     this.propagateStreamParams();
   }
 

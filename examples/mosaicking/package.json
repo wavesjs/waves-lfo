@@ -19,7 +19,8 @@
     "static-kdtree": "^1.0.1",
     "waves-audio": "wavesjs/waves-audio",
     "waves-lfo": "wavesjs/waves-lfo",
-    "waves-loaders": "wavesjs/waves-loaders"
+    "waves-loaders": "wavesjs/waves-loaders",
+    "waves-ui": "wavesjs/waves-ui"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",

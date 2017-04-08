@@ -26,11 +26,25 @@ class Synth extends audio.TimeEngine {
     this.buffer = buffer;
   }
 
+  setStartCallback(callback) {
+    this.startCallback = callback;
+  }
+
+  setAdvanceCallback(callback) {
+    this.advanceCallback = callback;
+  }
+
+  setClearCallback(callback) {
+    this.clearCallback = callback;
+  }
+
   start() {
     this.index = 0;
 
     if (!this.model)
       return;
+
+    this.startCallback(this.grainDuration);
 
     if (this.master)
       this.scheduler.resetEngineTime(this, audioContext.currentTime);
@@ -62,9 +76,12 @@ class Synth extends audio.TimeEngine {
     this.index += 1;
 
     if (this.index < this.model.length) {
+      this.advanceCallback(this.index * this.grainPeriod, timeOffset);
+
       const rand = Math.random() * this.periodRand - (this.periodRand / 2);
       return time + this.grainPeriod + rand;
     } else {
+      this.clearCallback();
       return undefined; // remove from scheduler
     }
   }
