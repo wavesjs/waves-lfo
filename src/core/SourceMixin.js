@@ -4,8 +4,8 @@
  *
  * Source have some responsability on graph as they mostly control its whole
  * lifecycle. They must implement the start and stop method in order to
- * make sure the graph is initialized and set `ready` to true.
- * A source should never accept and propagate incomming frames until `ready`
+ * make sure the graph is initialized and set `started` to true.
+ * A source should never accept and propagate incomming frames until `started`
  * is set to `true`.
  *
  * @example
@@ -19,8 +19,9 @@
   constructor(...args) {
     super(...args);
 
-    this.initialized = null;
-    this.ready = false;
+    this.initialized = false;
+    this.initPromise = null;
+    this.started = false;
   }
 
   /**
@@ -39,38 +40,35 @@
    * source.start();
    */
   init() {
-    this.initialized = this.initModule().then(() => { // when graph is ready
+    this.initPromise = this.initModule().then(() => { // when graph is started
       this.initStream(); // this is synchronous
+      this.initialized = true;
       return Promise.resolve(true);
     });
 
-    return this.initialized;
+    return this.initPromise;
   }
 
   /**
    * Interface method to implement that starts the graph.
    *
    * The method main purpose is to make sure take verify initialization step and
-   * set `ready` to `true` when done.
+   * set `started` to `true` when done.
    * Should behave synchronously when called inside `init().then()` and async
    * if called without init step.
    *
    * @example
    * // basic `start` implementation
    * start() {
-   *   // there might be a problem here if `start` is called twice synchronously
-   *   // as we should test if the promise is fullfiled instead of just "existing"
-   *   // unfortunatly there is no way to check the status of a promise
-   *   // synchronously (see http://stackoverflow.com/questions/30564053/how-can-i-synchronously-determine-a-javascript-promises-state)
-   *   // So let's hope people will do the right thing until we have a better
-   *   // solution.
-   *   if (!this.initialized) {
-   *     this.initialized = this.init();
-   *     this.initialized.then(() => this.start(startTime));
-   *     return;
-   *   }
+   * if (this.initialized === false) {
+   *   if (this.initPromise === null) // init has not yet been called
+   *     this.initPromise = this.init();
    *
-   *   this.ready = true;
+   *   this.initPromise.then(() => this.start(startTime));
+   *   return;
+   * }
+   *
+   *   this.started = true;
    * }
    */
   start() {}
@@ -81,20 +79,20 @@
    * @example
    * // basic `stop` implementation
    * stop() {
-   *   this.ready = false;
+   *   this.started = false;
    * }
    */
   stop() {
-    this.ready = false;
+    this.started = false;
   }
 
   /**
-   * Never allow incomming frames if `this.ready` is not `true`.
+   * Never allow incomming frames if `this.started` is not `true`.
    *
    * @param {Object} frame
    */
   processFrame(frame) {
-    if (!this.ready === true) {
+    if (!this.started === true) {
       this.prepareFrame();
       this.processFunction(frame);
       this.propagateFrame();

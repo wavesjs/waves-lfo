@@ -91,9 +91,11 @@ class AudioInBuffer extends SourceMixin(BaseLfo) {
    * @see {@link module:client.source.AudioInBuffer#stop}
    */
   start() {
-    if (!this.initialized) {
-      this.initialized = this.init();
-      this.initialized.then(() => this.start(startTime));
+    if (this.initialized === false) {
+      if (this.initPromise === null) // init has not yet been called
+        this.initPromise = this.init();
+
+      this.initPromise.then(() => this.start(startTime));
       return;
     }
 
@@ -101,7 +103,7 @@ class AudioInBuffer extends SourceMixin(BaseLfo) {
     const audioBuffer = this.params.get('audioBuffer');
     const buffer = audioBuffer.getChannelData(channel);
     this.endTime = 0;
-    this.ready = true;
+    this.started = true;
 
     this.processFrame(buffer);
   }
@@ -115,7 +117,7 @@ class AudioInBuffer extends SourceMixin(BaseLfo) {
    */
   stop() {
     this.finalizeStream(this.endTime);
-    this.ready = false;
+    this.started = false;
   }
 
   /** @private */

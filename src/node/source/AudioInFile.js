@@ -105,13 +105,15 @@ class AudioInFile extends SourceMixin(BaseLfo) {
    * @see {@link module:node.source.AudioInFile#stop}
    */
   start() {
-    if (!this.initialized) {
-      this.initialized = this.init();
-      this.initialized.then(() => this.start(startTime));
+    if (this.initialized === false) {
+      if (this.initPromise === null) // init has not yet been called
+        this.initPromise = this.init();
+
+      this.initPromise.then(() => this.start(startTime));
       return;
     }
 
-    this.ready = true;
+    this.started = true;
     this.processFrame(this.buffer);
   }
 
@@ -123,7 +125,7 @@ class AudioInFile extends SourceMixin(BaseLfo) {
    */
   stop() {
     this.finalizeStream(this.endTime);
-    this.ready = false;
+    this.started = false;
   }
 
   /** @private */

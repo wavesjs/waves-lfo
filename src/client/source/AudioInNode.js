@@ -92,9 +92,11 @@ class AudioInNode extends SourceMixin(BaseLfo) {
    * @see {@link module:client.source.AudioInNode#stop}
    */
   start() {
-    if (!this.initialized) {
-      this.initialized = this.init();
-      this.initialized.then(() => this.start(startTime));
+    if (this.initialized === false) {
+      if (this.initPromise === null) // init has not yet been called
+        this.initPromise = this.init();
+
+      this.initPromise.then(() => this.start(startTime));
       return;
     }
 
@@ -106,7 +108,7 @@ class AudioInNode extends SourceMixin(BaseLfo) {
     this.scriptProcessor = audioContext.createScriptProcessor(frameSize, 1, 1);
     this.scriptProcessor.onaudioprocess = this.processFrame;
 
-    this.ready = true;
+    this.started = true;
     this.sourceNode.connect(this.scriptProcessor);
     this.scriptProcessor.connect(audioContext.destination);
   }
@@ -119,7 +121,7 @@ class AudioInNode extends SourceMixin(BaseLfo) {
    */
   stop() {
     this.finalizeStream(this.frame.time);
-    this.ready = false;
+    this.started = false;
     this.sourceNode.disconnect();
     this.scriptProcessor.disconnect();
   }
@@ -146,7 +148,7 @@ class AudioInNode extends SourceMixin(BaseLfo) {
    * @private
    */
   processFrame(e) {
-    if (this.ready === false)
+    if (this.started === false)
       return;
 
     this.frame.data = e.inputBuffer.getChannelData(this._channel);

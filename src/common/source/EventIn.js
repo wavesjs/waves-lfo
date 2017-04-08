@@ -134,7 +134,6 @@ class EventIn extends SourceMixin(BaseLfo) {
 
     const audioContext = this.params.get('audioContext');
     this._getTime = getTimeFunction(audioContext);
-    this.ready = false;
     this._startTime = null;
     this._systemTime = null;
     this._absoluteTime = this.params.get('absoluteTime');
@@ -150,16 +149,18 @@ class EventIn extends SourceMixin(BaseLfo) {
    * @see {@link module:common.source.EventIn#stop}
    */
   start(startTime = null) {
-    if (!this.initialized) {
-      this.initialized = this.init();
-      this.initialized.then(() => this.start(startTime));
+    if (this.initialized === false) {
+      if (this.initPromise === null) // init has not yet been called
+        this.initPromise = this.init();
+
+      this.initPromise.then(() => this.start(startTime));
       return;
     }
 
     this._startTime = startTime;
     this._systemTime = null; // value set in the first `process` call
 
-    this.ready = true;
+    this.started = true;
   }
 
   /**
@@ -170,12 +171,12 @@ class EventIn extends SourceMixin(BaseLfo) {
    * @see {@link module:common.source.EventIn#start}
    */
   stop() {
-    if (this.ready && this._startTime !== null) {
+    if (this.started && this._startTime !== null) {
       const currentTime = this._getTime();
       const endTime = this.frame.time + (currentTime - this._systemTime);
 
       this.finalizeStream(endTime);
-      this.ready = false;
+      this.started = false;
     }
   }
 
@@ -263,7 +264,7 @@ class EventIn extends SourceMixin(BaseLfo) {
    * eventIn.processFrame({ time: 1, data: [0, 1, 2] });
    */
   processFrame(frame) {
-    if (!this.ready) return;
+    if (!this.started) return;
 
     this.prepareFrame();
     this.processFunction(frame);
