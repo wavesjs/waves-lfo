@@ -82,22 +82,22 @@
    *   this.started = false;
    * }
    */
-  stop() {
-    this.started = false;
-  }
+  stop() {}
 
   /**
    * Never allow incomming frames if `this.started` is not `true`.
    *
    * @param {Object} frame
+   *
+   * @example
+   * // basic `processFrame` implementation
+   * if (this.started === true) {
+   *   this.prepareFrame();
+   *   this.processFunction(frame);
+   *   this.propagateFrame();
+   * }
    */
-  processFrame(frame) {
-    if (!this.started === true) {
-      this.prepareFrame();
-      this.processFunction(frame);
-      this.propagateFrame();
-    }
-  }
+  processFrame(frame) {}
 }
 
 export default SourceMixin;
