@@ -1,0 +1,185 @@
+[==========] Running 10 benchmarks.
+
+
+RMS
+
+[ RUN      ] pipo_bench.FramesRMS1 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesRMS1 (180.914020 ms)
+[   RUNS   ]        Average time: 18091.402 us
+                         Fastest: 16866.766 us (-1224.636 us / -6.769 %)
+                         Slowest: 20888.820 us (+2797.418 us / +15.463 %)
+
+             Average performance: 55.27488 runs/s
+                Best performance: 59.28819 runs/s (+4.01331 runs/s / +7.26064 %)
+               Worst performance: 47.87250 runs/s (-7.40238 runs/s / -13.39194 %)
+[ITERATIONS]        Average time: 36.183 us
+                         Fastest: 33.734 us (-2.449 us / -6.769 %)
+                         Slowest: 41.778 us (+5.595 us / +15.463 %)
+
+             Average performance: 27637.43794 iterations/s
+                Best performance: 29644.09419 iterations/s (+2006.65625 iterations/s / +7.26064 %)
+               Worst performance: 23936.24915 iterations/s (-3701.18879 iterations/s / -13.39194 %)
+
+[ RUN      ] pipo_bench.FramesRMS2 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesRMS2 (171.001056 ms)
+[   RUNS   ]        Average time: 17100.106 us
+                         Fastest: 16700.251 us (-399.855 us / -2.338 %)
+                         Slowest: 18235.727 us (+1135.621 us / +6.641 %)
+
+             Average performance: 58.47917 runs/s
+                Best performance: 59.87934 runs/s (+1.40017 runs/s / +2.39430 %)
+               Worst performance: 54.83741 runs/s (-3.64176 runs/s / -6.22745 %)
+[ITERATIONS]        Average time: 34.200 us
+                         Fastest: 33.401 us (-0.800 us / -2.338 %)
+                         Slowest: 36.471 us (+2.271 us / +6.641 %)
+
+             Average performance: 29239.58551 iterations/s
+                Best performance: 29939.66977 iterations/s (+700.08425 iterations/s / +2.39430 %)
+               Worst performance: 27418.70395 iterations/s (-1820.88156 iterations/s / -6.22745 %)
+
+[ RUN      ] pipo_bench.FramesRMS3 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesRMS3 (158.753323 ms)
+[   RUNS   ]        Average time: 15875.332 us
+                         Fastest: 15419.596 us (-455.736 us / -2.871 %)
+                         Slowest: 17292.989 us (+1417.657 us / +8.930 %)
+
+             Average performance: 62.99081 runs/s
+                Best performance: 64.85254 runs/s (+1.86173 runs/s / +2.95557 %)
+               Worst performance: 57.82690 runs/s (-5.16390 runs/s / -8.19787 %)
+[ITERATIONS]        Average time: 31.751 us
+                         Fastest: 30.839 us (-0.911 us / -2.871 %)
+                         Slowest: 34.586 us (+2.835 us / +8.930 %)
+
+             Average performance: 31495.40372 iterations/s
+                Best performance: 32426.27109 iterations/s (+930.86737 iterations/s / +2.95557 %)
+               Worst performance: 28913.45157 iterations/s (-2581.95215 iterations/s / -8.19787 %)
+
+
+
+FFT
+
+[ RUN      ] pipo_bench.FramesFFT1 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesFFT1 (1226.081649 ms)
+[   RUNS   ]        Average time: 122608.165 us
+                         Fastest: 118514.216 us (-4093.949 us / -3.339 %)
+                         Slowest: 125317.485 us (+2709.320 us / +2.210 %)
+
+             Average performance: 8.15606 runs/s
+                Best performance: 8.43781 runs/s (+0.28174 runs/s / +3.45439 %)
+               Worst performance: 7.97973 runs/s (-0.17633 runs/s / -2.16196 %)
+[ITERATIONS]        Average time: 245.216 us
+                         Fastest: 237.028 us (-8.188 us / -3.339 %)
+                         Slowest: 250.635 us (+5.419 us / +2.210 %)
+
+             Average performance: 4078.03184 iterations/s
+                Best performance: 4218.90316 iterations/s (+140.87132 iterations/s / +3.45439 %)
+               Worst performance: 3989.86622 iterations/s (-88.16562 iterations/s / -2.16196 %)
+
+[ RUN      ] pipo_bench.FramesFFT2 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesFFT2 (1430.928468 ms)
+[   RUNS   ]        Average time: 143092.847 us
+                         Fastest: 139900.883 us (-3191.964 us / -2.231 %)
+                         Slowest: 151156.452 us (+8063.605 us / +5.635 %)
+
+             Average performance: 6.98847 runs/s
+                Best performance: 7.14792 runs/s (+0.15945 runs/s / +2.28159 %)
+               Worst performance: 6.61566 runs/s (-0.37281 runs/s / -5.33461 %)
+[ITERATIONS]        Average time: 286.186 us
+                         Fastest: 279.802 us (-6.384 us / -2.231 %)
+                         Slowest: 302.313 us (+16.127 us / +5.635 %)
+
+             Average performance: 3494.23477 iterations/s
+                Best performance: 3573.95886 iterations/s (+79.72409 iterations/s / +2.28159 %)
+               Worst performance: 3307.83101 iterations/s (-186.40375 iterations/s / -5.33461 %)
+
+[ RUN      ] pipo_bench.FramesFFT3 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesFFT3 (1629.327559 ms)
+[   RUNS   ]        Average time: 162932.756 us
+                         Fastest: 157925.280 us (-5007.476 us / -3.073 %)
+                         Slowest: 165977.323 us (+3044.567 us / +1.869 %)
+
+             Average performance: 6.13750 runs/s
+                Best performance: 6.33211 runs/s (+0.19461 runs/s / +3.17079 %)
+               Worst performance: 6.02492 runs/s (-0.11258 runs/s / -1.83433 %)
+[ITERATIONS]        Average time: 325.866 us
+                         Fastest: 315.851 us (-10.015 us / -3.073 %)
+                         Slowest: 331.955 us (+6.089 us / +1.869 %)
+
+             Average performance: 3068.75065 iterations/s
+                Best performance: 3166.05423 iterations/s (+97.30358 iterations/s / +3.17079 %)
+               Worst performance: 3012.45972 iterations/s (-56.29093 iterations/s / -1.83433 %)
+
+
+
+MFCC Setup (ignore that)
+
+# [ RUN      ] pipo_bench.setupmfcc (1 run, 1 iteration per run)
+# [     DONE ] pipo_bench.setupmfcc (0.000182 ms)
+# [   RUNS   ]        Average time: 0.182 us
+#                          Fastest: 0.182 us (0.000 us / 0.000 %)
+#                          Slowest: 0.182 us (0.000 us / 0.000 %)
+#
+#              Average performance: 5494505.49451 runs/s
+#                 Best performance: 5494505.49451 runs/s (0.00000 runs/s / 0.00000 %)
+#                Worst performance: 5494505.49451 runs/s (0.00000 runs/s / 0.00000 %)
+# [ITERATIONS]        Average time: 0.182 us
+#                          Fastest: 0.182 us (0.000 us / 0.000 %)
+#                          Slowest: 0.182 us (0.000 us / 0.000 %)
+#
+#              Average performance: 5494505.49451 iterations/s
+#                 Best performance: 5494505.49451 iterations/s (0.00000 iterations/s / 0.00000 %)
+#                Worst performance: 5494505.49451 iterations/s (0.00000 iterations/s / 0.00000 %)
+
+MFFC
+
+[ RUN      ] pipo_bench.FramesMFCC1 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesMFCC1 (1906.719363 ms)
+[   RUNS   ]        Average time: 190671.936 us
+                         Fastest: 183404.333 us (-7267.603 us / -3.812 %)
+                         Slowest: 199304.898 us (+8632.962 us / +4.528 %)
+
+             Average performance: 5.24461 runs/s
+                Best performance: 5.45243 runs/s (+0.20782 runs/s / +3.96261 %)
+               Worst performance: 5.01744 runs/s (-0.22717 runs/s / -4.33154 %)
+[ITERATIONS]        Average time: 381.344 us
+                         Fastest: 366.809 us (-14.535 us / -3.812 %)
+                         Slowest: 398.610 us (+17.266 us / +4.528 %)
+
+             Average performance: 2622.30515 iterations/s
+                Best performance: 2726.21694 iterations/s (+103.91180 iterations/s / +3.96261 %)
+               Worst performance: 2508.71908 iterations/s (-113.58607 iterations/s / -4.33154 %)
+
+[ RUN      ] pipo_bench.FramesMFCC2 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesMFCC2 (1919.888023 ms)
+[   RUNS   ]        Average time: 191988.802 us
+                         Fastest: 186984.875 us (-5003.927 us / -2.606 %)
+                         Slowest: 199823.091 us (+7834.289 us / +4.081 %)
+
+             Average performance: 5.20864 runs/s
+                Best performance: 5.34803 runs/s (+0.13939 runs/s / +2.67611 %)
+               Worst performance: 5.00443 runs/s (-0.20421 runs/s / -3.92061 %)
+[ITERATIONS]        Average time: 383.978 us
+                         Fastest: 373.970 us (-10.008 us / -2.606 %)
+                         Slowest: 399.646 us (+15.669 us / +4.081 %)
+
+             Average performance: 2604.31855 iterations/s
+                Best performance: 2674.01307 iterations/s (+69.69452 iterations/s / +2.67611 %)
+               Worst performance: 2502.21332 iterations/s (-102.10523 iterations/s / -3.92061 %)
+
+[ RUN      ] pipo_bench.FramesMFCC3 (10 runs, 500 iterations per run)
+[     DONE ] pipo_bench.FramesMFCC3 (2252.475285 ms)
+[   RUNS   ]        Average time: 225247.528 us
+                         Fastest: 87562.432 us (-137685.096 us / -61.126 %)
+                         Slowest: 249470.366 us (+24222.838 us / +10.754 %)
+
+             Average performance: 4.43956 runs/s
+                Best performance: 11.42042 runs/s (+6.98086 runs/s / +157.24220 %)
+               Worst performance: 4.00849 runs/s (-0.43107 runs/s / -9.70971 %)
+[ITERATIONS]        Average time: 450.495 us
+                         Fastest: 175.125 us (-275.370 us / -61.126 %)
+                         Slowest: 498.941 us (+48.446 us / +10.754 %)
+
+             Average performance: 2219.78018 iterations/s
+                Best performance: 5710.21143 iterations/s (+3490.43125 iterations/s / +157.24220 %)
+               Worst performance: 2004.24607 iterations/s (-215.53412 iterations/s / -9.70971 %)
+[==========] Ran 10 benchmarks.
