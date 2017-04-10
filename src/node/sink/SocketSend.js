@@ -19,9 +19,10 @@ const parameters = {
 };
 
 /**
- * This module doesn't implement start and stop as it is inherently part
- * of a larger graph.
+ * Send an lfo frame as a socket message to a `client.source.SocketReceive`
+ * instance.
  *
+ * @experimental
  * @params {Object} options
  */
 class SocketSend extends BaseLfo {

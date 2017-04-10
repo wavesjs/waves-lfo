@@ -19,8 +19,10 @@ const parameters = {
 };
 
 /**
- * This module doesn't implement start and stop as it is inherently part
- * of a larger graph.
+ * Receive an lfo frame as a socket message from a `client.sink.SocketSend`
+ * instance.
+ *
+ * @experimental
  *
  * @params {Object} options
  *

@@ -17,8 +17,11 @@ const parameters = {
 }
 
 /**
+ * Receive an lfo frame as a socket message from a `node.sink.SocketSend`
+ * instance.
  *
- *
+ * @experimental
+ * @todo - handle init / start properly.
  */
 class SocketReceive extends BaseLfo {
   constructor(options = {}) {

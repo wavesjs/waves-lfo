@@ -17,7 +17,10 @@ const parameters = {
 }
 
 /**
+ * Send an lfo frame as a socket message to a `node.source.SocketReceive`
+ * instance.
  *
+ * @experimental
  *
  * @example
  * const eventIn = new lfo.source.EventIn({

@@ -56,6 +56,8 @@
    * Should behave synchronously when called inside `init().then()` and async
    * if called without init step.
    *
+   * @abstract
+   *
    * @example
    * // basic `start` implementation
    * start() {
@@ -75,6 +77,8 @@
   /**
    * Interface method to implement that stops the graph.
    *
+   * @abstract
+   *
    * @example
    * // basic `stop` implementation
    * stop() {
@@ -86,6 +90,8 @@
   /**
    * The implementation should never allow incomming frames
    * if `this.started` is not `true`.
+   *
+   * @abstract
    *
    * @param {Object} frame
    *
