@@ -20,15 +20,6 @@
 //   return buffer;
 // }
 
-export const opcodes = {
-  INIT_MODULE_REQ: 10,
-  INIT_MODULE_ACK: 11,
-  PROCESS_STREAM_PARAMS: 12,
-  RESET_STREAM: 13,
-  FINALIZE_STREAM: 14,
-  PROCESS_FRAME: 15
-}
-
 // http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 function Uint16Array2json(arr) {
   const str = String.fromCharCode.apply(null, arr);
@@ -44,6 +35,16 @@ function json2Uint16Array(json) {
     bufferView[i] = str.charCodeAt(i);
 
   return bufferView;
+}
+
+
+export const opcodes = {
+  INIT_MODULE_REQ: 10,
+  INIT_MODULE_ACK: 11,
+  PROCESS_STREAM_PARAMS: 12,
+  RESET_STREAM: 13,
+  FINALIZE_STREAM: 14,
+  PROCESS_FRAME: 15
 }
 
 //
