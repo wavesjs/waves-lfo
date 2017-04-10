@@ -24,15 +24,15 @@ portfinder.getPort((err, port) => {
 
   // lfo graph
   const socketReceive = new lfo.source.SocketReceive({ server });
-  const logger = new lfo.sink.Logger({
-    streamParams: true,
-    time: true,
-    data: true,
-  });
-
   const socketSend = new lfo.sink.SocketSend({ port: 8000 });
 
-  socketReceive.connect(logger);
+  // const logger = new lfo.sink.Logger({
+  //   streamParams: true,
+  //   time: true,
+  //   data: true,
+  // });
+
+  // socketReceive.connect(logger);
   socketReceive.connect(socketSend);
 });
 

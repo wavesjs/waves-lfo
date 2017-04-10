@@ -5,11 +5,12 @@ html {
 
 body {
   margin: 0;
+  font-size: 2rem;
+  padding: 20px;
+  font-family: monospace;
 }
 
-h1 {
-  font-size: 2rem;
-  margin: 0;
-  padding: 10px;
-  color: rgba(0, 0, 0, 0.9);
+ul {
+  list-style-type: none;
+  padding-left: 0px;
 }
