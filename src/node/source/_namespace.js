@@ -1,9 +1,9 @@
 import AudioInFile from './AudioInFile';
-import WebSocket from './WebSocket';
+import SocketReceive from './SocketReceive';
 import EventIn from '../../common/source/EventIn';
 
 export default {
   AudioInFile,
-  WebSocket,
+  SocketReceive,
   EventIn,
 };

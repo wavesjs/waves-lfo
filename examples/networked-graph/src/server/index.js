@@ -22,13 +22,17 @@ portfinder.getPort((err, port) => {
     console.log(`Server started: http://127.0.0.1:${port}`);
   });
 
-  const socket = new lfo.source.WebSocket({ port: 8000 });
-
-  const bridge = new lfo.sink.Bridge({
-    processStreamParams: (streamParams) => console.log(streamParams),
-    processFrame: (streamParams) => console.log(streamParams),
-    finalizeStream: () => console.log('finalizeStream'),
+  // lfo graph
+  const socketReceive = new lfo.source.SocketReceive({ server });
+  const logger = new lfo.sink.Logger({
+    streamParams: true,
+    time: true,
+    data: true,
   });
 
-  socket.connect(bridge);
+  const socketSend = new lfo.sink.SocketSend({ port: 8000 });
+
+  socketReceive.connect(logger);
+  socketReceive.connect(socketSend);
 });
+

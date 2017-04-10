@@ -237,11 +237,18 @@ class BaseLfo {
     if (this.streamParams === null ||next.streamParams === null)
       throw new Error('Invalid connection: cannot connect a dead node');
 
-    this.nextModules.push(next);
-    next.prevModule = this;
-
-    if (this.streamParams.frameType !== null) // graph has already been started
-      next.processStreamParams(this.streamParams);
+    if (this.streamParams.frameType !== null) { // graph has already been started
+      // next.processStreamParams(this.streamParams);
+      next.initModule().then(() => {
+        next.processStreamParams(this.streamParams);
+        // we can forward frame from now
+        this.nextModules.push(next);
+        next.prevModule = this;
+      });
+    } else {
+      this.nextModules.push(next);
+      next.prevModule = this;
+    }
   }
 
   /**
@@ -296,6 +303,7 @@ class BaseLfo {
    * resolve only when its dependecy is ready.
    *
    * @return Promise
+   * @todo - Handle dynamic connections
    */
   initModule() {
     const nextPromises = this.nextModules.map((module) => {

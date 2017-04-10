@@ -4,6 +4,7 @@ import DataRecorder from '../../common/sink/DataRecorder';
 import SignalRecorder from '../../common/sink/SignalRecorder';
 
 import DataToFile from './DataToFile';
+import SocketSend from './SocketSend';
 
 export default {
   Bridge,
@@ -12,4 +13,5 @@ export default {
   SignalRecorder,
 
   DataToFile,
+  SocketSend,
 };

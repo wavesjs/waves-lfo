@@ -9,6 +9,7 @@ import BaseDisplay from './BaseDisplay';
 import BpfDisplay from './BpfDisplay';
 import MarkerDisplay from './MarkerDisplay';
 import SignalDisplay from './SignalDisplay';
+import SocketSend from './SocketSend';
 import SpectrumDisplay from './SpectrumDisplay';
 import TraceDisplay from './TraceDisplay';
 import VuMeterDisplay from './VuMeterDisplay';
@@ -24,6 +25,7 @@ export default {
   BpfDisplay,
   MarkerDisplay,
   SignalDisplay,
+  SocketSend,
   SpectrumDisplay,
   TraceDisplay,
   VuMeterDisplay,

@@ -1,81 +1,66 @@
 import * as lfo from 'waves-lfo/client';
 
-function json2Uint16Array(json) {
-  const str = JSON.stringify(json);
-  const buffer = new ArrayBuffer(str.length * 2); // 2 bytes for each char
-  const bufferView = new Uint16Array(buffer);
-
-  for (let i = 0, l = str.length; i < l; i++)
-    bufferView[i] = str.charCodeAt(i);
-
-  return bufferView;
-}
-
-function createSocket() {
-  // const url = window.location.origin.replace('http', 'ws');
-  const url = 'ws://127.0.0.1:8000';
-  const socket = new WebSocket(url);
-  socket.binaryType = 'arraybuffer';
-
-  socket.addEventListener('open', () => {
-    // const data = new Float32Array([Math.random(), Math.random(), Math.random()]);
-    // socket.send(data.buffer);
-
-    // console.log('sent:', data);
-
-    { // processStreamParams
-      const streamParams = { frameSize: 4, frameType: 'vector', frameRate: 1000, sourceSampleCount: null };
-      const streamParamsArray = json2Uint16Array(streamParams);
-
-      const ab = new ArrayBuffer(2 + streamParamsArray.length * 2);
-      const opcode = new Uint16Array(ab, 0, 1);
-      opcode[0] = 0;
-
-      const payload = new Uint16Array(ab, 2, streamParamsArray.length);
-      payload.set(streamParamsArray);
-
-      socket.send(ab);
-    }
-
-    { // resetStream();
-      const opcode = new Uint16Array(1);
-      opcode[0] = 1;
-
-      const data = new Uint16Array(1);
-      data.set(opcode, 0);
-
-      socket.send(data);
-    }
-
-    { // resetStream();
-      const opcode = new Uint16Array(1);
-      opcode[0] = 2;
-
-      const endTime = new Float64Array(1);
-      endTime[0] = Math.PI;
-
-      const data = new Uint16Array(1 + 4);
-      data.set(opcode, 0);
-      data.set(new Uint16Array(endTime.buffer), 1);
-
-      console.log(data);
-      socket.send(data);
-    }
+// source part of the application (mobile)
+function initSource() {
+  const eventIn = new lfo.source.EventIn({
+    frameType: 'vector',
+    frameSize: 2,
+    frameRate: 1,
   });
 
-  socket.addEventListener('message', (e) => {
-    console.log('received:', new Float32Array(e.data));
+  const socketSend = new lfo.sink.SocketSend({
+    port: 3000
   });
 
-  socket.addEventListener('error', () => {});
-  socket.addEventListener('close', () => {});
+  const loggerSend = new lfo.sink.Logger({
+    time: true,
+    data: true,
+  });
 
-  return socket;
+  eventIn.connect(socketSend);
+  eventIn.connect(loggerSend);
+
+  eventIn.init().then(() => {
+    console.log('initialized \\o/');
+    eventIn.start();
+
+    let time = 0;
+
+    (function send() {
+      const frame = {
+        time: time,
+        data: [Math.random(), Math.random()],
+        metadata: { test: true },
+      };
+
+      eventIn.processFrame(frame);
+      time += 1;
+
+      setTimeout(send, 1000);
+    }());
+  });
 }
 
-function init() {
-  const socket = createSocket();
-  console.log(socket);
+// sink part of the application
+function initSink() {
+  // back from server
+  const socketReceive = new lfo.source.SocketReceive({
+    port: 8000,
+  });
+
+  const loggerReceive = new lfo.sink.Logger({
+    data: true,
+    time: true,
+  });
+
+  socketReceive.connect(loggerReceive);
 }
 
-window.addEventListener('load', init);
+window.addEventListener('load', () => {
+  const hash = window.location.hash;
+
+  if (hash === '#source')
+    initSource();
+  else
+    initSink();
+});

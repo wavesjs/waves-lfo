@@ -8,9 +8,9 @@ var _AudioInFile = require('./AudioInFile');
 
 var _AudioInFile2 = _interopRequireDefault(_AudioInFile);
 
-var _WebSocket = require('./WebSocket');
+var _SocketReceive = require('./SocketReceive');
 
-var _WebSocket2 = _interopRequireDefault(_WebSocket);
+var _SocketReceive2 = _interopRequireDefault(_SocketReceive);
 
 var _EventIn = require('../../common/source/EventIn');
 
@@ -20,7 +20,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = {
   AudioInFile: _AudioInFile2.default,
-  WebSocket: _WebSocket2.default,
+  SocketReceive: _SocketReceive2.default,
   EventIn: _EventIn2.default
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIl9uYW1lc3BhY2UuanMiXSwibmFtZXMiOlsiQXVkaW9JbkZpbGUiLCJXZWJTb2NrZXQiLCJFdmVudEluIl0sIm1hcHBpbmdzIjoiOzs7Ozs7QUFBQTs7OztBQUNBOzs7O0FBQ0E7Ozs7OztrQkFFZTtBQUNiQSxvQ0FEYTtBQUViQyxnQ0FGYTtBQUdiQztBQUhhLEMiLCJmaWxlIjoiX25hbWVzcGFjZS5qcyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBBdWRpb0luRmlsZSBmcm9tICcuL0F1ZGlvSW5GaWxlJztcbmltcG9ydCBXZWJTb2NrZXQgZnJvbSAnLi9XZWJTb2NrZXQnO1xuaW1wb3J0IEV2ZW50SW4gZnJvbSAnLi4vLi4vY29tbW9uL3NvdXJjZS9FdmVudEluJztcblxuZXhwb3J0IGRlZmF1bHQge1xuICBBdWRpb0luRmlsZSxcbiAgV2ViU29ja2V0LFxuICBFdmVudEluLFxufTtcbiJdfQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIl9uYW1lc3BhY2UuanMiXSwibmFtZXMiOlsiQXVkaW9JbkZpbGUiLCJTb2NrZXRSZWNlaXZlIiwiRXZlbnRJbiJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUE7Ozs7QUFDQTs7OztBQUNBOzs7Ozs7a0JBRWU7QUFDYkEsb0NBRGE7QUFFYkMsd0NBRmE7QUFHYkM7QUFIYSxDIiwiZmlsZSI6Il9uYW1lc3BhY2UuanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgQXVkaW9JbkZpbGUgZnJvbSAnLi9BdWRpb0luRmlsZSc7XG5pbXBvcnQgU29ja2V0UmVjZWl2ZSBmcm9tICcuL1NvY2tldFJlY2VpdmUnO1xuaW1wb3J0IEV2ZW50SW4gZnJvbSAnLi4vLi4vY29tbW9uL3NvdXJjZS9FdmVudEluJztcblxuZXhwb3J0IGRlZmF1bHQge1xuICBBdWRpb0luRmlsZSxcbiAgU29ja2V0UmVjZWl2ZSxcbiAgRXZlbnRJbixcbn07XG4iXX0=

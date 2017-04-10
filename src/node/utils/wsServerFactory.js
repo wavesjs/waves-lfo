@@ -1,12 +1,26 @@
 import * as ws from 'uws';
 
-const wsServers = new Map;
+export const WebSocket = ws;
 
-export function wsServerFactory(port) {
-  if (!wsServers.has(port)) {
-    const wss = new ws.Server({ port: port });
-    wsServers.set(port, wss);
+// dictionnary of opened servers
+const wsServers = new Map();
+
+export function wsServerFactory(config) {
+  const wsConfig = {};
+  let key;
+
+  if (config.server !== null) {
+    wsConfig.server = config.server;
+    key = config.server;
+  } else {
+    wsConfig.port = config.port;
+    key = config.port;
   }
 
-  return wsServers.get(port);
+  if (!wsServers.has(key)) {
+    const wss = new ws.Server(wsConfig);
+    wsServers.set(key, wss);
+  }
+
+  return wsServers.get(key);
 }
