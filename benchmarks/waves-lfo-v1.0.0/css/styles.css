@@ -1,0 +1,19 @@
+html {
+  font-size: 62.5%;
+  font-family: monospace;
+}
+
+body {
+  margin: 20px;
+}
+
+h1 {
+  font-size: 2rem;
+  margin: 0;
+  padding: 10px;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+#results {
+  font-size: 1.4rem;
+}
