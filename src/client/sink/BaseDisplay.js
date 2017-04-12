@@ -129,9 +129,8 @@ class BaseDisplay extends BaseLfo {
      */
     this.displaySync = false;
 
-    //
-    this._stack;
-    this._rafId;
+    this._stack = [];
+    this._rafId = null;
 
     this.renderStack = this.renderStack.bind(this);
     this.shiftError = 0;
@@ -231,9 +230,6 @@ class BaseDisplay extends BaseLfo {
   /** @private */
   propagateStreamParams() {
     super.propagateStreamParams();
-
-    this._stack = [];
-    this._rafId = requestAnimationFrame(this.renderStack);
   }
 
   /** @private */
@@ -251,7 +247,9 @@ class BaseDisplay extends BaseLfo {
   finalizeStream(endTime) {
     this.currentTime = null;
     super.finalizeStream(endTime);
+
     cancelAnimationFrame(this._rafId);
+    this._rafId = null;
   }
 
   /**
@@ -273,6 +271,9 @@ class BaseDisplay extends BaseLfo {
       data: copy,
       metadata: frame.metadata,
     });
+
+    if (this._rafId === null)
+      this._rafId = requestAnimationFrame(this.renderStack);
   }
 
   /**
