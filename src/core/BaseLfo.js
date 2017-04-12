@@ -18,25 +18,28 @@ let id = 0;
  * - the **`processStreamParams`** method to define how the node modify the
  *   stream attributes (e.g. by changing the frame size)
  * - the **`process{FrameType}`** method to define the operations that the
- *   node apply on the stream. The type of input a node can handle is define
- *   by its implemented interface, if it implements `processSignal` a stream
- *   with `frameType === 'signal'` can be processed, `processVector` to handle
+ *   node apply on the stream. The type of input a node can handle is defined
+ *   by its implemented interface, if it implements `processSignal`, a stream
+ *   of type `signal` can be processed, `processVector` to handle
  *   an input of type `vector`.
  *
  * <span class="warning">_This class should be considered abstract and only
- * be used to be extended._</span>
+ * be used as a base class to extend._</span>
  *
+ * #### overview of the interface
  *
- * // overview of the behavior of a node
+ * **initModule**
+ *
+ * Returns a Promise that resolves when the module is initialized. Is
+ * especially important for modules that rely on asynchronous underlying APIs.
  *
  * **processStreamParams(prevStreamParams)**
  *
  * `base` class (default implementation)
- * - call `preprocessStreamParams`
+ * - call `prepareStreamParams`
  * - call `propagateStreamParams`
  *
  * `child` class
- * - call `preprocessStreamParams`
  * - override some of the inherited `streamParams`
  * - creates the any related logic buffers
  * - call `propagateStreamParams`
@@ -60,13 +63,13 @@ let id = 0;
  * **processFrame()**
  *
  * `base` class (default implementation)
- * - call `preprocessFrame`
+ * - call `prepareFrame`
  * - assign frameTime and frameMetadata to identity
  * - call the proper function according to inputType
  * - call `propagateFrame`
  *
  * `child` class
- * - call `preprocessFrame`
+ * - call `prepareFrame`
  * - do whatever you want with incomming frame
  * - call `propagateFrame`
  *
@@ -223,8 +226,8 @@ class BaseLfo {
 
   /**
    * Connect the current node (`prevModule`) to another node (`nextOp`).
-   * A given node can be connected to several operators and propagate the
-   * stream to each of them.
+   * A given node can be connected to several operators and propagate frames
+   * to each of them.
    *
    * @param {BaseLfo} next - Next operator in the graph.
    * @see {@link module:common.core.BaseLfo#processFrame}
@@ -290,13 +293,13 @@ class BaseLfo {
   }
 
   /**
-   * Return a promise that resolve when the module is ready to be consumed.
-   * Some modules have an async behavior at initialization and thus could
+   * Return a `Promise` that resolve when the module is ready to be consumed.
+   * Some modules relies on asynchronous APIs at initialization and thus could
    * be not ready to be consumed when the graph starts.
    * A module should be consider as initialized when all next modules (children)
    * are themselves initialized. The event bubbles up from sinks to sources.
    * When all its next operators are ready, a source can consider the whole graph
-   * as ready and then accept incoming.
+   * as ready and then start to produce frames.
    * The default implementation resolves when all next operators are resolved
    * themselves.
    * An operator relying on external async API must override this method to

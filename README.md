@@ -233,6 +233,16 @@ class Multiplier extends BaseLfo {
 const multiplier = new Multiplier({ factor: 4 });
 ```
 
+## Creating plugins
+
+To contribute and distribute a new `lfo` module, a good pratice is that the module should not directly depend on `lfo` (i.e. `wavesjs/waves-lfo` shouldn't be found in the `package.json` of the module or as a `devDependency`). The final application should be responsible for importing the \lfo library as well as the plugin.
+
+This practice should allow to create an ecosystem of module that, in the final application, would all point to the same instance of `lfo` and thus enforce inter-compatibilies.
+
+If need, all entry points expose a `VERSION` property that allows a plugin to test the loaded `lfo` version.
+
+A example of plugin can be found at [https://github.com/Ircam-RnD/xmm-lfo](https://github.com/Ircam-RnD/xmm-lfo)
+
 ## `lfo` and `PiPo`
 
 The `lfo` library is based on the same concepts and very similar formalisms as [PiPo](http://ismm.ircam.fr/pipo/).

@@ -23,6 +23,7 @@ function getTimeFunction(audioContext = null) {
       return t[0] + t[1] * 1e-9;
     }
   } else {
+    // @todo - replace with `performance.now`
     if (audioContext === null || (!audioContext instanceof AudioContext)) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       audioContext = new AudioContext();
@@ -121,7 +122,7 @@ const definitions = {
  * // feed `deviceorientation` data into the graph
  * window.addEventListener('deviceorientation', (e) => {
  *   const frame = {
- *     time: new Date().getTime(),
+ *     time: window.performace.now() / 1000,
  *     data: [e.alpha, e.beta, e.gamma],
  *   };
  *
