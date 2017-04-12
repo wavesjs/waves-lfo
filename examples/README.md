@@ -8,5 +8,5 @@ npm install
 npm run watch
 ```
 
-some of the example require to load ressources, a simple http-server should then be use (for example [that](https://www.npmjs.com/package/http-server)).
+Some of the example require to load ressources, a simple http-server should then be use (for example [that](https://www.npmjs.com/package/http-server)).
 
