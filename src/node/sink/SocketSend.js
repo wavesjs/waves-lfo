@@ -24,6 +24,8 @@ const parameters = {
  *
  * <p class="warning">Experimental</p>
  *
+ * @memberof module:node.sink
+ *
  * @params {Object} options
  */
 class SocketSend extends BaseLfo {

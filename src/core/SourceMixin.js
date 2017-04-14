@@ -8,6 +8,10 @@
  * A source should never accept and propagate incomming frames until `started`
  * is set to `true`.
  *
+ * @name SourceMixin
+ * @memberof module:core
+ * @mixin
+ *
  * @example
  * class MySource extends SourceMixin(BaseLfo) {}
  */
@@ -29,6 +33,10 @@
    * called safely. If `start` is called whithout explicit `init`, `init` is
    * made internally, actual start of the graph is then not garanteed to be
    * synchronous.
+   *
+   * @memberof module:core.SourceMixin
+   * @instance
+   * @name init
    *
    * @return Promise
    *
@@ -56,7 +64,9 @@
    * Should behave synchronously when called inside `init().then()` and async
    * if called without init step.
    *
-   * @abstract
+   * @memberof module:core.SourceMixin
+   * @instance
+   * @name start
    *
    * @example
    * // basic `start` implementation
@@ -77,7 +87,9 @@
   /**
    * Interface method to implement that stops the graph.
    *
-   * @abstract
+   * @memberof module:core.SourceMixin
+   * @instance
+   * @name stop
    *
    * @example
    * // basic `stop` implementation
@@ -91,7 +103,9 @@
    * The implementation should never allow incomming frames
    * if `this.started` is not `true`.
    *
-   * @abstract
+   * @memberof module:core.SourceMixin
+   * @instance
+   * @name processFrame
    *
    * @param {Object} frame
    *

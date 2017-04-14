@@ -23,6 +23,8 @@ const parameters = {
  * instance.
  *
  * <p class="warning">Experimental</p>
+
+ * @memberof module:node.source
  *
  * @params {Object} options
  *

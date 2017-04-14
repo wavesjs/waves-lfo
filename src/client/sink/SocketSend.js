@@ -22,6 +22,8 @@ const parameters = {
  *
  * <p class="warning">Experimental</p>
  *
+ * @memberof module:client.sink
+ *
  * @example
  * const eventIn = new lfo.source.EventIn({
  *   frameType: 'vector',

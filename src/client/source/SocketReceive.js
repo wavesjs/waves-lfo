@@ -22,6 +22,8 @@ const parameters = {
  *
  * <p class="warning">Experimental</p>
  *
+ * @memberof module:client.source
+ *
  * @todo - handle init / start properly.
  */
 class SocketReceive extends BaseLfo {
