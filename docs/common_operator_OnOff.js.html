@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lfo (Low Frequency Operators) - Source: common/operator/OnOff.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/overrides.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- if home page assume a title is already present in README -->
+    
+    <h1 class="page-title">Source: common/operator/OnOff.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import BaseLfo from '../../core/BaseLfo';
+
+const definitions = {
+  state: {
+    type: 'enum',
+    default: 'on',
+    list: ['on', 'off'],
+    metas: { kind: 'dynamic' },
+  },
+};
+
+/**
+ * The OnOff operator allows to stop the propagation of the stream in a
+ * subgraph. When "on", frames are propagated, when "off" the propagation is
+ * stopped.
+ *
+ * The `streamParams` propagation is never bypassed so the subsequent subgraph
+ * is always ready for incomming frames.
+ *
+ * @memberof module:common.operator
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {String} [options.state='on'] - Default state.
+ *
+ * @example
+ * import * as lfo from 'waves-lfo/common';
+ *
+ * const frames = [
+ *   { time: 0, data: [1, 2] },
+ *   { time: 1, data: [3, 4] },
+ *   { time: 2, data: [5, 6] },
+ * ];
+ *
+ * const eventIn = new EventIn({
+ *   frameSize: 2,
+ *   frameRate: 0,
+ *   frameType: 'vector',
+ * });
+ *
+ * const onOff = new OnOff();
+ *
+ * const logger = new Logger({ data: true });
+ *
+ * eventIn.connect(onOff);
+ * onOff.connect(logger);
+ *
+ * eventIn.start();
+ *
+ * eventIn.processFrame(frames[0]);
+ * > [0, 1]
+ *
+ * // bypass subgraph
+ * onOff.setState('off');
+ * eventIn.processFrame(frames[1]);
+ *
+ * // re-open subgraph
+ * onOff.setState('on');
+ * eventIn.processFrame(frames[2]);
+ * > [5, 6]
+ */
+class OnOff extends BaseLfo {
+  constructor(options = {}) {
+    super(definitions, options);
+
+    this.state = this.params.get('state');
+  }
+
+  /**
+   * Set the state of the `OnOff`.
+   *
+   * @param {String} state - New state of the operator (`on` or `off`)
+   */
+  setState(state) {
+    if (definitions.state.list.indexOf(state) === -1)
+      throw new Error(`Invalid switch state value "${state}" [valid values: "on"/"off"]`);
+
+    this.state = state;
+  }
+
+  // define all possible stream API
+  /** @private */
+  processScalar() {}
+  /** @private */
+  processVector() {}
+  /** @private */
+  processSignal() {}
+
+  /** @private */
+  processFrame(frame) {
+    if (this.state === 'on') {
+      this.prepareFrame();
+
+      this.frame.time = frame.time;
+      this.frame.metadata = frame.metadata;
+      this.frame.data = frame.data;
+
+      this.propagateFrame();
+    }
+  }
+}
+
+export default OnOff;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-client.sink.BaseDisplay.html">client.sink.BaseDisplay</a></li><li><a href="module-client.sink.BpfDisplay.html">client.sink.BpfDisplay</a></li><li><a href="module-client.sink.MarkerDisplay.html">client.sink.MarkerDisplay</a></li><li><a href="module-client.sink.SignalDisplay.html">client.sink.SignalDisplay</a></li><li><a href="module-client.sink.SocketSend.html">client.sink.SocketSend</a></li><li><a href="module-client.sink.SpectrumDisplay.html">client.sink.SpectrumDisplay</a></li><li><a href="module-client.sink.TraceDisplay.html">client.sink.TraceDisplay</a></li><li><a href="module-client.sink.VuMeterDisplay.html">client.sink.VuMeterDisplay</a></li><li><a href="module-client.sink.WaveformDisplay.html">client.sink.WaveformDisplay</a></li><li><a href="module-client.source.AudioInBuffer.html">client.source.AudioInBuffer</a></li><li><a href="module-client.source.AudioInNode.html">client.source.AudioInNode</a></li><li><a href="module-client.source.SocketReceive.html">client.source.SocketReceive</a></li><li><a href="module-common.operator.Biquad.html">common.operator.Biquad</a></li><li><a href="module-common.operator.Dct.html">common.operator.Dct</a></li><li><a href="module-common.operator.Fft.html">common.operator.Fft</a></li><li><a href="module-common.operator.Magnitude.html">common.operator.Magnitude</a></li><li><a href="module-common.operator.MeanStddev.html">common.operator.MeanStddev</a></li><li><a href="module-common.operator.Mel.html">common.operator.Mel</a></li><li><a href="module-common.operator.Mfcc.html">common.operator.Mfcc</a></li><li><a href="module-common.operator.MinMax.html">common.operator.MinMax</a></li><li><a href="module-common.operator.MovingAverage.html">common.operator.MovingAverage</a></li><li><a href="module-common.operator.MovingMedian.html">common.operator.MovingMedian</a></li><li><a href="module-common.operator.OnOff.html">common.operator.OnOff</a></li><li><a href="module-common.operator.Rms.html">common.operator.Rms</a></li><li><a href="module-common.operator.Segmenter.html">common.operator.Segmenter</a></li><li><a href="module-common.operator.Select.html">common.operator.Select</a></li><li><a href="module-common.operator.Slicer.html">common.operator.Slicer</a></li><li><a href="module-common.operator.Yin.html">common.operator.Yin</a></li><li><a href="module-common.sink.Bridge.html">common.sink.Bridge</a></li><li><a href="module-common.sink.DataRecorder.html">common.sink.DataRecorder</a></li><li><a href="module-common.sink.Logger.html">common.sink.Logger</a></li><li><a href="module-common.sink.SignalRecorder.html">common.sink.SignalRecorder</a></li><li><a href="module-common.source.EventIn.html">common.source.EventIn</a></li><li><a href="module-core.BaseLfo.html">core.BaseLfo</a></li><li><a href="module-node.sink.DataToFile.html">node.sink.DataToFile</a></li><li><a href="module-node.sink.SocketSend.html">node.sink.SocketSend</a></li><li><a href="module-node.source.SocketReceive.html">node.source.SocketReceive</a></li></ul><h3>Mixins</h3><ul><li><a href="module-core.SourceMixin.html">core.SourceMixin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Fri Apr 14 2017 19:00:10 GMT+0200 (CEST)
+    
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

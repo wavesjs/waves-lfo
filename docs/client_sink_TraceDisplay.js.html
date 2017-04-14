@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lfo (Low Frequency Operators) - Source: client/sink/TraceDisplay.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/overrides.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- if home page assume a title is already present in README -->
+    
+    <h1 class="page-title">Source: client/sink/TraceDisplay.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import BaseDisplay from './BaseDisplay';
+import { getColors, getHue, hexToRGB } from '../utils/display-utils';
+
+
+const definitions = {
+  color: {
+    type: 'string',
+    default: getColors('trace'),
+    metas: { kind: 'dynamic' },
+  },
+  colorScheme: {
+    type: 'enum',
+    default: 'none',
+    list: ['none', 'hue', 'opacity'],
+  },
+};
+
+/**
+ * Display a range value around a mean value (for example mean
+ * and standart deviation).
+ *
+ * This sink can handle input of type `vector` of frameSize >= 2.
+ *
+ * @param {Object} options - Override default parameters.
+ * @param {String} [options.color='orange'] - Color.
+ * @param {String} [options.colorScheme='none'] - If a third value is available
+ *  in the input, can be used to control the opacity or the hue. If input frame
+ *  size is 2, this param is automatically set to `none`
+ * @param {Number} [options.min=-1] - Minimum value represented in the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.max=1] - Maximum value represented in the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.width=300] - Width of the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.height=150] - Height of the canvas.
+ *  _dynamic parameter_
+ * @param {Element|CSSSelector} [options.container=null] - Container element
+ *  in which to insert the canvas. _constant parameter_
+ * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
+ *  in which to draw. _constant parameter_
+ * @param {Number} [options.duration=1] - Duration (in seconds) represented in
+ *  the canvas. _dynamic parameter_
+ * @param {Number} [options.referenceTime=null] - Optionnal reference time the
+ *  display should considerer as the origin. Is only usefull when synchronizing
+ *  several display using the `DisplaySync` class.
+ *
+ * @memberof module:client.sink
+ *
+ * @example
+ * import * as lfo from 'waves-lfo/client';
+ *
+ * const AudioContext = (window.AudioContext || window.webkitAudioContext);
+ * const audioContext = new AudioContext();
+ *
+ * navigator.mediaDevices
+ *   .getUserMedia({ audio: true })
+ *   .then(init)
+ *   .catch((err) => console.error(err.stack));
+ *
+ * function init(stream) {
+ *   const source = audioContext.createMediaStreamSource(stream);
+ *
+ *   const audioInNode = new lfo.source.AudioInNode({
+ *     sourceNode: source,
+ *     audioContext: audioContext,
+ *   });
+ *
+ *   // not sure it make sens but...
+ *   const meanStddev = new lfo.operator.MeanStddev();
+ *
+ *   const traceDisplay = new lfo.sink.TraceDisplay({
+ *     canvas: '#trace',
+ *   });
+ *
+ *   const logger = new lfo.sink.Logger({ data: true });
+ *
+ *   audioInNode.connect(meanStddev);
+ *   meanStddev.connect(traceDisplay);
+ *
+ *   audioInNode.start();
+ * }
+ */
+class TraceDisplay extends BaseDisplay {
+  constructor(options = {}) {
+    super(definitions, options);
+
+    this.prevFrame = null;
+  }
+
+  /** @private */
+  processStreamParams(prevStreamParams) {
+    this.prepareStreamParams(prevStreamParams);
+
+    if (this.streamParams.frameSize === 2)
+      this.params.set('colorScheme', 'none');
+
+    this.propagateStreamParams();
+  }
+
+  /** @private */
+  processVector(frame, frameWidth, pixelsSinceLastFrame) {
+    const colorScheme = this.params.get('colorScheme');
+    const ctx = this.ctx;
+    const prevData = this.prevFrame ? this.prevFrame.data : null;
+    const data = frame.data;
+
+    const halfRange = data[1] / 2;
+    const mean = this.getYPosition(data[0]);
+    const min = this.getYPosition(data[0] - halfRange);
+    const max = this.getYPosition(data[0] + halfRange);
+
+    let prevHalfRange;
+    let prevMean;
+    let prevMin;
+    let prevMax;
+
+    if (prevData !== null) {
+      prevHalfRange = prevData[1] / 2;
+      prevMean = this.getYPosition(prevData[0]);
+      prevMin = this.getYPosition(prevData[0] - prevHalfRange);
+      prevMax = this.getYPosition(prevData[0] + prevHalfRange);
+    }
+
+    const color = this.params.get('color');
+    let gradient;
+    let rgb;
+
+    switch (colorScheme) {
+      case 'none':
+        rgb = hexToRGB(color);
+        ctx.fillStyle = `rgba(${rgb.join(',')}, 0.7)`;
+        ctx.strokeStyle = color;
+      break;
+      case 'hue':
+        gradient = ctx.createLinearGradient(-pixelsSinceLastFrame, 0, 0, 0);
+
+        if (prevData)
+          gradient.addColorStop(0, `hsl(${getHue(prevData[2])}, 100%, 50%)`);
+        else
+          gradient.addColorStop(0, `hsl(${getHue(data[2])}, 100%, 50%)`);
+
+        gradient.addColorStop(1, `hsl(${getHue(data[2])}, 100%, 50%)`);
+        ctx.fillStyle = gradient;
+      break;
+      case 'opacity':
+        rgb = hexToRGB(this.params.get('color'));
+        gradient = ctx.createLinearGradient(-pixelsSinceLastFrame, 0, 0, 0);
+
+        if (prevData)
+          gradient.addColorStop(0, `rgba(${rgb.join(',')}, ${prevData[2]})`);
+        else
+          gradient.addColorStop(0, `rgba(${rgb.join(',')}, ${data[2]})`);
+
+        gradient.addColorStop(1, `rgba(${rgb.join(',')}, ${data[2]})`);
+        ctx.fillStyle = gradient;
+      break;
+    }
+
+    ctx.save();
+    // draw range
+    ctx.beginPath();
+    ctx.moveTo(0, mean);
+    ctx.lineTo(0, max);
+
+    if (prevData !== null) {
+      ctx.lineTo(-pixelsSinceLastFrame, prevMax);
+      ctx.lineTo(-pixelsSinceLastFrame, prevMin);
+    }
+
+    ctx.lineTo(0, min);
+    ctx.closePath();
+
+    ctx.fill();
+
+    // draw mean
+    if (colorScheme === 'none' &amp;&amp; prevMean) {
+      ctx.beginPath();
+      ctx.moveTo(-pixelsSinceLastFrame, prevMean);
+      ctx.lineTo(0, mean);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+
+    ctx.restore();
+
+    this.prevFrame = frame;
+  }
+};
+
+export default TraceDisplay;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-client.sink.BaseDisplay.html">client.sink.BaseDisplay</a></li><li><a href="module-client.sink.BpfDisplay.html">client.sink.BpfDisplay</a></li><li><a href="module-client.sink.MarkerDisplay.html">client.sink.MarkerDisplay</a></li><li><a href="module-client.sink.SignalDisplay.html">client.sink.SignalDisplay</a></li><li><a href="module-client.sink.SocketSend.html">client.sink.SocketSend</a></li><li><a href="module-client.sink.SpectrumDisplay.html">client.sink.SpectrumDisplay</a></li><li><a href="module-client.sink.TraceDisplay.html">client.sink.TraceDisplay</a></li><li><a href="module-client.sink.VuMeterDisplay.html">client.sink.VuMeterDisplay</a></li><li><a href="module-client.sink.WaveformDisplay.html">client.sink.WaveformDisplay</a></li><li><a href="module-client.source.AudioInBuffer.html">client.source.AudioInBuffer</a></li><li><a href="module-client.source.AudioInNode.html">client.source.AudioInNode</a></li><li><a href="module-client.source.SocketReceive.html">client.source.SocketReceive</a></li><li><a href="module-common.operator.Biquad.html">common.operator.Biquad</a></li><li><a href="module-common.operator.Dct.html">common.operator.Dct</a></li><li><a href="module-common.operator.Fft.html">common.operator.Fft</a></li><li><a href="module-common.operator.Magnitude.html">common.operator.Magnitude</a></li><li><a href="module-common.operator.MeanStddev.html">common.operator.MeanStddev</a></li><li><a href="module-common.operator.Mel.html">common.operator.Mel</a></li><li><a href="module-common.operator.Mfcc.html">common.operator.Mfcc</a></li><li><a href="module-common.operator.MinMax.html">common.operator.MinMax</a></li><li><a href="module-common.operator.MovingAverage.html">common.operator.MovingAverage</a></li><li><a href="module-common.operator.MovingMedian.html">common.operator.MovingMedian</a></li><li><a href="module-common.operator.OnOff.html">common.operator.OnOff</a></li><li><a href="module-common.operator.Rms.html">common.operator.Rms</a></li><li><a href="module-common.operator.Segmenter.html">common.operator.Segmenter</a></li><li><a href="module-common.operator.Select.html">common.operator.Select</a></li><li><a href="module-common.operator.Slicer.html">common.operator.Slicer</a></li><li><a href="module-common.operator.Yin.html">common.operator.Yin</a></li><li><a href="module-common.sink.Bridge.html">common.sink.Bridge</a></li><li><a href="module-common.sink.DataRecorder.html">common.sink.DataRecorder</a></li><li><a href="module-common.sink.Logger.html">common.sink.Logger</a></li><li><a href="module-common.sink.SignalRecorder.html">common.sink.SignalRecorder</a></li><li><a href="module-common.source.EventIn.html">common.source.EventIn</a></li><li><a href="module-core.BaseLfo.html">core.BaseLfo</a></li><li><a href="module-node.sink.DataToFile.html">node.sink.DataToFile</a></li><li><a href="module-node.sink.SocketSend.html">node.sink.SocketSend</a></li><li><a href="module-node.source.SocketReceive.html">node.source.SocketReceive</a></li></ul><h3>Mixins</h3><ul><li><a href="module-core.SourceMixin.html">core.SourceMixin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Fri Apr 14 2017 19:00:10 GMT+0200 (CEST)
+    
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

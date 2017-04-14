@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lfo (Low Frequency Operators) - Source: client/sink/SocketSend.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/overrides.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- if home page assume a title is already present in README -->
+    
+    <h1 class="page-title">Source: client/sink/SocketSend.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import BaseLfo from '../../core/BaseLfo';
+import { opcodes, encoders, decoders } from '../../common/utils/wsUtils';
+
+const parameters = {
+  port: {
+    type: 'integer',
+    default: 8000,
+    nullable: true,
+    constant: true,
+  },
+  url: {
+    type: 'string',
+    default: null,
+    nullable: true,
+    constant: true,
+  }
+}
+
+/**
+ * Send an lfo frame as a socket message to a `node.source.SocketReceive`
+ * instance.
+ *
+ * &lt;p class="warning">Experimental&lt;/p>
+ *
+ * @memberof module:client.sink
+ *
+ * @example
+ * const eventIn = new lfo.source.EventIn({
+ *   frameType: 'vector',
+ *   frameSize: 2,
+ *   frameRate: 1,
+ * });
+ *
+ * const socketSend = new lfo.sink.SocketSend({
+ *   port: 3000
+ * });
+ *
+ * eventIn.connect(socketSend);
+ *
+ * eventIn.init().then(() => {
+ *   eventIn.start();
+ *
+ *   let time = 0;
+ *
+ *   (function createFrame() {
+ *     eventIn.process(time, [Math.random(), Math.random()], { test: true });
+ *     time += 1;
+ *
+ *     setTimeout(createFrame, 1000);
+ *   }());
+ * });
+ */
+class SocketSend extends BaseLfo {
+  constructor(options = {}) {
+    super(parameters, options);
+
+    const protocol = window.location.protocol.replace(/^http/, 'ws');
+    const address = this.params.get('url') || window.location.hostname;
+    const port = this.params.get('port') || ''; // everything falsy becomes ''
+    const socketAddress = `${protocol}//${address}:${port}`;
+
+    this.socket = new WebSocket(socketAddress);
+    this.socket.binaryType = 'arraybuffer';
+
+    this.openedPromise = new Promise((resolve, reject) => {
+      this.socket.onopen = resolve;
+    });
+
+    this.socket.onerror = (err) => console.error(err.stack);
+  }
+
+  initModule() {
+    // send a INIT_MODULE_REQ and wait for INIT_MODULE_ACK
+    // no need to get children promises as we are in a leef
+    return this.openedPromise.then(() => {
+      return new Promise((resolve, reject) => {
+        this.socket.onmessage = (e) => {
+          const opcode = decoders.opcode(e.data);
+
+          if (opcode === opcodes.INIT_MODULE_ACK)
+            resolve();
+        }
+
+        const buffer = encoders.initModuleReq();
+        this.socket.send(buffer);
+      });
+    });
+  }
+
+  processStreamParams(prevStreamParams) {
+    super.processStreamParams(prevStreamParams);
+
+    const buffer = encoders.streamParams(this.streamParams);
+    this.socket.send(buffer);
+  }
+
+  resetStream() {
+    super.resetStream();
+
+    const buffer = encoders.resetStream();
+    this.socket.send(buffer);
+  }
+
+    /** @private */
+  finalizeStream(endTime) {
+    super.finalizeStream(endTime);
+
+    const buffer = encoders.finalizeStream(endTime);
+    this.socket.send(buffer);
+  }
+
+  // process any type
+  /** @private */
+  processScalar() {}
+  /** @private */
+  processVector() {}
+  /** @private */
+  processSignal() {}
+
+  processFrame(frame) {
+    const frameSize = this.streamParams.frameSize;
+    this.frame.time = frame.time;
+    this.frame.data.set(frame.data, 0);
+    this.frame.metadata = frame.metadata;
+
+    const buffer = encoders.processFrame(this.frame, frameSize);
+    this.socket.send(buffer);
+  }
+}
+
+export default SocketSend;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-client.sink.BaseDisplay.html">client.sink.BaseDisplay</a></li><li><a href="module-client.sink.BpfDisplay.html">client.sink.BpfDisplay</a></li><li><a href="module-client.sink.MarkerDisplay.html">client.sink.MarkerDisplay</a></li><li><a href="module-client.sink.SignalDisplay.html">client.sink.SignalDisplay</a></li><li><a href="module-client.sink.SocketSend.html">client.sink.SocketSend</a></li><li><a href="module-client.sink.SpectrumDisplay.html">client.sink.SpectrumDisplay</a></li><li><a href="module-client.sink.TraceDisplay.html">client.sink.TraceDisplay</a></li><li><a href="module-client.sink.VuMeterDisplay.html">client.sink.VuMeterDisplay</a></li><li><a href="module-client.sink.WaveformDisplay.html">client.sink.WaveformDisplay</a></li><li><a href="module-client.source.AudioInBuffer.html">client.source.AudioInBuffer</a></li><li><a href="module-client.source.AudioInNode.html">client.source.AudioInNode</a></li><li><a href="module-client.source.SocketReceive.html">client.source.SocketReceive</a></li><li><a href="module-common.operator.Biquad.html">common.operator.Biquad</a></li><li><a href="module-common.operator.Dct.html">common.operator.Dct</a></li><li><a href="module-common.operator.Fft.html">common.operator.Fft</a></li><li><a href="module-common.operator.Magnitude.html">common.operator.Magnitude</a></li><li><a href="module-common.operator.MeanStddev.html">common.operator.MeanStddev</a></li><li><a href="module-common.operator.Mel.html">common.operator.Mel</a></li><li><a href="module-common.operator.Mfcc.html">common.operator.Mfcc</a></li><li><a href="module-common.operator.MinMax.html">common.operator.MinMax</a></li><li><a href="module-common.operator.MovingAverage.html">common.operator.MovingAverage</a></li><li><a href="module-common.operator.MovingMedian.html">common.operator.MovingMedian</a></li><li><a href="module-common.operator.OnOff.html">common.operator.OnOff</a></li><li><a href="module-common.operator.Rms.html">common.operator.Rms</a></li><li><a href="module-common.operator.Segmenter.html">common.operator.Segmenter</a></li><li><a href="module-common.operator.Select.html">common.operator.Select</a></li><li><a href="module-common.operator.Slicer.html">common.operator.Slicer</a></li><li><a href="module-common.operator.Yin.html">common.operator.Yin</a></li><li><a href="module-common.sink.Bridge.html">common.sink.Bridge</a></li><li><a href="module-common.sink.DataRecorder.html">common.sink.DataRecorder</a></li><li><a href="module-common.sink.Logger.html">common.sink.Logger</a></li><li><a href="module-common.sink.SignalRecorder.html">common.sink.SignalRecorder</a></li><li><a href="module-common.source.EventIn.html">common.source.EventIn</a></li><li><a href="module-core.BaseLfo.html">core.BaseLfo</a></li><li><a href="module-node.sink.DataToFile.html">node.sink.DataToFile</a></li><li><a href="module-node.sink.SocketSend.html">node.sink.SocketSend</a></li><li><a href="module-node.source.SocketReceive.html">node.source.SocketReceive</a></li></ul><h3>Mixins</h3><ul><li><a href="module-core.SourceMixin.html">core.SourceMixin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Fri Apr 14 2017 19:00:10 GMT+0200 (CEST)
+    
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
