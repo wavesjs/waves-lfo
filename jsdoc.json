@@ -53,7 +53,7 @@
     "plugins/markdown"
   ],
   "opts": {
-    "projectTitle": "WavesJS - Low Frequency Operators",
+    "projectTitle": "lfo (Low Frequency Operators)",
     "template": "node_modules/jsdoc-template",
     "destination": "./docs",
     "encoding": "utf8"
