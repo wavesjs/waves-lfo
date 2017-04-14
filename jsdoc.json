@@ -3,6 +3,7 @@
     "include": [
       "README.md",
       "src/core/BaseLfo.js",
+      "src/core/SourceMixin.js",
 
       "src/common/operator/Biquad.js",
       "src/common/operator/Dct.js",
@@ -32,6 +33,7 @@
       "src/client/sink/BpfDisplay.js",
       "src/client/sink/MarkerDisplay.js",
       "src/client/sink/SignalDisplay.js",
+      "src/client/sink/SocketSend.js",
       "src/client/sink/SpectrumDisplay.js",
       "src/client/sink/TraceDisplay.js",
       "src/client/sink/VuMeterDisplay.js",
@@ -39,10 +41,12 @@
 
       "src/client/source/AudioInBuffer.js",
       "src/client/source/AudioInNode.js",
+      "src/client/source/SocketReceive.js",
 
       "src/node/sink/DataToFile.js",
+      "src/node/sink/SocketSend.js",
 
-      "src/node/source/AudioInFile.js"
+      "src/node/source/SocketReceive.js"
     ]
   },
   "plugins": [

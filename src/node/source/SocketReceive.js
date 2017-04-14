@@ -22,7 +22,7 @@ const parameters = {
  * Receive an lfo frame as a socket message from a `client.sink.SocketSend`
  * instance.
  *
- * @experimental
+ * <p class="warning">Experimental</p>
  *
  * @params {Object} options
  *

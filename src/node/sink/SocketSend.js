@@ -22,7 +22,8 @@ const parameters = {
  * Send an lfo frame as a socket message to a `client.source.SocketReceive`
  * instance.
  *
- * @experimental
+ * <p class="warning">Experimental</p>
+ *
  * @params {Object} options
  */
 class SocketSend extends BaseLfo {
