@@ -1,6 +1,6 @@
 {
   "name": "waves-lfo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Low Frequency Operators",
   "main": "dist/index.js",
   "standalone": "lfo",
