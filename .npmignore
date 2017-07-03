@@ -1,6 +1,10 @@
-jsdoc.json
-tests
-resources
-examples
+benchmarks
 bin
 docs
+examples
+resources
+src
+tests
+
+TODOS.md
+jsdoc.json
