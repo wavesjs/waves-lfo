@@ -1,31 +1,26 @@
 {
-  "name": "waves-lfo",
+  "name": "@ircam/waves-lfo",
   "version": "1.0.1",
   "description": "Low Frequency Operators",
-  "main": "dist/index.js",
-  "standalone": "lfo",
-  "license": "BSD-3",
+  "main": "",
+  "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
     "url": "https://github.com/wavesjs/waves-lfo"
   },
   "bugs": {
-    "url": "https://github.com/wavesjs/lfo/issues"
+    "url": "https://github.com/wavesjs/waves-lfo/issues"
   },
-  "homepage": "https://github.com/wavesjs/lfo",
+  "homepage": "http://wavesjs.github.io/waves-lfo",
   "scripts": {
     "bundle": "node ./bin/runner --bundle",
+    "deploy": "np --yolo",
     "doc": "jsdoc -c jsdoc.json",
     "test": "babel-tape-runner tests/**.test.js",
     "transpile": "node ./bin/runner --transpile",
+    "version": "npm run transpile && npm run doc && git add docs",
     "prewatch": "npm run transpile",
     "watch": "node ./bin/runner --watch"
-  },
-  "jshintConfig": {
-    "esnext": true,
-    "browser": true,
-    "node": true,
-    "devel": true
   },
   "dependencies": {
     "av": "^0.4.9",
@@ -45,6 +40,7 @@
     "fs-extra": "^0.30.0",
     "jsdoc": "^3.4.2",
     "jsdoc-template": "ircam-jstools/jsdoc-template",
+    "np": "^2.16.0",
     "ora": "^0.3.0",
     "tape": "^4.6.2",
     "uglify-js": "^2.6.2",
