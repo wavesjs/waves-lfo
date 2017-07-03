@@ -6,8 +6,8 @@ _NOTES.md
 examples/test-worker
 
 # remove all the following in master branch
-docs
-/client
-/common
-/node
-/core
+# docs
+# /client
+# /common
+# /node
+# /core
