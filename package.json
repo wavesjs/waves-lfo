@@ -2,17 +2,17 @@
   "name": "waves-lfo",
   "version": "1.0.1",
   "description": "Low Frequency Operators",
-  "main": "dist/index.js",
+  "main": "",
   "standalone": "lfo",
-  "license": "BSD-3",
+  "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
     "url": "https://github.com/wavesjs/waves-lfo"
   },
   "bugs": {
-    "url": "https://github.com/wavesjs/lfo/issues"
+    "url": "https://github.com/wavesjs/waves-lfo/issues"
   },
-  "homepage": "https://github.com/wavesjs/lfo",
+  "homepage": "http://wavesjs.github.io/waves-lfo",
   "scripts": {
     "bundle": "node ./bin/runner --bundle",
     "doc": "jsdoc -c jsdoc.json",
@@ -20,12 +20,6 @@
     "transpile": "node ./bin/runner --transpile",
     "prewatch": "npm run transpile",
     "watch": "node ./bin/runner --watch"
-  },
-  "jshintConfig": {
-    "esnext": true,
-    "browser": true,
-    "node": true,
-    "devel": true
   },
   "dependencies": {
     "av": "^0.4.9",
