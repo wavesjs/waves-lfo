@@ -11,6 +11,9 @@
   "bugs": {
     "url": "https://github.com/wavesjs/waves-lfo/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "http://wavesjs.github.io/waves-lfo",
   "scripts": {
     "bundle": "node ./bin/runner --bundle",
