@@ -1,5 +1,5 @@
 
-![logo](https://cdn.rawgit.com/wavesjs/waves-lfo/develop/resources/logo.png)
+![logo](https://cdn.rawgit.com/wavesjs/waves-lfo/master/resources/logo.png)
 
 # _Low Frequency Operators_
 
@@ -16,7 +16,7 @@ The library provides three namespaces:
 
 A `graph` is a combination of at least a `source` and a `sink` with any number of `operator` modules in between:
 
-![scheme](https://dl.dropboxusercontent.com/u/606131/lfo.png)
+![scheme](https://cdn.rawgit.com/wavesjs/waves-lfo/master/resources/graph.png)
 
 ## Documentation
 
