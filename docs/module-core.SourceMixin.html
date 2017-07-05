@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lfo (Low Frequency Operators) - Mixin: SourceMixin</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/overrides.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- if home page assume a title is already present in README -->
+    
+    <h1 class="page-title">Mixin: SourceMixin</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>SourceMixin</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Interface added to `LfoCore to implement source</p>
+<p>Source have some responsability on graph as they mostly control its whole
+lifecycle. They must implement the start and stop method in order to
+make sure the graph is initialized and set <code>started</code> to true.
+A source should never accept and propagate incomming frames until <code>started</code>
+is set to <code>true</code>.</p></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_SourceMixin.js.html">core/SourceMixin.js</a>, <a href="core_SourceMixin.js.html#line2">line 2</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            <h3>Example</h3>
+            
+    <pre class="prettyprint"><code>class MySource extends SourceMixin(BaseLfo) {}</code></pre>
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="init"><span class="type-signature"></span>init<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Initialize the graph by calling <code>initModule</code>. When the returned <code>Promise</code>
+fulfills, the graph can be considered as initialized and <code>start</code> can be
+called safely. If <code>start</code> is called whithout explicit <code>init</code>, <code>init</code> is
+made internally, actual start of the graph is then not garanteed to be
+synchronous.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_SourceMixin.js.html">core/SourceMixin.js</a>, <a href="core_SourceMixin.js.html#line30">line 30</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>// safe initialization and start
+source.init().then(() => source.start())
+// safe initialization and start
+source.start();</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="processFrame"><span class="type-signature"></span>processFrame<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>The implementation should never allow incomming frames
+if <code>this.started</code> is not <code>true</code>.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_SourceMixin.js.html">core/SourceMixin.js</a>, <a href="core_SourceMixin.js.html#line102">line 102</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>// basic `processFrame` implementation
+processFrame(frame) {
+  if (this.started === true) {
+    this.prepareFrame();
+    this.processFunction(frame);
+    this.propagateFrame();
+  }
+}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="start"><span class="type-signature"></span>start<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Interface method to implement that starts the graph.</p>
+<p>The method main purpose is to make sure take verify initialization step and
+set <code>started</code> to <code>true</code> when done.
+Should behave synchronously when called inside <code>init().then()</code> and async
+if called without init step.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_SourceMixin.js.html">core/SourceMixin.js</a>, <a href="core_SourceMixin.js.html#line59">line 59</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>// basic `start` implementation
+start() {
+  if (this.initialized === false) {
+    if (this.initPromise === null) // init has not yet been called
+      this.initPromise = this.init();
+
+    this.initPromise.then(this.start);
+    return;
+  }
+
+  this.started = true;
+}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="stop"><span class="type-signature"></span>stop<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Interface method to implement that stops the graph.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_SourceMixin.js.html">core/SourceMixin.js</a>, <a href="core_SourceMixin.js.html#line87">line 87</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>// basic `stop` implementation
+stop() {
+  this.started = false;
+}</code></pre>
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-client.sink.BaseDisplay.html">client.sink.BaseDisplay</a></li><li><a href="module-client.sink.BpfDisplay.html">client.sink.BpfDisplay</a></li><li><a href="module-client.sink.MarkerDisplay.html">client.sink.MarkerDisplay</a></li><li><a href="module-client.sink.SignalDisplay.html">client.sink.SignalDisplay</a></li><li><a href="module-client.sink.SocketSend.html">client.sink.SocketSend</a></li><li><a href="module-client.sink.SpectrumDisplay.html">client.sink.SpectrumDisplay</a></li><li><a href="module-client.sink.TraceDisplay.html">client.sink.TraceDisplay</a></li><li><a href="module-client.sink.VuMeterDisplay.html">client.sink.VuMeterDisplay</a></li><li><a href="module-client.sink.WaveformDisplay.html">client.sink.WaveformDisplay</a></li><li><a href="module-client.source.AudioInBuffer.html">client.source.AudioInBuffer</a></li><li><a href="module-client.source.AudioInNode.html">client.source.AudioInNode</a></li><li><a href="module-client.source.SocketReceive.html">client.source.SocketReceive</a></li><li><a href="module-common.operator.Biquad.html">common.operator.Biquad</a></li><li><a href="module-common.operator.Dct.html">common.operator.Dct</a></li><li><a href="module-common.operator.Fft.html">common.operator.Fft</a></li><li><a href="module-common.operator.Magnitude.html">common.operator.Magnitude</a></li><li><a href="module-common.operator.MeanStddev.html">common.operator.MeanStddev</a></li><li><a href="module-common.operator.Mel.html">common.operator.Mel</a></li><li><a href="module-common.operator.Mfcc.html">common.operator.Mfcc</a></li><li><a href="module-common.operator.MinMax.html">common.operator.MinMax</a></li><li><a href="module-common.operator.MovingAverage.html">common.operator.MovingAverage</a></li><li><a href="module-common.operator.MovingMedian.html">common.operator.MovingMedian</a></li><li><a href="module-common.operator.OnOff.html">common.operator.OnOff</a></li><li><a href="module-common.operator.Rms.html">common.operator.Rms</a></li><li><a href="module-common.operator.Segmenter.html">common.operator.Segmenter</a></li><li><a href="module-common.operator.Select.html">common.operator.Select</a></li><li><a href="module-common.operator.Slicer.html">common.operator.Slicer</a></li><li><a href="module-common.operator.Yin.html">common.operator.Yin</a></li><li><a href="module-common.sink.Bridge.html">common.sink.Bridge</a></li><li><a href="module-common.sink.DataRecorder.html">common.sink.DataRecorder</a></li><li><a href="module-common.sink.Logger.html">common.sink.Logger</a></li><li><a href="module-common.sink.SignalRecorder.html">common.sink.SignalRecorder</a></li><li><a href="module-common.source.EventIn.html">common.source.EventIn</a></li><li><a href="module-core.BaseLfo.html">core.BaseLfo</a></li><li><a href="module-node.sink.DataToFile.html">node.sink.DataToFile</a></li><li><a href="module-node.sink.SocketSend.html">node.sink.SocketSend</a></li><li><a href="module-node.source.SocketReceive.html">node.source.SocketReceive</a></li></ul><h3>Mixins</h3><ul><li><a href="module-core.SourceMixin.html">core.SourceMixin</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Jul 05 2017 11:50:30 GMT+0200 (CEST)
+    
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
