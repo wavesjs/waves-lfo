@@ -1,5 +1,5 @@
 {
-  "name": "@ircam/waves-lfo",
+  "name": "waves-lfo",
   "version": "1.1.0",
   "description": "Low Frequency Operators",
   "main": "",
@@ -15,6 +15,7 @@
     "access": "public"
   },
   "homepage": "http://wavesjs.github.io/waves-lfo",
+  "keywords": ["dsp", "feature extraction", "filters", "audio", "sensors"],
   "scripts": {
     "bundle": "node ./bin/runner --bundle",
     "deploy": "np --yolo",
