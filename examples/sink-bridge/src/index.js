@@ -27,55 +27,57 @@ const bridge = new lfo.sink.Bridge();
 eventIn.connect(movingAverage);
 movingAverage.connect(bridge);
 
-eventIn.start();
+eventIn.init().then(() => {
+  eventIn.start();
 
-// push values into graph on event
-$scene.addEventListener('mousemove', (e) => {
-  const now = new Date().getTime();
-  const x = e.clientX - halfWidth;
-  const y = e.clientY - halfHeight;
+  // push values into graph on event
+  $scene.addEventListener('mousemove', (e) => {
+    const now = new Date().getTime();
+    const x = e.clientX - halfWidth;
+    const y = e.clientY - halfHeight;
 
-  eventIn.process(now, [x, y]);
-});
+    eventIn.process(now, [x, y]);
+  });
 
-let simpleDisplay = true;
-// cheap resampler
-const smooth = new lfo.operator.MovingAverage({ order: 10 });
-smooth.initStream({ frameSize: 2, frameType: 'vector' });
+  let simpleDisplay = true;
+  // cheap resampler
+  const smooth = new lfo.operator.MovingAverage({ order: 10 });
+  smooth.initStream({ frameSize: 2, frameType: 'vector' });
 
-// pull values from graph at `requestAnimationFrame` interval
-(function draw() {
-  const smoothedValues = smooth.inputVector(bridge.frame.data);
-  const x = smoothedValues[0];
-  const y = smoothedValues[1];
-  const opacity = simpleDisplay ? 0.2 : 1;
+  // pull values from graph at `requestAnimationFrame` interval
+  (function draw() {
+    const smoothedValues = smooth.inputVector(bridge.frame.data);
+    const x = smoothedValues[0];
+    const y = smoothedValues[1];
+    const opacity = simpleDisplay ? 0.2 : 1;
 
-  ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
-  ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+    ctx.fillRect(0, 0, width, height);
 
-  ctx.save();
-  ctx.translate(halfWidth, halfHeight);
+    ctx.save();
+    ctx.translate(halfWidth, halfHeight);
 
-  if (simpleDisplay)
-    ctx.beginPath();
+    if (simpleDisplay)
+      ctx.beginPath();
 
-  ctx.fillStyle = 'white';
-  ctx.arc(x, y, 5, 0, _2PI, true);
-  ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.arc(x, y, 5, 0, _2PI, true);
+    ctx.fill();
 
-  if (simpleDisplay)
-    ctx.closePath();
+    if (simpleDisplay)
+      ctx.closePath();
 
-  ctx.restore();
+    ctx.restore();
 
-  requestAnimationFrame(draw);
-}());
+    requestAnimationFrame(draw);
+  }());
 
-new controllers.Toggle({
-  label: 'alternative display',
-  default: false,
-  container: '#controllers',
-  callback: (value) => simpleDisplay = !value,
+  new controllers.Toggle({
+    label: 'alternative display',
+    default: false,
+    container: '#controllers',
+    callback: (value) => simpleDisplay = !value,
+  });
 });
 
 

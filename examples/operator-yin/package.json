@@ -1,7 +1,7 @@
 {
-  "name": "es6-prototyping-boilerplate",
+  "name": "lfo-yin",
   "version": "1.0.1",
-  "description": "boilerplate for rapid es6 prototyping",
+  "description": "",
   "main": "dist/main.js",
   "author": "Benjamin Matuszewski",
   "license": "ISC",
@@ -11,13 +11,12 @@
     "prewatch": "npm run transpile",
     "watch": "./bin/runner --watch",
     "serve": "./bin/runner --serve",
-
     "postinstall": "npm run bundle"
   },
   "dependencies": {
-    "babel-runtime": "^6.9.2",
     "basic-controllers": "ircam-jstools/basic-controllers#v1.0.0",
-    "waves-lfo": "wavesjs/waves-lfo"
+    "babel-runtime": "^6.9.2",
+    "waves-lfo": "^1.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",
