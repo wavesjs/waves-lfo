@@ -29,7 +29,7 @@ _**Important**: in the documentation, all nodes in the `common` and `core` names
 ### Install
 
 ```sh
-$ npm install [--save] wavesjs/waves-lfo
+$ npm install [--save] waves-lfo
 ```
 
 ### Import the library
