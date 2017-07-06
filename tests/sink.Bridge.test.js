@@ -3,6 +3,7 @@ import Bridge from '../src/common/sink/Bridge';
 import tape from 'tape';
 
 tape('Bridge', (t) => {
+  t.plan(13);
 
   const frame0 = {
     time: 0,
@@ -43,20 +44,23 @@ tape('Bridge', (t) => {
   });
 
   eventIn.connect(bridge);
-  eventIn.start();
 
-  eventIn.processFrame(frame0);
-  eventIn.processFrame(frame1);
+  eventIn.init().then(() => {
+    eventIn.start();
 
-  t.comment('pull paradigm');
+    eventIn.processFrame(frame0);
+    eventIn.processFrame(frame1);
 
-  const expected = frame1;
-  t.deepEqual(bridge.frame.time, expected.time, 'should execute with proper time');
-  t.looseEqual(bridge.frame.data, expected.data, 'should execute with proper data');
-  t.equal(bridge.frame.data === expected.data, false, 'should be a copy data');
-  t.deepEqual(bridge.frame.metadata, expected.metadata, 'should execute with proper metadata');
+    t.comment('pull paradigm');
 
-  eventIn.stop();
+    const expected = frame1;
+    t.deepEqual(bridge.frame.time, expected.time, 'should execute with proper time');
+    t.looseEqual(bridge.frame.data, expected.data, 'should execute with proper data');
+    t.equal(bridge.frame.data === expected.data, false, 'should be a copy data');
+    t.deepEqual(bridge.frame.metadata, expected.metadata, 'should execute with proper metadata');
 
-  t.end();
+    eventIn.stop();
+
+    t.end();
+  });
 });
