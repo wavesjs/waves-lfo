@@ -1,4 +1,4 @@
-import parameters from 'parameters';
+import parameters from '@ircam/parameters';
 
 let id = 0;
 

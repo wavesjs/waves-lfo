@@ -27,9 +27,9 @@
     "watch": "node ./bin/runner --watch"
   },
   "dependencies": {
+    "@ircam/parameters": "^1.2.0",
     "av": "^0.4.9",
     "babel-runtime": "^6.6.1",
-    "parameters": "ircam-jstools/parameters#v1.0.1",
     "uws": "^0.14.1"
   },
   "devDependencies": {
