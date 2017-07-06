@@ -31,16 +31,13 @@ const definitions = {
  *
  * @memberof module:node.sink
  *
- * @todo - add options to store streamParams (kind of header)
+ * @todo - add an option to store the `streamParams`
  *
  * @example
  * import path from 'path';
  * import EventIn from '../src/common/source/EventIn';
  * import Logger from '../src/common/sink/Logger';
  * import DataToFile from '../src/node/sink/DataToFile';
- *
- * // console.log(process.cwd(), lfo);
- * // process.exit();
  *
  * const eventIn = new EventIn({
  *   frameSize: 2,
@@ -72,10 +69,8 @@ const definitions = {
  *
  *   if (time < 20)
  *     setTimeout(loop, 300);
- *   else {
- *     console.log('???');
+ *   else
  *     eventIn.stop();
- *   }
  * }());
  */
 class DataToFile extends BaseLfo {
