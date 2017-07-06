@@ -25,6 +25,8 @@ import tape from 'tape';
 // recorder.stop();
 
 tape('DataRecorder', (t) => {
+  t.plan(9);
+
   const eventIn = new EventIn({
     frameType: 'vector',
     frameSize: 2,
@@ -70,20 +72,22 @@ tape('DataRecorder', (t) => {
 
   eventIn.connect(recorder1);
   eventIn.connect(recorder2);
-  eventIn.start();
+  eventIn.init().then(() => {
+    eventIn.start();
 
-  t.throws(() => recorder1.retrieve(), 'should throw if retrieve called before start');
+    t.throws(() => recorder1.retrieve(), 'should throw if retrieve called before start');
 
-  // start recording
-  recorder1.start();
-  recorder2.start();
+    // start recording
+    recorder1.start();
+    recorder2.start();
 
-  eventIn.processFrame(frames[0]);
-  eventIn.processFrame(frames[1]);
+    eventIn.processFrame(frames[0]);
+    eventIn.processFrame(frames[1]);
 
-  recorder1.stop();
-  recorder2.stop();
+    recorder1.stop();
+    recorder2.stop();
 
-  t.end();
+    t.end();
+  });
 });
 

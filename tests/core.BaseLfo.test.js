@@ -50,7 +50,7 @@ tape('BaseLfo', (t) => {
 
   const aliveChild = new ChildNode();
   parent.connect(aliveChild);
-  t.notDeepEqual(parent.nextOps.indexOf(aliveChild), -1, 'should add child node to `nextOps` attribute');
+  t.notDeepEqual(parent.nextModules.indexOf(aliveChild), -1, 'should add child node to `nextModules` attribute');
   t.deepEqual(aliveChild.prevOp, parent, 'should be defined as the `prevOp` of the child node');
 
   const deadChild = new ChildNode();
@@ -62,7 +62,7 @@ tape('BaseLfo', (t) => {
   t.comment('disconnect');
 
   parent.disconnect(aliveChild);
-  t.deepEqual(parent.nextOps.indexOf(aliveChild), -1, 'should remove child node from parent\'s `nextOps` attribute');
+  t.deepEqual(parent.nextModules.indexOf(aliveChild), -1, 'should remove child node from parent\'s `nextModules` attribute');
   t.deepEqual(aliveChild.prevOp, null, 'should set `prevOp` attribute to null');
 
 

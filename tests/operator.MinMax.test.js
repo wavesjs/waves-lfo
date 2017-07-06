@@ -4,7 +4,7 @@ import EventIn from '../src/common/source/EventIn';
 import tape from 'tape';
 
 tape('MinMax', (t) => {
-
+  t.plan(5);
   t.comment('processSignal');
 
   const eventIn = new EventIn({
@@ -40,22 +40,24 @@ tape('MinMax', (t) => {
 
   asserter.setExpectedFrames([expected]);
 
-  eventIn.start();
-  eventIn.processFrame(frame);
+  eventIn.init().then(() => {
+    eventIn.start();
+    eventIn.processFrame(frame);
 
-  t.comment('inputSignal');
+    t.comment('inputSignal');
 
-  const input = new Float32Array(512);
+    const input = new Float32Array(512);
 
-  for (let i = 0; i < 512; i++)
-    input[i] = Math.random();
+    for (let i = 0; i < 512; i++)
+      input[i] = Math.random();
 
-  const output = minMax.inputSignal(input);
+    const output = minMax.inputSignal(input);
 
-  t.deepEqual(output[0], Math.min.apply(null, input), 'should have proper min');
-  t.deepEqual(output[1], Math.max.apply(null, input), 'should have proper max');
+    t.deepEqual(output[0], Math.min.apply(null, input), 'should have proper min');
+    t.deepEqual(output[1], Math.max.apply(null, input), 'should have proper max');
 
-  t.end();
+    t.end();
+  }).catch(err => console.error(err.stack));
 });
 
 

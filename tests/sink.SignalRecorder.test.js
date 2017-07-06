@@ -4,6 +4,8 @@ import tape from 'tape';
 
 
 tape('SignalRecorder', (t) => {
+  t.plan(2);
+
   [1, Infinity].forEach((duration) => {
     const signal = [0, 0, 1, 2, 3, 4];
     const expected = [1, 2, 3, 4];
@@ -22,13 +24,13 @@ tape('SignalRecorder', (t) => {
     });
 
     eventIn.connect(recorder);
-    eventIn.start();
+    eventIn.init().then(() => {
+      eventIn.start();
 
-    // start recording
-    recorder.start();
-    eventIn.process(0, signal);
-    recorder.stop();
+      // start recording
+      recorder.start();
+      eventIn.process(0, signal);
+      recorder.stop();
+    });
   });
-
-  t.end();
 });

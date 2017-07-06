@@ -4,6 +4,7 @@ import tape from 'tape';
 
 
 tape('EventIn', (t) => {
+  t.plan(22);
   t.comment('params');
 
   // test parameters defaults
@@ -35,13 +36,14 @@ tape('EventIn', (t) => {
 
   t.comment('start (~ processStreamParams)');
 
-  b.start();
+  b.init().then(() => {
 
-  t.equal(b.streamParams.frameSize, options.frameSize, 'should initialize streamParams.frameSize properly');
-  t.equal(b.streamParams.frameType, options.frameType, 'should initialize streamParams.frameType properly');
-  t.equal(b.streamParams.description, options.description, 'should initialize streamParam.description properly');
-  t.equal(b.streamParams.frameRate, options.frameRate, 'should initialize streamParams.frameRate properly');
-  t.equal(b.streamParams.sourceSampleRate, options.frameRate, 'should initialize streamParams.sampleRate properly');
+    t.equal(b.streamParams.frameSize, options.frameSize, 'should initialize streamParams.frameSize properly');
+    t.equal(b.streamParams.frameType, options.frameType, 'should initialize streamParams.frameType properly');
+    t.equal(b.streamParams.description, options.description, 'should initialize streamParam.description properly');
+    t.equal(b.streamParams.frameRate, options.frameRate, 'should initialize streamParams.frameRate properly');
+    t.equal(b.streamParams.sourceSampleRate, options.frameRate, 'should initialize streamParams.sampleRate properly');
+  });
 
 
   t.comment('processFrame');
@@ -64,24 +66,23 @@ tape('EventIn', (t) => {
   };
 
   const c = new Child();
+
   b.connect(c);
-  b.start(); // repropagate start
+  b.init().then(() => {
+    b.start(); // repropagate start
 
-  b.processFrame(frame);
+    b.processFrame(frame);
 
-  t.equal(b.frame.time, frame.time, 'should have proper frame.time');
-  t.looseEqual(b.frame.data, frame.data, 'should have proper frame.data');
-  t.equal(b.frame.metadata, frame.metadata, 'should have proper frame.metadata');
+    t.equal(b.frame.time, frame.time, 'should have proper frame.time');
+    t.looseEqual(b.frame.data, frame.data, 'should have proper frame.data');
+    t.equal(b.frame.metadata, frame.metadata, 'should have proper frame.metadata');
 
-  t.equal(c.frame.time, frame.time, 'should have propagated frame.time');
-  t.looseEqual(c.frame.data, frame.data, 'should have propagated frame.data');
-  t.looseEqual(c.frame.data instanceof Float32Array, true, 'frame.data should be a Float32Array');
-  t.equal(c.frame.metadata, frame.metadata, 'should have propagated frame.metadata');
+    t.equal(c.frame.time, frame.time, 'should have propagated frame.time');
+    t.looseEqual(c.frame.data, frame.data, 'should have propagated frame.data');
+    t.looseEqual(c.frame.data instanceof Float32Array, true, 'frame.data should be a Float32Array');
+    t.equal(c.frame.metadata, frame.metadata, 'should have propagated frame.metadata');
 
-  b.stop();
-
-
-
-  t.end();
+    b.stop();
+  });
 });
 

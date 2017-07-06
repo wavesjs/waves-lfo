@@ -1,7 +1,7 @@
 {
-  "name": "es6-prototyping-boilerplate",
+  "name": "lfo-networked-graph",
   "version": "1.0.1",
-  "description": "boilerplate for rapid es6 prototyping",
+  "description": "",
   "main": "dist/main.js",
   "author": "Benjamin Matuszewski",
   "license": "ISC",
@@ -15,9 +15,10 @@
   "dependencies": {
     "babel-runtime": "^6.23.0",
     "klaw": "^1.3.1",
-    "motion-input": "collective-soundworks/motion-input",
+    "motion-input": "collective-soundworks/motion-input#v1.0.4-b",
     "source-map-support": "^0.4.14",
-    "uws": "^0.14.1"
+    "uws": "^0.14.1",
+    "waves-lfo": "^1.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",
