@@ -249,6 +249,7 @@ The `lfo` library is based on the same concepts and very similar formalisms as [
 However, the APIs of `lfo` and `PiPo` defer in many details due to the very different constraints of the Javascript and C/C++ development and runtime environments.
 
 <hr />
+
 ## Credits and License
 
 The `lfo` library has been developed at [Ircam – Centre Pompidou](http://www.ircam.fr) and is released under the BSD-3-Clause license.
