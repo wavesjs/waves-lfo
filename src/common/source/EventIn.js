@@ -188,6 +188,7 @@ class EventIn extends SourceMixin(BaseLfo) {
     const sampleRate = this.params.get('sampleRate');
     const frameRate = this.params.get('frameRate');
     const description = this.params.get('description');
+
     // init operator's stream params
     this.streamParams.frameSize = frameType === 'scalar' ? 1 : frameSize;
     this.streamParams.frameType = frameType;
@@ -203,7 +204,7 @@ class EventIn extends SourceMixin(BaseLfo) {
 
     } else if (frameType === 'vector' || frameType === 'scalar') {
       if (frameRate === null)
-        throw new Error('Undefined "frameRate" for "vector" stream');
+        throw new Error(`Undefined "frameRate" for "${frameType}" stream`);
 
       this.streamParams.frameRate = frameRate;
       this.streamParams.sourceSampleRate = frameRate;
