@@ -1,6 +1,6 @@
 import * as Benchmark from 'benchmark';
 import * as lfo from 'waves-lfo/common';
-import * as Meyda from 'meyda/dist/node/main';
+import * as Meyda from 'meyda';
 
 
 export function getFftSuites(buffer, bufferLength, sampleRate, log) {
@@ -23,7 +23,7 @@ export function getFftSuites(buffer, bufferLength, sampleRate, log) {
         sourceSampleRate: sampleRate,
       });
 
-      suite.add(`lfo:fft - frameSize: ${frameSize}`, {
+      suite.add(`lfo:fft\t\tframeSize: ${frameSize}\t`, {
         fn: function() {
           for (let i = 0; i < numFrames; i++) {
             const start = i * frameSize;
@@ -37,7 +37,7 @@ export function getFftSuites(buffer, bufferLength, sampleRate, log) {
       Meyda.bufferSize = frameSize;
       Meyda.sampleRate = sampleRate;
 
-      suite.add(`meyda:fft - frameSize: ${frameSize}`, {
+      suite.add(`meyda:fft\tframeSize: ${frameSize}\t`, {
         fn: function() {
           for (let i = 0; i < numFrames; i++) {
             const start = i * frameSize;
@@ -53,7 +53,7 @@ export function getFftSuites(buffer, bufferLength, sampleRate, log) {
       });
 
       suite.on('complete', function() {
-        log.push('==> Fastest is ' + this.filter('fastest').map('name'));
+        log.push('==> Fastest is ' + this.filter('fastest').map('name') + '\n');
         next();
       });
 

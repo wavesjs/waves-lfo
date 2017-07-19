@@ -17,14 +17,18 @@ asset.decodeToBuffer(init);
 function init(buffer) {
   const bufferLength = buffer.length;
   const sampleRate = asset.format.sampleRate;
-  const log = [];
+  const logStack = [];
+  const stack = [];
 
-  const fftSuites = getFftSuites(buffer, bufferLength, sampleRate, log);
-  const rmsSuites = getRmsSuites(buffer, bufferLength, sampleRate, log);
-  const mfccSuites = getMfccSuites(buffer, bufferLength, sampleRate, log);
+  const fftSuites = getFftSuites(buffer, bufferLength, sampleRate, logStack);
+  stack.push(fftSuites);
+  const rmsSuites = getRmsSuites(buffer, bufferLength, sampleRate, logStack);
+  stack.push(rmsSuites);
+  const mfccSuites = getMfccSuites(buffer, bufferLength, sampleRate, logStack);
+  stack.push(mfccSuites);
 
-  const suites = flatten([fftSuites, rmsSuites, mfccSuites]);
-  suites.push(() => console.log(log.join('\n')));
+  const suites = flatten(stack);
+  suites.push(() => console.log(logStack.join('\n')));
 
   runSequence(suites);
 }

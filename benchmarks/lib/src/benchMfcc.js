@@ -1,6 +1,6 @@
 import * as Benchmark from 'benchmark';
 import * as lfo from 'waves-lfo/common';
-import * as Meyda from 'meyda/dist/node/main';
+import * as Meyda from 'meyda';
 
 
 export function getMfccSuites(buffer, bufferLength, sampleRate, log) {
@@ -21,7 +21,7 @@ export function getMfccSuites(buffer, bufferLength, sampleRate, log) {
         sourceSampleRate: sampleRate,
       });
 
-      suite.add(`lfo:mfcc - frameSize: ${frameSize}`, {
+      suite.add(`lfo:mfcc\tframeSize: ${frameSize}\t`, {
         fn: function() {
           for (let i = 0; i < numFrames; i++) {
             const start = i * frameSize;
@@ -35,7 +35,7 @@ export function getMfccSuites(buffer, bufferLength, sampleRate, log) {
       Meyda.bufferSize = frameSize;
       Meyda.sampleRate = sampleRate;
 
-      suite.add(`meyda:mfcc - frameSize: ${frameSize}`, {
+      suite.add(`meyda:mfcc\tframeSize: ${frameSize}\t`, {
         fn: function() {
           for (let i = 0; i < numFrames; i++) {
             const start = i * frameSize;
@@ -51,7 +51,7 @@ export function getMfccSuites(buffer, bufferLength, sampleRate, log) {
       });
 
       suite.on('complete', function() {
-        log.push('==> Fastest is ' + this.filter('fastest').map('name'));
+        log.push('==> Fastest is ' + this.filter('fastest').map('name') + '\n');
         next();
       });
 
