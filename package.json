@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@ircam/parameters": "^1.2.0",
+    "@ircam/ticker": "^1.0.1",
     "av": "^0.4.9",
     "babel-runtime": "^6.23.0",
     "uws": "^0.14.5"
