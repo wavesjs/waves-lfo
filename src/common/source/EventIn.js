@@ -145,8 +145,8 @@ class EventIn extends SourceMixin(BaseLfo) {
    * the graph. Any call to `process` or `processFrame` before `start` will be
    * ignored.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
-   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
    * @see {@link module:common.source.EventIn#stop}
    */
   start(startTime = null) {
@@ -154,8 +154,7 @@ class EventIn extends SourceMixin(BaseLfo) {
       if (this.initPromise === null) // init has not yet been called
         this.initPromise = this.init();
 
-      this.initPromise.then(() => this.start(startTime));
-      return;
+      return this.initPromise.then(() => this.start(startTime));
     }
 
     this._startTime = startTime;
@@ -168,7 +167,7 @@ class EventIn extends SourceMixin(BaseLfo) {
    * Finalize the stream and stop the whole graph. Any call to `process` or
    * `processFrame` after `stop` will be ignored.
    *
-   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:common.source.EventIn#start}
    */
   stop() {

@@ -102,8 +102,8 @@ class AudioInFile extends SourceMixin(BaseLfo) {
   /**
    * Start the graph, load the file and start slicing it.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
-   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
    * @see {@link module:node.source.AudioInFile#stop}
    */
   start() {
@@ -122,7 +122,7 @@ class AudioInFile extends SourceMixin(BaseLfo) {
   /**
    * Finalize the stream and stop the graph.
    *
-   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:node.source.AudioInFile#start}
    */
   stop() {

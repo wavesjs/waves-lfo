@@ -35,8 +35,8 @@ const definitions = {
  * @param {Function} [options.finalizeStream=null] - Callback executed on each
  *  `finalizeStream` call.
  *
- * @see {@link module:common.core.BaseLfo#processFrame}
- * @see {@link module:common.core.BaseLfo#processStreamParams}
+ * @see {@link module:core.BaseLfo#processFrame}
+ * @see {@link module:core.BaseLfo#processStreamParams}
  *
  * @example
  * import * as lfo from 'waves-lfo/common';

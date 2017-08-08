@@ -99,7 +99,7 @@ class BaseLfo {
      * @type {Object}
      * @name params
      * @instance
-     * @memberof module:common.core.BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.params = parameters(definitions, options);
     // listen for param updates
@@ -124,7 +124,7 @@ class BaseLfo {
      *
      * @name streamParams
      * @instance
-     * @memberof module:common.core.BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.streamParams = {
       frameType: null,
@@ -145,7 +145,7 @@ class BaseLfo {
      * @property {Float32Array} data - Data of the current frame.
      * @property {Object} metadata - Metadata associted to the current frame.
      * @instance
-     * @memberof module:common.core.BaseLfo
+     * @memberof module:core.BaseLfo
      */
     this.frame = {
       time: 0,
@@ -160,9 +160,9 @@ class BaseLfo {
      * @type {Array<BaseLfo>}
      * @name nextModules
      * @instance
-     * @memberof module:common.core.BaseLfo
-     * @see {@link module:common.core.BaseLfo#connect}
-     * @see {@link module:common.core.BaseLfo#disconnect}
+     * @memberof module:core.BaseLfo
+     * @see {@link module:core.BaseLfo#connect}
+     * @see {@link module:core.BaseLfo#disconnect}
      */
     this.nextModules = [];
 
@@ -172,9 +172,9 @@ class BaseLfo {
      * @type {BaseLfo}
      * @name prevModule
      * @instance
-     * @memberof module:common.core.BaseLfo
-     * @see {@link module:common.core.BaseLfo#connect}
-     * @see {@link module:common.core.BaseLfo#disconnect}
+     * @memberof module:core.BaseLfo
+     * @see {@link module:core.BaseLfo#connect}
+     * @see {@link module:core.BaseLfo#disconnect}
      */
     this.prevModule = null;
 
@@ -186,7 +186,7 @@ class BaseLfo {
      * @type {Boolean}
      * @name _reinit
      * @instance
-     * @memberof module:common.core.BaseLfo
+     * @memberof module:core.BaseLfo
      * @private
      */
     this._reinit = false;
@@ -204,7 +204,7 @@ class BaseLfo {
   /**
    * Reset all parameters to their initial value (as defined on instantication)
    *
-   * @see {@link module:common.core.BaseLfo#streamParams}
+   * @see {@link module:core.BaseLfo#streamParams}
    */
   resetParams() {
     this.params.reset();
@@ -230,8 +230,8 @@ class BaseLfo {
    * to each of them.
    *
    * @param {BaseLfo} next - Next operator in the graph.
-   * @see {@link module:common.core.BaseLfo#processFrame}
-   * @see {@link module:common.core.BaseLfo#disconnect}
+   * @see {@link module:core.BaseLfo#processFrame}
+   * @see {@link module:core.BaseLfo#disconnect}
    */
   connect(next) {
     if (!(next instanceof BaseLfo))
@@ -275,7 +275,7 @@ class BaseLfo {
    * When detroyed, the `streamParams` of the node are set to `null`, the
    * operator is then considered as `dead` and cannot be reconnected.
    *
-   * @see {@link module:common.core.BaseLfo#connect}
+   * @see {@link module:core.BaseLfo#connect}
    */
   destroy() {
     // destroy all chidren
@@ -321,8 +321,8 @@ class BaseLfo {
    *
    * @param {Object} [streamParams={}] - Parameters of the stream.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
-   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
    */
   initStream(streamParams = {}) {
     this.processStreamParams(streamParams);
@@ -334,7 +334,7 @@ class BaseLfo {
    * A source operator should call `processStreamParams` and `resetStream` when
    * started, each of these method propagate through the graph automaticaly.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#processStreamParams}
    */
   resetStream() {
     // buttom up
@@ -377,8 +377,8 @@ class BaseLfo {
    *
    * @param {Object} prevStreamParams - `streamParams` of the previous operator.
    *
-   * @see {@link module:common.core.BaseLfo#prepareStreamParams}
-   * @see {@link module:common.core.BaseLfo#propagateStreamParams}
+   * @see {@link module:core.BaseLfo#prepareStreamParams}
+   * @see {@link module:core.BaseLfo#propagateStreamParams}
    */
   processStreamParams(prevStreamParams = {}) {
     this.prepareStreamParams(prevStreamParams);
@@ -399,8 +399,8 @@ class BaseLfo {
    *
    * @param {Object} prevStreamParams - `streamParams` of the previous operator.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
-   * @see {@link module:common.core.BaseLfo#propagateStreamParams}
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#propagateStreamParams}
    */
   prepareStreamParams(prevStreamParams = {}) {
     Object.assign(this.streamParams, prevStreamParams);
@@ -440,8 +440,8 @@ class BaseLfo {
    * to all its next operators, must be called at the end of any
    * `processStreamParams` implementation.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
-   * @see {@link module:common.core.BaseLfo#prepareStreamParams}
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#prepareStreamParams}
    */
   propagateStreamParams() {
     this.frame.data = new Float32Array(this.streamParams.frameSize);
@@ -459,9 +459,9 @@ class BaseLfo {
    *  previous operator. The incomming frame should never be modified by
    *  the operator.
    *
-   * @see {@link module:common.core.BaseLfo#prepareFrame}
-   * @see {@link module:common.core.BaseLfo#propagateFrame}
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#prepareFrame}
+   * @see {@link module:core.BaseLfo#propagateFrame}
+   * @see {@link module:core.BaseLfo#processStreamParams}
    */
   processFrame(frame) {
     this.prepareFrame();
@@ -479,8 +479,8 @@ class BaseLfo {
    * frame type of the previous operator. Is dynamically assigned in
    * `prepareStreamParams`.
    *
-   * @see {@link module:common.core.BaseLfo#prepareStreamParams}
-   * @see {@link module:common.core.BaseLfo#processFrame}
+   * @see {@link module:core.BaseLfo#prepareStreamParams}
+   * @see {@link module:core.BaseLfo#processFrame}
    */
   processFunction(frame) {
     this.frame = frame;
@@ -489,7 +489,7 @@ class BaseLfo {
   /**
    * Common logic to perform at the beginning of the `processFrame`.
    *
-   * @see {@link module:common.core.BaseLfo#processFrame}
+   * @see {@link module:core.BaseLfo#processFrame}
    */
   prepareFrame() {
     if (this._reinit === true) {
@@ -503,7 +503,7 @@ class BaseLfo {
    * Forward the current `frame` to the next operators, is called at the end of
    * `processFrame`.
    *
-   * @see {@link module:common.core.BaseLfo#processFrame}
+   * @see {@link module:core.BaseLfo#processFrame}
    */
   propagateFrame() {
     for (let i = 0, l = this.nextModules.length; i < l; i++)
