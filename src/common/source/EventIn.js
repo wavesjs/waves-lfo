@@ -23,13 +23,7 @@ function getTimeFunction(audioContext = null) {
       return t[0] + t[1] * 1e-9;
     }
   } else {
-    // @todo - replace with `performance.now`
-    if (audioContext === null || (!audioContext instanceof AudioContext)) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioContext = new AudioContext();
-    }
-
-    return () => audioContext.currentTime;
+    return () => performance.now() / 1000;
   }
 }
 
