@@ -6,7 +6,7 @@ const definitions = {
     default: 0,
     metas: { kind: 'static' },
   },
-  indices: {
+  indexes: {
     type: 'any',
     default: null,
     nullable: true,
@@ -15,15 +15,15 @@ const definitions = {
 };
 
 /**
- * Select one or several indices from a `vector` input. If only one index is
+ * Select one or several indexes from a `vector` input. If only one index is
  * selected, the output will be of type `scalar`, otherwise the output will
- * be a vector containing the selected indices.
+ * be a vector containing the selected indexes.
  *
  * @memberof module:common.operator
  *
  * @param {Object} options - Override default values.
  * @param {Number} options.index - Index to select from the input frame.
- * @param {Array<Number>} options.indices - Indices to select from the input
+ * @param {Array<Number>} options.indexes - Indices to select from the input
  *  frame, if defined, take precedance over `option.index`.
  *
  * @example
@@ -54,17 +54,17 @@ class Select extends BaseLfo {
     this.prepareStreamParams(prevStreamParams);
 
     const index = this.params.get('index');
-    const indices = this.params.get('indices');
+    const indexes = this.params.get('indexes');
 
-    let max = (indices !== null) ?  Math.max.apply(null, indices) : index;
+    let max = (indexes !== null) ?  Math.max.apply(null, indexes) : index;
 
     if (max >= prevStreamParams.frameSize)
       throw new Error(`Invalid select index "${max}"`);
 
-    this.streamParams.frameType = (indices !== null) ? 'vector' : 'scalar';
-    this.streamParams.frameSize = (indices !== null) ? indices.length : 1;
+    this.streamParams.frameType = (indexes !== null) ? 'vector' : 'scalar';
+    this.streamParams.frameSize = (indexes !== null) ? indexes.length : 1;
 
-    this.select = (indices !== null) ? indices : [index];
+    this.select = (indexes !== null) ? indexes : [index];
 
     // steal description() from parent
     if (prevStreamParams.description) {
