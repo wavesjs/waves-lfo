@@ -10,7 +10,7 @@ const definitions = {
     type: 'any',
     default: null,
     nullable: true,
-    metas: { kind: 'static' },
+    metas: { kind: 'dynamic' },
   }
 };
 
@@ -35,18 +35,28 @@ const definitions = {
  * });
  *
  * const select = new lfo.operator.Select({
- *   index: 1,
+ *   indexes: [2, 0],
  * });
  *
  * eventIn.start();
- * eventIn.process(0, [0, 1, 2]);
- * > 1
- * eventIn.process(0, [3, 4, 5]);
- * > 4
+ * eventIn.process(0, [0, 2, 4]);
+ * > [4, 0]
+ * eventIn.process(0, [1, 3, 5]);
+ * > [5, 1]
  */
 class Select extends BaseLfo {
   constructor(options = {}) {
     super(definitions, options);
+  }
+
+  /** @private */
+  onParamUpdate(name, value, metas = {}) {
+    super.onParamUpdate(name, value, metas);
+
+    const index = this.params.get('index');
+    const indexes = this.params.get('indexes');
+
+    this.select = (indexes !== null) ? indexes : [index];
   }
 
   /** @private */
