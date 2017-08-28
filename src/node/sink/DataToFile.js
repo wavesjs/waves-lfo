@@ -124,7 +124,7 @@ class DataToFile extends BaseLfo {
       case 'json':
         this.file.write('\n]');
         break;
-        case 'csv':
+      case 'csv':
         // this.file.write(endTime.toString());
         break;
     }
