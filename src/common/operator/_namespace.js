@@ -1,5 +1,6 @@
 import Biquad from './Biquad';
 import Dct from './Dct';
+import Delta from './Delta';
 import Fft from './Fft';
 import Magnitude from './Magnitude';
 import MeanStddev from './MeanStddev';
@@ -20,6 +21,7 @@ import Yin from './Yin';
 export default {
   Biquad,
   Dct,
+  Delta,
   Fft,
   Magnitude,
   MeanStddev,
