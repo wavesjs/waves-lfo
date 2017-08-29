@@ -71,7 +71,7 @@ class MovingMedian extends BaseLfo {
     super(definitions, options);
 
     this.ringBuffer = null;
-    this.sorter = null;
+    this.sortBuffer = null;
     this.ringIndex = 0;
 
     this._ensureOddOrder();
