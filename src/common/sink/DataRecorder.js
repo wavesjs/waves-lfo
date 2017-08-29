@@ -30,8 +30,9 @@ const definitions = {
  *  - when `false`, format is [{ time, data }, { time, data }, ...]
  *  - when `true`, format is { time: [...], data: [...] }
  * @param {Function} [options.callback] - Callback to execute when a new record
- *  is ended. This can happen when: `stop` is called on the recorder, or `stop`
- *  is called on the source.
+ *  is ended. This can happen when:
+ *  - `stop` is called on the recorder
+ *  - `stop` is called on the source.
  *
  * @todo - Add auto record param.
  *
