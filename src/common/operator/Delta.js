@@ -69,7 +69,7 @@ function simpleLinearRegression(values, dt) {
 }
 
 const definitions = {
-  order: {
+  size: {
     type: 'integer',
     min: 2,
     max: +Infinity,
@@ -96,15 +96,15 @@ class Delta extends BaseLfo {
     this.prepareStreamParams(prevStreamParams);
 
     const frameSize = this.streamParams.frameSize;
-    const order = this.params.get('order');
-    const bufferSize = frameSize * order;
+    const size = this.params.get('size');
+    const bufferSize = frameSize * size;
 
     this.buffers = [];
     // counter before the operator starts outputing frames
     this.ringIndex = 0;
 
     for (let i = 0; i < frameSize; i++)
-      this.buffers[i] = new Float32Array(order);
+      this.buffers[i] = new Float32Array(size);
 
     this.propagateStreamParams();
   }
@@ -113,11 +113,11 @@ class Delta extends BaseLfo {
     super.resetStream();
 
     const frameSize = this.streamParams.frameSize;
-    const order = this.params.get('order');
+    const size = this.params.get('size');
     const buffers = this.buffers;
 
     for (let i = 0; i < frameSize; i++) {
-      for (let j = 0; j < order; j++)
+      for (let j = 0; j < size; j++)
         buffers[i][j] = 0;
     }
 
@@ -128,26 +128,28 @@ class Delta extends BaseLfo {
    * Assume a stream of vector at a fixed `frameRate`.
    */
   inputVector(data) {
-    const order = this.params.get('order');
+    const size = this.params.get('size');
     const outData = this.frame.data;
     const frameSize = this.streamParams.frameSize;
     const frameRate = this.streamParams.frameRate;
     const buffers = this.buffers;
     const dt = 1 / frameRate;
-    this.ringIndex += 1;
+
+    if (this.ringIndex < size)
+      this.ringIndex += 1;
 
     // copy incomming data into buffer
     for (let i = 0; i < frameSize; i++) {
       const buffer = buffers[i];
 
-      // we need to keep the order of the incomming frames
+      // we need to keep the size of the incomming frames
       // then we have to shift all the values in the buffers
-      for (let j = 1; j < order; j++)
+      for (let j = 1; j < size; j++)
         buffer[j - 1] = buffer[j];
 
-      buffer[order - 1] = data[i];
+      buffer[size - 1] = data[i];
 
-      if (this.ringIndex >= order)
+      if (this.ringIndex >= size)
         outData[i] = simpleLinearRegression(buffer, dt);
       else
         outData[i] = 0;
@@ -157,11 +159,10 @@ class Delta extends BaseLfo {
   }
 
   processVector(frame) {
-
-
+    this.frame.data = this.inputVector(frame.data);
     // center time according to delta size
     const frameRate = this.streamParams.frameRate;
-    this.frame.time -= 0.5 * (order - 1) / frameRate;
+    this.frame.time -= 0.5 * (size - 1) / frameRate;
   }
 }
 
