@@ -8,7 +8,7 @@ function simpleLinearRegression(values, dt) {
   const length = values.length;
 
   for (let i = 0; i < length; i++) {
-    xSum += dt;
+    xSum += i * dt;
     ySum += values[i];
   }
 
@@ -74,8 +74,15 @@ const definitions = {
     min: 2,
     max: +Infinity,
     default: 3,
-  }
-}
+  },
+  useFrameRate: {
+    type: 'integer',
+    min: 0,
+    max: +Infinity,
+    default: null,
+    nullable: true,
+  },
+};
 
 /**
  * Returns the simple derivative of successive value using
@@ -83,6 +90,11 @@ const definitions = {
  * The current implementation assumes a fixed `frameRate` (`frame.time` is ignored)
  *
  * Before the module is filled, it outputs a value of 0.
+ *
+ * @param {Object} options - Override default parameters
+ * @param {Number} [options.size=3] - Size of the window
+ * @param {Number} [options.useFrameRate=null] - Override stream frame rate for
+ *  the regression
  */
 class Delta extends BaseLfo {
   constructor(options = {}) {
@@ -90,8 +102,10 @@ class Delta extends BaseLfo {
 
     this.buffers = null;
     this.ringIndex = 0;
+    this.frameRate = null;
   }
 
+  /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
@@ -102,6 +116,9 @@ class Delta extends BaseLfo {
     this.buffers = [];
     // counter before the operator starts outputing frames
     this.ringIndex = 0;
+    this.frameRate = this.params.get('useFrameRate') === null ?
+      this.streamParams.frameRate :
+      this.params.get('useFrameRate');
 
     for (let i = 0; i < frameSize; i++)
       this.buffers[i] = new Float32Array(size);
@@ -109,6 +126,7 @@ class Delta extends BaseLfo {
     this.propagateStreamParams();
   }
 
+  /** @private */
   resetStream() {
     super.resetStream();
 
@@ -131,9 +149,11 @@ class Delta extends BaseLfo {
     const size = this.params.get('size');
     const outData = this.frame.data;
     const frameSize = this.streamParams.frameSize;
-    const frameRate = this.streamParams.frameRate;
+    // const frameRate = this.streamParams.frameRate;
     const buffers = this.buffers;
-    const dt = 1 / frameRate;
+    const dt = 1 / this.frameRate;
+
+    // console.log(dt);
 
     if (this.ringIndex < size)
       this.ringIndex += 1;
@@ -142,8 +162,8 @@ class Delta extends BaseLfo {
     for (let i = 0; i < frameSize; i++) {
       const buffer = buffers[i];
 
-      // we need to keep the size of the incomming frames
-      // then we have to shift all the values in the buffers
+      // we need to keep the order of the incomming frames
+      // so we have to shift all the values in the buffers
       for (let j = 1; j < size; j++)
         buffer[j - 1] = buffer[j];
 
@@ -158,9 +178,11 @@ class Delta extends BaseLfo {
     return outData;
   }
 
+  /** @private */
   processVector(frame) {
     this.frame.data = this.inputVector(frame.data);
     // center time according to delta size
+    const size = this.params.get('size');
     const frameRate = this.streamParams.frameRate;
     this.frame.time -= 0.5 * (size - 1) / frameRate;
   }

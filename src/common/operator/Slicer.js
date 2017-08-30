@@ -83,6 +83,11 @@ class Slicer extends BaseLfo {
     this.streamParams.frameSize = frameSize;
     this.streamParams.frameRate = prevStreamParams.sourceSampleRate / hopSize;
 
+    if (this.streamParams.frameSize === 1)
+      this.streamParams.frameType = 'scalar';
+    else
+      this.streamParams.frameType = 'signal';
+
     this.propagateStreamParams();
   }
 
