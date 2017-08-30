@@ -1,4 +1,5 @@
 import Biquad from './Biquad';
+import Clip from './Clip';
 import Dct from './Dct';
 import Delta from './Delta';
 import Fft from './Fft';
@@ -12,14 +13,16 @@ import MovingAverage from './MovingAverage';
 import MovingMedian from './MovingMedian';
 import OnOff from './OnOff';
 import Rms from './Rms';
-import Scaler from './Scaler';
+import Multiplier from './Multiplier';
 import Segmenter from './Segmenter';
+import Scale from './Scale';
 import Select from './Select';
 import Slicer from './Slicer';
 import Yin from './Yin';
 
 export default {
   Biquad,
+  Clip,
   Dct,
   Delta,
   Fft,
@@ -33,7 +36,7 @@ export default {
   MovingMedian,
   OnOff,
   Rms,
-  Scaler,
+  Multiplier,
   Segmenter,
   Select,
   Slicer,
