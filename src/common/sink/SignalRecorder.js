@@ -109,7 +109,7 @@ class SignalRecorder extends BaseLfo {
     this.isRecording = false;
 
     const retrieveAudioBuffer = this.params.get('retrieveAudioBuffer');
-    let audioContext = this.params.get('audioContext');
+    const audioContext = this.params.get('audioContext');
     // needed to retrieve an AudioBuffer
     if (retrieveAudioBuffer && audioContext === null)
       throw new Error('Invalid parameter "audioContext": an AudioContext must be provided when `retrieveAudioBuffer` is set to `true`')

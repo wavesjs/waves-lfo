@@ -47,7 +47,7 @@
    * source.start();
    */
   init() {
-    this.initPromise = this.initModule().then(() => { // when graph is started
+    this.initPromise = this.initModule().then(() => {
       this.initStream(); // this is synchronous
       this.initialized = true;
       return Promise.resolve(true);

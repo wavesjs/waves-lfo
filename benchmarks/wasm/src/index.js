@@ -52,7 +52,7 @@ Promise.all([webAssemblyPromise, audioBufferPromise])
     var exports = wasm.instance.exports; // the exports of that instance
     var imports = wasm.imports;
 
-    const frameSize = 4096;
+    const frameSize = 256;
 
     const buffer = audioBuffer.getChannelData(0);
     const bufferLength = buffer.length;
@@ -77,7 +77,7 @@ Promise.all([webAssemblyPromise, audioBufferPromise])
 
     const suite = new Benchmark.Suite();
 
-    suite.add(`lfo-asm:fft - frameSize: ${frameSize}`, {
+    suite.add(`lfo-asm:fft\tframeSize: ${frameSize}\t`, {
       fn: function() {
         for (let i = 0; i < numFrames; i++) {
           const start = i * frameSize;

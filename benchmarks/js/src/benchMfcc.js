@@ -1,9 +1,9 @@
 import * as Benchmark from 'benchmark';
 import * as lfo from 'waves-lfo/common';
-import * as Meyda from 'meyda/dist/node/main';
+import * as Meyda from 'meyda';
 
 
-export function getFftSuites(buffer, bufferLength, sampleRate, log) {
+export function getMfccSuites(buffer, bufferLength, sampleRate, log) {
 
   const suites = [256, 1024, 4096].map((frameSize) => {
 
@@ -11,25 +11,23 @@ export function getFftSuites(buffer, bufferLength, sampleRate, log) {
       const numFrames = Math.floor(bufferLength / frameSize);
       const suite = new Benchmark.Suite();
 
-      const fft = new lfo.operator.Fft({
-        window: 'hamming',
-        mode: 'magnitude',
-        size: frameSize,
+      const mfcc = new lfo.operator.Mfcc({
+        nbrCoefs: 13,
       });
 
-      fft.initStream({
+      mfcc.initStream({
         frameSize: frameSize,
         frameType: 'signal',
         sourceSampleRate: sampleRate,
       });
 
-      suite.add(`lfo:fft - frameSize: ${frameSize}`, {
+      suite.add(`lfo:mfcc\tframeSize: ${frameSize}\t`, {
         fn: function() {
           for (let i = 0; i < numFrames; i++) {
             const start = i * frameSize;
             const end = start + frameSize;
             const frame = buffer.subarray(start, end);
-            const res = fft.inputSignal(frame);
+            const res = mfcc.inputSignal(frame);
           }
         },
       });
@@ -37,13 +35,13 @@ export function getFftSuites(buffer, bufferLength, sampleRate, log) {
       Meyda.bufferSize = frameSize;
       Meyda.sampleRate = sampleRate;
 
-      suite.add(`meyda:fft - frameSize: ${frameSize}`, {
+      suite.add(`meyda:mfcc\tframeSize: ${frameSize}\t`, {
         fn: function() {
           for (let i = 0; i < numFrames; i++) {
             const start = i * frameSize;
             const end = start + frameSize;
             const frame = buffer.subarray(start, end);
-            const res = Meyda.extract('amplitudeSpectrum', frame);
+            const res = Meyda.extract('mfcc', frame);
           }
         },
       });
@@ -53,13 +51,12 @@ export function getFftSuites(buffer, bufferLength, sampleRate, log) {
       });
 
       suite.on('complete', function() {
-        log.push('==> Fastest is ' + this.filter('fastest').map('name'));
+        log.push('==> Fastest is ' + this.filter('fastest').map('name') + '\n');
         next();
       });
 
       suite.run({ async: false });
     }
-
   });
 
   return suites;

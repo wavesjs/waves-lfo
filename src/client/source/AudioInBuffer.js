@@ -86,8 +86,8 @@ class AudioInBuffer extends SourceMixin(BaseLfo) {
    * When called, the slicing of the given `audioBuffer` starts immediately and
    * each resulting frame is propagated in graph.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
-   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
    * @see {@link module:client.source.AudioInBuffer#stop}
    */
   start() {
@@ -112,7 +112,7 @@ class AudioInBuffer extends SourceMixin(BaseLfo) {
    * Finalize the stream and stop the whole graph. When called, the slicing of
    * the `audioBuffer` stops immediately.
    *
-   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:client.source.AudioInBuffer#start}
    */
   stop() {

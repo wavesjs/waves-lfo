@@ -1,9 +1,9 @@
 import * as Benchmark from 'benchmark';
 import * as lfo from 'waves-lfo/common';
-import * as Meyda from 'meyda/dist/node/main';
+import * as Meyda from 'meyda';
 
 
-export function getRmsSuites(buffer, bufferLength, sampleRate, log) {
+export function getFftSuites(buffer, bufferLength, sampleRate, log) {
 
   const suites = [256, 1024, 4096].map((frameSize) => {
 
@@ -11,20 +11,25 @@ export function getRmsSuites(buffer, bufferLength, sampleRate, log) {
       const numFrames = Math.floor(bufferLength / frameSize);
       const suite = new Benchmark.Suite();
 
-      const rms = new lfo.operator.Rms();
-      rms.initStream({
+      const fft = new lfo.operator.Fft({
+        window: 'hamming',
+        mode: 'magnitude',
+        size: frameSize,
+      });
+
+      fft.initStream({
         frameSize: frameSize,
         frameType: 'signal',
         sourceSampleRate: sampleRate,
       });
 
-      suite.add(`lfo:rms - frameSize: ${frameSize}`, {
+      suite.add(`lfo:fft\t\tframeSize: ${frameSize}\t`, {
         fn: function() {
           for (let i = 0; i < numFrames; i++) {
             const start = i * frameSize;
             const end = start + frameSize;
             const frame = buffer.subarray(start, end);
-            const res = rms.inputSignal(frame);
+            const res = fft.inputSignal(frame);
           }
         },
       });
@@ -32,13 +37,13 @@ export function getRmsSuites(buffer, bufferLength, sampleRate, log) {
       Meyda.bufferSize = frameSize;
       Meyda.sampleRate = sampleRate;
 
-      suite.add(`meyda:rms - frameSize: ${frameSize}`, {
+      suite.add(`meyda:fft\tframeSize: ${frameSize}\t`, {
         fn: function() {
           for (let i = 0; i < numFrames; i++) {
             const start = i * frameSize;
             const end = start + frameSize;
             const frame = buffer.subarray(start, end);
-            const res = Meyda.extract('rms', frame);
+            const res = Meyda.extract('amplitudeSpectrum', frame);
           }
         },
       });
@@ -48,12 +53,13 @@ export function getRmsSuites(buffer, bufferLength, sampleRate, log) {
       });
 
       suite.on('complete', function() {
-        log.push('==> Fastest is ' + this.filter('fastest').map('name'));
+        log.push('==> Fastest is ' + this.filter('fastest').map('name') + '\n');
         next();
       });
 
       suite.run({ async: false });
     }
+
   });
 
   return suites;

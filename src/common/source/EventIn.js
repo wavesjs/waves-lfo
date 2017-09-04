@@ -23,13 +23,7 @@ function getTimeFunction(audioContext = null) {
       return t[0] + t[1] * 1e-9;
     }
   } else {
-    // @todo - replace with `performance.now`
-    if (audioContext === null || (!audioContext instanceof AudioContext)) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioContext = new AudioContext();
-    }
-
-    return () => audioContext.currentTime;
+    return () => performance.now() / 1000;
   }
 }
 
@@ -145,8 +139,8 @@ class EventIn extends SourceMixin(BaseLfo) {
    * the graph. Any call to `process` or `processFrame` before `start` will be
    * ignored.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
-   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
    * @see {@link module:common.source.EventIn#stop}
    */
   start(startTime = null) {
@@ -154,8 +148,7 @@ class EventIn extends SourceMixin(BaseLfo) {
       if (this.initPromise === null) // init has not yet been called
         this.initPromise = this.init();
 
-      this.initPromise.then(() => this.start(startTime));
-      return;
+      return this.initPromise.then(() => this.start(startTime));
     }
 
     this._startTime = startTime;
@@ -168,7 +161,7 @@ class EventIn extends SourceMixin(BaseLfo) {
    * Finalize the stream and stop the whole graph. Any call to `process` or
    * `processFrame` after `stop` will be ignored.
    *
-   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:common.source.EventIn#start}
    */
   stop() {
@@ -188,6 +181,7 @@ class EventIn extends SourceMixin(BaseLfo) {
     const sampleRate = this.params.get('sampleRate');
     const frameRate = this.params.get('frameRate');
     const description = this.params.get('description');
+
     // init operator's stream params
     this.streamParams.frameSize = frameType === 'scalar' ? 1 : frameSize;
     this.streamParams.frameType = frameType;
@@ -203,7 +197,7 @@ class EventIn extends SourceMixin(BaseLfo) {
 
     } else if (frameType === 'vector' || frameType === 'scalar') {
       if (frameRate === null)
-        throw new Error('Undefined "frameRate" for "vector" stream');
+        throw new Error(`Undefined "frameRate" for "${frameType}" stream`);
 
       this.streamParams.frameRate = frameRate;
       this.streamParams.sourceSampleRate = frameRate;

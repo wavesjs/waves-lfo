@@ -248,8 +248,11 @@ class BaseDisplay extends BaseLfo {
     this.currentTime = null;
     super.finalizeStream(endTime);
 
-    cancelAnimationFrame(this._rafId);
     this._rafId = null;
+
+    // clear the stack if not empty
+    if (this._stack.length > 0)
+      this.renderStack();
   }
 
   /**
@@ -273,7 +276,7 @@ class BaseDisplay extends BaseLfo {
     });
 
     if (this._rafId === null)
-      this._rafId = requestAnimationFrame(this.renderStack);
+      this._rafId = window.requestAnimationFrame(this.renderStack);
   }
 
   /**
@@ -294,9 +297,8 @@ class BaseDisplay extends BaseLfo {
       }
     }
 
-    // reinit stack for next call
-    this._stack.length = 0;
-    this._rafId = requestAnimationFrame(this.renderStack);
+    this._stack.length = 0; // reinit stack for next call
+    this._rafId = null;
   }
 
   /**

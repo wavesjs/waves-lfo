@@ -87,8 +87,8 @@ class AudioInNode extends SourceMixin(BaseLfo) {
    * Propagate the `streamParams` in the graph and start to propagate signal
    * blocks produced by the audio node into the graph.
    *
-   * @see {@link module:common.core.BaseLfo#processStreamParams}
-   * @see {@link module:common.core.BaseLfo#resetStream}
+   * @see {@link module:core.BaseLfo#processStreamParams}
+   * @see {@link module:core.BaseLfo#resetStream}
    * @see {@link module:client.source.AudioInNode#stop}
    */
   start() {
@@ -116,7 +116,7 @@ class AudioInNode extends SourceMixin(BaseLfo) {
   /**
    * Finalize the stream and stop the whole graph.
    *
-   * @see {@link module:common.core.BaseLfo#finalizeStream}
+   * @see {@link module:core.BaseLfo#finalizeStream}
    * @see {@link module:client.source.AudioInNode#start}
    */
   stop() {
