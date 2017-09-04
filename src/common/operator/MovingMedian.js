@@ -6,14 +6,14 @@ const definitions = {
     min: 1,
     max: 1e9,
     default: 9,
-    metas: { kind: 'dynamic' },
+    metas: { kind: 'static' },
   },
   fill: {
     type: 'float',
     min: -Infinity,
     max: +Infinity,
     default: 0,
-    metas: { kind: 'dynamic' },
+    metas: { kind: 'static' },
   },
 };
 
