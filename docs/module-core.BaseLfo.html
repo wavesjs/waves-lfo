@@ -210,6 +210,664 @@ especially important for modules that rely on asynchronous underlying APIs.</p>
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="frame"><span class="type-signature"></span>frame<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Current frame. This object and its data are updated at each incomming
+frame without reallocating memory.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>time</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Time of the current frame.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Float32Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Data of the current frame.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>metadata</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Metadata associted to the current frame.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_BaseLfo.js.html">core/BaseLfo.js</a>, <a href="core_BaseLfo.js.html#line138">line 138</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="nextModules"><span class="type-signature"></span>nextModules<span class="type-signature"> :Array.&lt;BaseLfo></span></h4>
+
+
+
+
+<div class="description">
+    <p>List of nodes connected to the ouput of the node (lower in the graph).
+At each frame, the node forward its <code>frame</code> to to all its <code>nextModules</code>.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;BaseLfo></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_BaseLfo.js.html">core/BaseLfo.js</a>, <a href="core_BaseLfo.js.html#line156">line 156</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-core.BaseLfo.html#connect">module:core.BaseLfo#connect</a></li>
+        
+            <li><a href="module-core.BaseLfo.html#disconnect">module:core.BaseLfo#disconnect</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="params"><span class="type-signature"></span>params<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Parameter bag containing parameter instances.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_BaseLfo.js.html">core/BaseLfo.js</a>, <a href="core_BaseLfo.js.html#line96">line 96</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="prevModule"><span class="type-signature"></span>prevModule<span class="type-signature"> :BaseLfo</span></h4>
+
+
+
+
+<div class="description">
+    <p>The node from which the node receive the frames (upper in the graph).</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">BaseLfo</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_BaseLfo.js.html">core/BaseLfo.js</a>, <a href="core_BaseLfo.js.html#line169">line 169</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-core.BaseLfo.html#connect">module:core.BaseLfo#connect</a></li>
+        
+            <li><a href="module-core.BaseLfo.html#disconnect">module:core.BaseLfo#disconnect</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="streamParams"><span class="type-signature"></span>streamParams<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Description of the stream output of the node.
+Set to <code>null</code> when the node is destroyed.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>frameSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Frame size at the output of the node.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>frameRate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Frame rate at the output of the node.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>frameType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Frame type at the output of the node,
+ possible values are <code>signal</code>, <code>vector</code> or <code>scalar</code>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>If type is <code>vector</code>, describe
+ the dimension(s) of output stream.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sourceSampleRate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Sample rate of the source of the
+ graph. <em>The value should be defined by sources and never modified</em>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sourceSampleCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Number of consecutive discrete
+ time values contained in the data frame output by the source.
+ <em>The value should be defined by sources and never modified</em>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core_BaseLfo.js.html">core/BaseLfo.js</a>, <a href="core_BaseLfo.js.html#line108">line 108</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -331,9 +989,9 @@ to each of them.</p>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#processFrame</li>
+            <li><a href="module-core.BaseLfo.html#processFrame">module:core.BaseLfo#processFrame</a></li>
         
-            <li>module:common.core.BaseLfo#disconnect</li>
+            <li><a href="module-core.BaseLfo.html#disconnect">module:core.BaseLfo#disconnect</a></li>
         </ul>
     </dd>
     
@@ -424,7 +1082,7 @@ operator is then considered as <code>dead</code> and cannot be reconnected.</p>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#connect</li>
+            <li><a href="module-core.BaseLfo.html#connect">module:core.BaseLfo#connect</a></li>
         </ul>
     </dd>
     
@@ -1075,9 +1733,9 @@ resolve only when its dependecy is ready.</p>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#processStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#processStreamParams">module:core.BaseLfo#processStreamParams</a></li>
         
-            <li>module:common.core.BaseLfo#resetStream</li>
+            <li><a href="module-core.BaseLfo.html#resetStream">module:core.BaseLfo#resetStream</a></li>
         </ul>
     </dd>
     
@@ -1345,7 +2003,7 @@ extended to handle particular logic bound to a specific parameter.</p>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#processFrame</li>
+            <li><a href="module-core.BaseLfo.html#processFrame">module:core.BaseLfo#processFrame</a></li>
         </ul>
     </dd>
     
@@ -1493,9 +2151,9 @@ following by order of preference: <code>processScalar</code>, <code>processVecto
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#processStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#processStreamParams">module:core.BaseLfo#processStreamParams</a></li>
         
-            <li>module:common.core.BaseLfo#propagateStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#propagateStreamParams">module:core.BaseLfo#propagateStreamParams</a></li>
         </ul>
     </dd>
     
@@ -1637,11 +2295,11 @@ of the following method <code>processVector</code>, <code>processSignal</code> o
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#prepareFrame</li>
+            <li><a href="module-core.BaseLfo.html#prepareFrame">module:core.BaseLfo#prepareFrame</a></li>
         
-            <li>module:common.core.BaseLfo#propagateFrame</li>
+            <li><a href="module-core.BaseLfo.html#propagateFrame">module:core.BaseLfo#propagateFrame</a></li>
         
-            <li>module:common.core.BaseLfo#processStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#processStreamParams">module:core.BaseLfo#processStreamParams</a></li>
         </ul>
     </dd>
     
@@ -1732,9 +2390,9 @@ frame type of the previous operator. Is dynamically assigned in
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#prepareStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#prepareStreamParams">module:core.BaseLfo#prepareStreamParams</a></li>
         
-            <li>module:common.core.BaseLfo#processFrame</li>
+            <li><a href="module-core.BaseLfo.html#processFrame">module:core.BaseLfo#processFrame</a></li>
         </ul>
     </dd>
     
@@ -1882,9 +2540,9 @@ operators in the graph.</li>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#prepareStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#prepareStreamParams">module:core.BaseLfo#prepareStreamParams</a></li>
         
-            <li>module:common.core.BaseLfo#propagateStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#propagateStreamParams">module:core.BaseLfo#propagateStreamParams</a></li>
         </ul>
     </dd>
     
@@ -1974,7 +2632,7 @@ operators in the graph.</li>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#processFrame</li>
+            <li><a href="module-core.BaseLfo.html#processFrame">module:core.BaseLfo#processFrame</a></li>
         </ul>
     </dd>
     
@@ -2065,9 +2723,9 @@ to all its next operators, must be called at the end of any
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#processStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#processStreamParams">module:core.BaseLfo#processStreamParams</a></li>
         
-            <li>module:common.core.BaseLfo#prepareStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#prepareStreamParams">module:core.BaseLfo#prepareStreamParams</a></li>
         </ul>
     </dd>
     
@@ -2156,7 +2814,7 @@ to all its next operators, must be called at the end of any
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li><a href="module-common.core.BaseLfo.html#streamParams">module:common.core.BaseLfo#streamParams</a></li>
+            <li><a href="module-core.BaseLfo.html#streamParams">module:core.BaseLfo#streamParams</a></li>
         </ul>
     </dd>
     
@@ -2247,7 +2905,7 @@ started, each of these method propagate through the graph automaticaly.</p>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li>module:common.core.BaseLfo#processStreamParams</li>
+            <li><a href="module-core.BaseLfo.html#processStreamParams">module:core.BaseLfo#processStreamParams</a></li>
         </ul>
     </dd>
     
@@ -2293,7 +2951,7 @@ started, each of these method propagate through the graph automaticaly.</p>
 
 <footer>
     
-        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri Jul 07 2017 11:41:41 GMT+0200 (CEST)
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Tue Sep 05 2017 14:32:15 GMT+0200 (CEST)
     
 </footer>
 
