@@ -45,7 +45,6 @@
 
       "src/node/sink/DataToFile.js",
       "src/node/sink/SocketSend.js",
-
       "src/node/source/SocketReceive.js"
     ]
   },
