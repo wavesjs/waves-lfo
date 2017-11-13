@@ -80,7 +80,7 @@ class MovingMedian extends BaseLfo {
   /** @private */
   _ensureOddOrder() {
     if (this.params.get('order') % 2 === 0)
-      throw new Error(`Invalid value ${order} for param "order" - should be odd`);
+      throw new Error(`Invalid value ${order} for param "order" - must be odd`);
   }
 
   /** @private */
