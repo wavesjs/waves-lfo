@@ -89,6 +89,12 @@ class BpfDisplay extends BaseDisplay {
     return this.params.get('radius');
   }
 
+  resetStream() {
+    super.resetStream();
+
+    this.prevFrame = null;
+  }
+
   /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
