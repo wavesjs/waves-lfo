@@ -120,6 +120,7 @@ class BaseDisplay extends BaseLfo {
     this.cachedCanvas = document.createElement('canvas');
     this.cachedCtx = this.cachedCanvas.getContext('2d');
 
+    this.hasDuration = hasDuration;
     this.previousFrame = null;
     this.currentTime = hasDuration ? this.params.get('referenceTime') : null;
 
@@ -239,6 +240,9 @@ class BaseDisplay extends BaseLfo {
     const width = this.canvasWidth;
     const height = this.canvasHeight;
 
+    this.previousFrame = null;
+    this.currentTime = this.hasDuration ? this.params.get('referenceTime') : null;
+
     this.ctx.clearRect(0, 0, width, height);
     this.cachedCtx.clearRect(0, 0, width, height);
   }
@@ -355,8 +359,8 @@ class BaseDisplay extends BaseLfo {
     }
 
     // width of the frame in pixels
-    const fFrameWidth = (frameDuration / canvasDuration) * canvasWidth;
-    const frameWidth = Math.floor(fFrameWidth + 0.5);
+    const floatFrameWidth = (frameDuration / canvasDuration) * canvasWidth;
+    const frameWidth = Math.floor(floatFrameWidth + 0.5);
 
     // define position of the head in the canvas
     const canvasStartTime = this.currentTime - canvasDuration;
