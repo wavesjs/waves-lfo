@@ -234,10 +234,7 @@ class BaseLfo {
    * @see {@link module:core.BaseLfo#disconnect}
    */
   connect(next) {
-    if (!(next instanceof BaseLfo))
-      throw new Error('Invalid connection: child node is not an instance of `BaseLfo`');
-
-    if (this.streamParams === null ||next.streamParams === null)
+    if (this.streamParams === null || next.streamParams === null)
       throw new Error('Invalid connection: cannot connect a dead node');
 
     if (this.streamParams.frameType !== null) { // graph has already been started
