@@ -32,17 +32,36 @@ tape('MovingAverage', (t) => {
   t.deepLooseEqual(node.ringBuffer, expected, `should define ring buffer size according to order and frameSize filled with given default`);
 
 
-  t.comment('scalar input');
+  t.comment('#inputScalar');
 
-  const sAvg = new MovingAverage({ order: 5, fill: 0 });
-  sAvg.processStreamParams({ frameSize: 1 });
-  sAvg.resetStream();
+  const isAvg = new MovingAverage({ order: 5, fill: 0 });
+  isAvg.processStreamParams({ frameSize: 1 });
+  isAvg.resetStream();
 
   values = [1, 1, 1, 1, 1];
   expected = [1/5, 2/5, 3/5, 4/5, 1];
 
   for (let i = 0; i < values.length; i++) {
-    const avg = sAvg.inputScalar(values[i]);
+    const avg = isAvg.inputScalar(values[i]);
+    t.deepEqual(avg, expected[i], 'should output a proper mean');
+  }
+
+  t.comment('#processScalar');
+
+  const psAvg = new MovingAverage({ order: 5, fill: 0 });
+  psAvg.processStreamParams({ frameSize: 1 });
+  psAvg.resetStream();
+
+  values = [1, 1, 1, 1, 1];
+  expected = [1/5, 2/5, 3/5, 4/5, 1];
+
+  for (let i = 0; i < values.length; i++) {
+    // create a frame as if comming from a previous node
+    const frame = { data: [values[i]] };
+    psAvg.processScalar(frame);
+    // avoid floating point errors
+    const avg = parseFloat(psAvg.frame.data[0].toFixed(6));
+
     t.deepEqual(avg, expected[i], 'should output a proper mean');
   }
 

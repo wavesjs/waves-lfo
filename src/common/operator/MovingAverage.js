@@ -134,7 +134,7 @@ class MovingAverage extends BaseLfo {
   }
 
   /** @private */
-  processScalar(value) {
+  processScalar(frame) {
     this.frame.data[0] = this.inputScalar(frame.data[0]);
   }
 
