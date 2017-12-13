@@ -28,6 +28,9 @@ export const getColors = function(type, nbr) {
     case 'trace':
       return colors[1]; // orange
       break;
+    case 'bar-chart':
+      return colors;
+      break;
   }
 };
 
