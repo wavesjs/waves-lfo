@@ -1,0 +1,20 @@
+html {
+  font-size: 62.5%;
+  font-family: arial;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin: 0 0 20px 0;
+  color: rgba(0, 0, 0, 0.4);
+  font-family: "Courier New", Courier, monospace;
+}
+
+canvas {
+  outline: 1px solid #cdcdcd;
+}

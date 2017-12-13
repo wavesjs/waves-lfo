@@ -6,6 +6,7 @@ import SignalRecorder from '../../common/sink/SignalRecorder';
 
 // client only
 import BaseDisplay from './BaseDisplay';
+import BarChartDisplay from './BarChartDisplay';
 import BpfDisplay from './BpfDisplay';
 import MarkerDisplay from './MarkerDisplay';
 import SignalDisplay from './SignalDisplay';
@@ -22,6 +23,7 @@ export default {
   SignalRecorder,
 
   BaseDisplay,
+  BarChartDisplay,
   BpfDisplay,
   MarkerDisplay,
   SignalDisplay,
