@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lfo (Low Frequency Operators) - Class: SignalDisplay</title>
+    <title>lfo (Low Frequency Operators) - Class: Scale</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,7 +20,7 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Class: SignalDisplay</h1>
+    <h1 class="page-title">Class: Scale</h1>
     
 
     
@@ -32,9 +32,9 @@
 
 <header>
     
-        <h2>SignalDisplay</h2>
+        <h2>Scale</h2>
         
-            <div class="class-description"><p>Display a stream of type <code>signal</code> on a canvas.</p></div>
+            <div class="class-description"><p>Apply a linear scale on the incomming stream. The output is not clipped.</p></div>
         
     
 </header>
@@ -48,7 +48,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="SignalDisplay"><span class="type-signature"></span>new SignalDisplay<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Scale"><span class="type-signature"></span>new Scale<span class="signature">(options)</span><span class="type-signature"></span></h4>
 
     
 
@@ -103,7 +103,7 @@
 
             
 
-            <td class="description last"><p>Override default parameters.</p>
+            <td class="description last"><p>Override default options</p>
                 <h6>Properties</h6>
                 
 
@@ -133,46 +133,7 @@
 
         <tr>
             
-                <td class="name"><code>color</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    '#00e600'
-                
-                </td>
-            
-
-            <td class="description last"><p>Color of the signal.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>min</code></td>
+                <td class="name"><code>inputMin</code></td>
             
 
             <td class="type">
@@ -199,20 +160,19 @@
             
                 <td class="default">
                 
-                    -1
+                    0
                 
                 </td>
             
 
-            <td class="description last"><p>Minimum value represented in the canvas.
- <em>dynamic parameter</em></p></td>
+            <td class="description last"><p>Input Minimum</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>max</code></td>
+                <td class="name"><code>inputMax</code></td>
             
 
             <td class="type">
@@ -244,15 +204,14 @@
                 </td>
             
 
-            <td class="description last"><p>Maximum value represented in the canvas.
- <em>dynamic parameter</em></p></td>
+            <td class="description last"><p>Input Maximum</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>width</code></td>
+                <td class="name"><code>outputMin</code></td>
             
 
             <td class="type">
@@ -279,146 +238,19 @@
             
                 <td class="default">
                 
-                    300
+                    0
                 
                 </td>
             
 
-            <td class="description last"><p>Width of the canvas.
- <em>dynamic parameter</em></p></td>
+            <td class="description last"><p>Output Minimum</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    150
-                
-                </td>
-            
-
-            <td class="description last"><p>Height of the canvas.
- <em>dynamic parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>container</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Element</span>
-|
-
-<span class="param-type">CSSSelector</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p>Container element
- in which to insert the canvas. <em>constant parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>canvas</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Element</span>
-|
-
-<span class="param-type">CSSSelector</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p>Canvas element
- in which to draw. <em>constant parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>duration</code></td>
+                <td class="name"><code>outputMax</code></td>
             
 
             <td class="type">
@@ -450,51 +282,7 @@
                 </td>
             
 
-            <td class="description last"><p>Duration (in seconds) represented in
- the canvas. This parameter only exists for operators that display several
- consecutive frames on the canvas. <em>dynamic parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>referenceTime</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p>Optionnal reference time the
- display should considerer as the origin. Is only usefull when synchronizing
- several display using the <code>DisplaySync</code> class. This parameter only exists
- for operators that display several consecutive frames on the canvas.</p></td>
+            <td class="description last"><p>Output Maximum</p></td>
         </tr>
 
     
@@ -542,7 +330,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client_sink_SignalDisplay.js.html">client/sink/SignalDisplay.js</a>, <a href="client_sink_SignalDisplay.js.html#line80">line 80</a>
+        <a href="common_operator_Scale.js.html">common/operator/Scale.js</a>, <a href="common_operator_Scale.js.html#line61">line 61</a>
     </li></ul></dd>
     
 
@@ -550,6 +338,13 @@
 
     
 
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>- implement log and exp scale</li>
+        </ul>
+    </dd>
     
 </dl>
 
@@ -565,27 +360,6 @@
 
 
 
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const eventIn = new lfo.source.EventIn({
-  frameType: 'signal',
-  sampleRate: 8,
-  frameSize: 4,
-});
-
-const signalDisplay = new lfo.sink.SignalDisplay({
-  canvas: '#signal-canvas',
-});
-
-eventIn.connect(signalDisplay);
-eventIn.start();
-
-// push triangle signal in the graph
-eventIn.process(0, [0, 0.5, 1, 0.5]);
-eventIn.process(0.5, [0, -0.5, -1, -0.5]);
-// ...</code></pre>
 
 
 

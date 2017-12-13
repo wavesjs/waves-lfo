@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lfo (Low Frequency Operators) - Source: node/sink/DataToFile.js</title>
+    <title>lfo (Low Frequency Operators) - Class: Power</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,188 +20,202 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Source: node/sink/DataToFile.js</h1>
+    <h1 class="page-title">Class: Power</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>import BaseLfo from '../../core/BaseLfo';
-import fse from 'fs-extra';
-import fs from 'fs';
-import util from 'util';
+        <h2>Power</h2>
+        
+            <div class="class-description"><p>Apply an exponant power to the stream.</p></div>
+        
+    
+</header>
 
-const definitions = {
-  filename: {
-    type: 'string',
-    default: null,
-    constant: true,
-  },
-  format: {
-    type: 'enum',
-    default: 'txt',
-    list: ['txt', 'json', 'csv'],
-  },
-  // header: {
-  //   type: 'boolean',
-  //   default: false,
-  // },
-};
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="Power"><span class="type-signature"></span>new Power<span class="signature">(options, exponent)</span><span class="type-signature"></span></h4>
+
+    
 
 
-/**
- * Record input frames into a file.
- *
- * @param {Object} options - Override default parameters.
- * @param {String} [options.filename=null] - Path of the output file.
- * @param {String} [options.format='txt'] - Format in which the data should
- *  be stored. Available options: 'txt', 'json' or 'csv'.
- *
- * @memberof module:node.sink
- *
- * @todo - add an option to store the `streamParams`
- *
- * @example
- * import path from 'path';
- * import EventIn from '../src/common/source/EventIn';
- * import Logger from '../src/common/sink/Logger';
- * import DataToFile from '../src/node/sink/DataToFile';
- *
- * const eventIn = new EventIn({
- *   frameSize: 2,
- *   frameRate: 1,
- *   frameType: 'vector',
- * });
- *
- * const dataToFile = new DataToFile({
- *   filename: path.join(__dirname, './node_sink.DataToFile.test.json'),
- *   format: 'json',
- * });
- *
- * const logger = new Logger({
- *   data: true,
- * });
- *
- * eventIn.connect(logger);
- * eventIn.connect(dataToFile);
- * eventIn.start();
- *
- * let time = 0;
- * const period = 1;
- *
- * (function loop(){
- *   const data = [Math.random(), Math.random()];
- *   eventIn.process(time, data);
- *
- *   time += period;
- *
- *   if (time &lt; 20)
- *     setTimeout(loop, 300);
- *   else
- *     eventIn.stop();
- * }());
- */
-class DataToFile extends BaseLfo {
-  constructor(options = {}) {
-    super(definitions, options);
 
-    this.firstRow = true;
-  }
 
-  /** @private */
-  processStreamParams(prevStreamParams) {
-    this.prepareStreamParams(prevStreamParams);
 
-    const filename = this.params.get('filename');
-    this.file = fs.createWriteStream(filename);
 
-    const format = this.params.get('format');
 
-    switch (format) {
-      case 'txt':
-        break;
-      case 'json':
-        this.file.write('[\n');
-        break;
-      case 'csv':
-        const { description, frameSize } = this.streamParams;
 
-        let header = 'time';
 
-        if (description !== null &amp;&amp; description.length) {
-          header += ',' + description.join(',');
-        } else {
-          for (let i = 0; i &lt; frameSize; i++)
-            header += ',row-' + i;
-        }
 
-        header += '\n';
 
-        this.file.write(header);
-        break;
-    }
-  }
+    <h5>Parameters:</h5>
+    
 
-  /** @private */
-  finalizeStream(endTime) {
-    const format = this.params.get('format');
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
-    switch (format) {
-      case 'txt':
-        break;
-      case 'json':
-        this.file.write('\n]');
-        break;
-      case 'csv':
-        // this.file.write(endTime.toString());
-        break;
-    }
-  }
+        <th>Type</th>
 
-  // process any kind of stream
-  /** @private */
-  processSignal() {}
-  /** @private */
-  processVector() {}
-  /** @private */
-  processScalar() {}
+        
 
-  /** @private */
-  processFrame(frame) {
-    const format = this.params.get('format');
-    let str;
+        
 
-    switch (format) {
-      case 'txt':
-        str = util.format('%s\n', frame.data);
-        break;
-      case 'json':
-        frame.data = Array.from(frame.data);
-        str = JSON.stringify(frame);
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-        if (!this.firstRow)
-          str = ',\n' + str;
+    <tbody>
+    
 
-        this.firstRow = false;
-        break;
-      case 'csv':
-        str = frame.time + ',';
-        str += util.format('%s\n', frame.data);
-        break;
-    }
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
 
-    this.file.write(str);
-  }
-}
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
 
-export default DataToFile;
-</code></pre>
-        </article>
-    </section>
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Override default parameters</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>exponent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Exponent</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_operator_Power.js.html">common/operator/Power.js</a>, <a href="common_operator_Power.js.html#line16">line 16</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lfo (Low Frequency Operators) - Class: SignalDisplay</title>
+    <title>lfo (Low Frequency Operators) - Class: Delta</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,7 +20,7 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Class: SignalDisplay</h1>
+    <h1 class="page-title">Class: Delta</h1>
     
 
     
@@ -32,9 +32,12 @@
 
 <header>
     
-        <h2>SignalDisplay</h2>
+        <h2>Delta</h2>
         
-            <div class="class-description"><p>Display a stream of type <code>signal</code> on a canvas.</p></div>
+            <div class="class-description"><p>Returns the simple derivative of successive value using
+simple linear regression.
+The current implementation assumes a fixed <code>frameRate</code> (<code>frame.time</code> is ignored)</p>
+<p>Before the module is filled, it outputs a value of 0.</p></div>
         
     
 </header>
@@ -48,7 +51,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="SignalDisplay"><span class="type-signature"></span>new SignalDisplay<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Delta"><span class="type-signature"></span>new Delta<span class="signature">(options)</span><span class="type-signature"></span></h4>
 
     
 
@@ -103,7 +106,7 @@
 
             
 
-            <td class="description last"><p>Override default parameters.</p>
+            <td class="description last"><p>Override default parameters</p>
                 <h6>Properties</h6>
                 
 
@@ -133,46 +136,7 @@
 
         <tr>
             
-                <td class="name"><code>color</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    '#00e600'
-                
-                </td>
-            
-
-            <td class="description last"><p>Color of the signal.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>min</code></td>
+                <td class="name"><code>size</code></td>
             
 
             <td class="type">
@@ -199,267 +163,19 @@
             
                 <td class="default">
                 
-                    -1
+                    3
                 
                 </td>
             
 
-            <td class="description last"><p>Minimum value represented in the canvas.
- <em>dynamic parameter</em></p></td>
+            <td class="description last"><p>Size of the window</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>max</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    1
-                
-                </td>
-            
-
-            <td class="description last"><p>Maximum value represented in the canvas.
- <em>dynamic parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    300
-                
-                </td>
-            
-
-            <td class="description last"><p>Width of the canvas.
- <em>dynamic parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    150
-                
-                </td>
-            
-
-            <td class="description last"><p>Height of the canvas.
- <em>dynamic parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>container</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Element</span>
-|
-
-<span class="param-type">CSSSelector</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p>Container element
- in which to insert the canvas. <em>constant parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>canvas</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Element</span>
-|
-
-<span class="param-type">CSSSelector</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p>Canvas element
- in which to draw. <em>constant parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>duration</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    1
-                
-                </td>
-            
-
-            <td class="description last"><p>Duration (in seconds) represented in
- the canvas. This parameter only exists for operators that display several
- consecutive frames on the canvas. <em>dynamic parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>referenceTime</code></td>
+                <td class="name"><code>useFrameRate</code></td>
             
 
             <td class="type">
@@ -491,10 +207,8 @@
                 </td>
             
 
-            <td class="description last"><p>Optionnal reference time the
- display should considerer as the origin. Is only usefull when synchronizing
- several display using the <code>DisplaySync</code> class. This parameter only exists
- for operators that display several consecutive frames on the canvas.</p></td>
+            <td class="description last"><p>Override stream frame rate for
+ the regression</p></td>
         </tr>
 
     
@@ -542,7 +256,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client_sink_SignalDisplay.js.html">client/sink/SignalDisplay.js</a>, <a href="client_sink_SignalDisplay.js.html#line80">line 80</a>
+        <a href="common_operator_Delta.js.html">common/operator/Delta.js</a>, <a href="common_operator_Delta.js.html#line99">line 99</a>
     </li></ul></dd>
     
 
@@ -567,27 +281,6 @@
 
 
 
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const eventIn = new lfo.source.EventIn({
-  frameType: 'signal',
-  sampleRate: 8,
-  frameSize: 4,
-});
-
-const signalDisplay = new lfo.sink.SignalDisplay({
-  canvas: '#signal-canvas',
-});
-
-eventIn.connect(signalDisplay);
-eventIn.start();
-
-// push triangle signal in the graph
-eventIn.process(0, [0, 0.5, 1, 0.5]);
-eventIn.process(0.5, [0, -0.5, -1, -0.5]);
-// ...</code></pre>
-
-
 
     
     </div>
@@ -604,6 +297,92 @@ eventIn.process(0.5, [0, -0.5, -1, -0.5]);
 
     
 
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="inputVector"><span class="type-signature"></span>inputVector<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Assume a stream of vector at a fixed <code>frameRate</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_operator_Delta.js.html">common/operator/Delta.js</a>, <a href="common_operator_Delta.js.html#line148">line 148</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 
     

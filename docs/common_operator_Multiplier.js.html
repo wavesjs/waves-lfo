@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lfo (Low Frequency Operators) - Source: node/sink/DataToFile.js</title>
+    <title>lfo (Low Frequency Operators) - Source: common/operator/Multiplier.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,7 +20,7 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Source: node/sink/DataToFile.js</h1>
+    <h1 class="page-title">Source: common/operator/Multiplier.js</h1>
     
 
     
@@ -31,174 +31,114 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>import BaseLfo from '../../core/BaseLfo';
-import fse from 'fs-extra';
-import fs from 'fs';
-import util from 'util';
 
 const definitions = {
-  filename: {
-    type: 'string',
-    default: null,
-    constant: true,
-  },
-  format: {
-    type: 'enum',
-    default: 'txt',
-    list: ['txt', 'json', 'csv'],
-  },
-  // header: {
-  //   type: 'boolean',
-  //   default: false,
-  // },
+  // float or array
+  factor: {
+    type: 'any',
+    default: 1,
+  }
 };
 
-
 /**
- * Record input frames into a file.
+ * Multiply a given signal or vector by a given factor. On vector
+ * streams, `factor` can be an array of values to apply on each dimension of the
+ * vector frames.
  *
- * @param {Object} options - Override default parameters.
- * @param {String} [options.filename=null] - Path of the output file.
- * @param {String} [options.format='txt'] - Format in which the data should
- *  be stored. Available options: 'txt', 'json' or 'csv'.
+ * _support `standalone` usage_
  *
- * @memberof module:node.sink
+ * @param {Object} options - override default values
+ * @param {Number|Array} [options.factor=1] - factor or array of factor to
+ *  apply on the incomming frame. Setting an array is only defined in case of
+ *  a vector stream.
  *
- * @todo - add an option to store the `streamParams`
+ * @memberof module:common.operator
  *
  * @example
- * import path from 'path';
- * import EventIn from '../src/common/source/EventIn';
- * import Logger from '../src/common/sink/Logger';
- * import DataToFile from '../src/node/sink/DataToFile';
+ * import * as lfo from 'waves-lfo/common';
  *
- * const eventIn = new EventIn({
+ * const eventIn = new lfo.operator.EventIn({
+ *   type: 'vector',
  *   frameSize: 2,
- *   frameRate: 1,
- *   frameType: 'vector',
+ *   frameRate: 0,
  * });
+ * const scaler = new lfo.operator.Multiplier({ factor: 0.1 });
  *
- * const dataToFile = new DataToFile({
- *   filename: path.join(__dirname, './node_sink.DataToFile.test.json'),
- *   format: 'json',
- * });
+ * eventIn.connect(scaler);
  *
- * const logger = new Logger({
- *   data: true,
- * });
- *
- * eventIn.connect(logger);
- * eventIn.connect(dataToFile);
- * eventIn.start();
- *
- * let time = 0;
- * const period = 1;
- *
- * (function loop(){
- *   const data = [Math.random(), Math.random()];
- *   eventIn.process(time, data);
- *
- *   time += period;
- *
- *   if (time &lt; 20)
- *     setTimeout(loop, 300);
- *   else
- *     eventIn.stop();
- * }());
+ * eventIn.process(null, [2, 3]);
+ * > [0.2, 0.3]
  */
-class DataToFile extends BaseLfo {
-  constructor(options = {}) {
+class Multiplier extends BaseLfo {
+  constructor(options) {
     super(definitions, options);
+  }
 
-    this.firstRow = true;
+  /**
+   * Use the `Multiplier` operator in standalone mode.
+   *
+   * @param {Float32Array|Array} data - Input vector
+   * @return {Array} - Scaled values
+   *
+   * @example
+   * const scaler = new Multiplier({ factor: [2, 4] });
+   * scaler.initStream({ frameType: 'vector', frameSize: 2 });
+   *
+   * scaler.inputVector([3, 2]);
+   * > [6, 8]
+   */
+  inputVector(data) {
+    const output = this.frame.data;
+    const frameSize = this.streamParams.frameSize;
+    const factor = this.params.get('factor');
+
+    if (Array.isArray(factor)) {
+      for (let i = 0; i &lt; frameSize; i++)
+        output[i] = data[i] * factor[i];
+    } else {
+      for (let i = 0; i &lt; frameSize; i++)
+        output[i] = data[i] * factor;
+    }
+
+    return output;
   }
 
   /** @private */
-  processStreamParams(prevStreamParams) {
-    this.prepareStreamParams(prevStreamParams);
+  processVector(frame) {
+    this.frame.data = this.inputVector(frame.data);
+  }
 
-    const filename = this.params.get('filename');
-    this.file = fs.createWriteStream(filename);
+  /**
+   * Use the `Multiplier` operator in standalone mode.
+   *
+   * @param {Float32Array|Array} data - Input signal.
+   * @return {Array} - Scaled signal.
+   *
+   * @example
+   * const scaler = new Multiplier({ factor: 0.1 });
+   * scaler.initStream({ frameType: 'signal', frameSize: 2 });
+   *
+   * scaler.inputVector([1, 2]);
+   * > [0.1, 0.2]
+   */
+  inputSignal(data) {
+    const output = this.frame.data;
+    const frameSize = this.streamParams.frameSize;
+    const factor = this.params.get('factor');
 
-    const format = this.params.get('format');
+    for (let i = 0; i &lt; frameSize; i++)
+      output[i] = data[i] * factor;
 
-    switch (format) {
-      case 'txt':
-        break;
-      case 'json':
-        this.file.write('[\n');
-        break;
-      case 'csv':
-        const { description, frameSize } = this.streamParams;
-
-        let header = 'time';
-
-        if (description !== null &amp;&amp; description.length) {
-          header += ',' + description.join(',');
-        } else {
-          for (let i = 0; i &lt; frameSize; i++)
-            header += ',row-' + i;
-        }
-
-        header += '\n';
-
-        this.file.write(header);
-        break;
-    }
+    return output;
   }
 
   /** @private */
-  finalizeStream(endTime) {
-    const format = this.params.get('format');
-
-    switch (format) {
-      case 'txt':
-        break;
-      case 'json':
-        this.file.write('\n]');
-        break;
-      case 'csv':
-        // this.file.write(endTime.toString());
-        break;
-    }
-  }
-
-  // process any kind of stream
-  /** @private */
-  processSignal() {}
-  /** @private */
-  processVector() {}
-  /** @private */
-  processScalar() {}
-
-  /** @private */
-  processFrame(frame) {
-    const format = this.params.get('format');
-    let str;
-
-    switch (format) {
-      case 'txt':
-        str = util.format('%s\n', frame.data);
-        break;
-      case 'json':
-        frame.data = Array.from(frame.data);
-        str = JSON.stringify(frame);
-
-        if (!this.firstRow)
-          str = ',\n' + str;
-
-        this.firstRow = false;
-        break;
-      case 'csv':
-        str = frame.time + ',';
-        str += util.format('%s\n', frame.data);
-        break;
-    }
-
-    this.file.write(str);
+  processSignal(frame) {
+    this.frame.data = this.inputSignal(frame.data);
   }
 }
 
-export default DataToFile;
+export default Multiplier;
 </code></pre>
         </article>
     </section>

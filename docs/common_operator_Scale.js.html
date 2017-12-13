@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lfo (Low Frequency Operators) - Source: node/sink/DataToFile.js</title>
+    <title>lfo (Low Frequency Operators) - Source: common/operator/Scale.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,7 +20,7 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Source: node/sink/DataToFile.js</h1>
+    <h1 class="page-title">Source: common/operator/Scale.js</h1>
     
 
     
@@ -31,174 +31,136 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>import BaseLfo from '../../core/BaseLfo';
-import fse from 'fs-extra';
-import fs from 'fs';
-import util from 'util';
 
 const definitions = {
-  filename: {
-    type: 'string',
-    default: null,
-    constant: true,
-  },
-  format: {
+  type: {
     type: 'enum',
-    default: 'txt',
-    list: ['txt', 'json', 'csv'],
+    list: ['linear'],
+    default: 'linear',
+    metas: {
+      kind: 'dynamic',
+    }
   },
-  // header: {
-  //   type: 'boolean',
-  //   default: false,
-  // },
-};
-
+  inputMin: {
+    type: 'float',
+    default: 0,
+    min: -Infinity,
+    max: +Infinity,
+    metas: {
+      kind: 'dynamic',
+    },
+  },
+  inputMax: {
+    type: 'float',
+    default: 1,
+    min: -Infinity,
+    max: +Infinity,
+    metas: {
+      kind: 'dynamic',
+    },
+  },
+  outputMin: {
+    type: 'float',
+    default: 1,
+    min: -Infinity,
+    max: +Infinity,
+    metas: {
+      kind: 'dynamic',
+    },
+  },
+  outputMax: {
+    type: 'float',
+    default: 1,
+    min: -Infinity,
+    max: +Infinity,
+    metas: {
+      kind: 'dynamic',
+    },
+  },
+}
 
 /**
- * Record input frames into a file.
+ * Apply a linear scale on the incomming stream. The output is not clipped.
  *
- * @param {Object} options - Override default parameters.
- * @param {String} [options.filename=null] - Path of the output file.
- * @param {String} [options.format='txt'] - Format in which the data should
- *  be stored. Available options: 'txt', 'json' or 'csv'.
+ * @todo - implement log and exp scale
  *
- * @memberof module:node.sink
- *
- * @todo - add an option to store the `streamParams`
- *
- * @example
- * import path from 'path';
- * import EventIn from '../src/common/source/EventIn';
- * import Logger from '../src/common/sink/Logger';
- * import DataToFile from '../src/node/sink/DataToFile';
- *
- * const eventIn = new EventIn({
- *   frameSize: 2,
- *   frameRate: 1,
- *   frameType: 'vector',
- * });
- *
- * const dataToFile = new DataToFile({
- *   filename: path.join(__dirname, './node_sink.DataToFile.test.json'),
- *   format: 'json',
- * });
- *
- * const logger = new Logger({
- *   data: true,
- * });
- *
- * eventIn.connect(logger);
- * eventIn.connect(dataToFile);
- * eventIn.start();
- *
- * let time = 0;
- * const period = 1;
- *
- * (function loop(){
- *   const data = [Math.random(), Math.random()];
- *   eventIn.process(time, data);
- *
- *   time += period;
- *
- *   if (time &lt; 20)
- *     setTimeout(loop, 300);
- *   else
- *     eventIn.stop();
- * }());
+ * @param {Object} options - Override default options
+ * @param {Number} [options.inputMin=0] - Input Minimum
+ * @param {Number} [options.inputMax=1] - Input Maximum
+ * @param {Number} [options.outputMin=0] - Output Minimum
+ * @param {Number} [options.outputMax=1] - Output Maximum
  */
-class DataToFile extends BaseLfo {
-  constructor(options = {}) {
+class Scale extends BaseLfo {
+  constructor(options) {
     super(definitions, options);
 
-    this.firstRow = true;
+    this.scale = null;
+  }
+
+  /** @private */
+  _setScaleFunction() {
+    const inputMin = this.params.get('inputMin');
+    const inputMax = this.params.get('inputMax');
+    const outputMin = this.params.get('outputMin');
+    const outputMax = this.params.get('outputMax');
+
+    const a = (outputMax - outputMin) / (inputMax - inputMin);
+    const b = outputMin - a * inputMin;
+
+    this.scale = (x) => a * x + b;
+  }
+
+  /** @private */
+  onParamUpdate(name, value, metas) {
+    super.onParamUpdate(name, value, metas);
+
+    if (name !== 'type')
+      this._setScaleFunction();
   }
 
   /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
 
-    const filename = this.params.get('filename');
-    this.file = fs.createWriteStream(filename);
+    this._setScaleFunction();
 
-    const format = this.params.get('format');
+    this.propagateStreamParams();
+  }
 
-    switch (format) {
-      case 'txt':
-        break;
-      case 'json':
-        this.file.write('[\n');
-        break;
-      case 'csv':
-        const { description, frameSize } = this.streamParams;
+  inputVector(data) {
+    const outData = this.frame.data;
+    const frameSize = this.streamParams.frameSize;
+    const scale = this.scale;
 
-        let header = 'time';
+    for (let i = 0; i &lt; frameSize; i++)
+      outData[i] = scale(data[i]);
 
-        if (description !== null &amp;&amp; description.length) {
-          header += ',' + description.join(',');
-        } else {
-          for (let i = 0; i &lt; frameSize; i++)
-            header += ',row-' + i;
-        }
-
-        header += '\n';
-
-        this.file.write(header);
-        break;
-    }
+    return outData;
   }
 
   /** @private */
-  finalizeStream(endTime) {
-    const format = this.params.get('format');
-
-    switch (format) {
-      case 'txt':
-        break;
-      case 'json':
-        this.file.write('\n]');
-        break;
-      case 'csv':
-        // this.file.write(endTime.toString());
-        break;
-    }
+  processVector(frame) {
+    this.frame.data = this.inputVector(frame.data);
   }
 
-  // process any kind of stream
-  /** @private */
-  processSignal() {}
-  /** @private */
-  processVector() {}
-  /** @private */
-  processScalar() {}
+  inputSignal(data) {
+    const outData = this.frame.data;
+    const frameSize = this.streamParams.frameSize;
+    const scale = this.scale;
+
+    for (let i = 0; i &lt; frameSize; i++)
+      outData[i] = scale(data[i]);
+
+    return outData;
+  }
 
   /** @private */
-  processFrame(frame) {
-    const format = this.params.get('format');
-    let str;
-
-    switch (format) {
-      case 'txt':
-        str = util.format('%s\n', frame.data);
-        break;
-      case 'json':
-        frame.data = Array.from(frame.data);
-        str = JSON.stringify(frame);
-
-        if (!this.firstRow)
-          str = ',\n' + str;
-
-        this.firstRow = false;
-        break;
-      case 'csv':
-        str = frame.time + ',';
-        str += util.format('%s\n', frame.data);
-        break;
-    }
-
-    this.file.write(str);
+  processSignal(frame) {
+    this.frame.data = this.inputVector(frame.data);
   }
 }
 
-export default DataToFile;
+export default Scale;
 </code></pre>
         </article>
     </section>

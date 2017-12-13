@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lfo (Low Frequency Operators) - Class: SignalDisplay</title>
+    <title>lfo (Low Frequency Operators) - Class: BarChartDisplay</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,7 +20,7 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Class: SignalDisplay</h1>
+    <h1 class="page-title">Class: BarChartDisplay</h1>
     
 
     
@@ -32,9 +32,9 @@
 
 <header>
     
-        <h2>SignalDisplay</h2>
+        <h2>BarChartDisplay</h2>
         
-            <div class="class-description"><p>Display a stream of type <code>signal</code> on a canvas.</p></div>
+            <div class="class-description"><p>Display a bar chart from an incomming <code>vector</code> input.</p></div>
         
     
 </header>
@@ -48,7 +48,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="SignalDisplay"><span class="type-signature"></span>new SignalDisplay<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="BarChartDisplay"><span class="type-signature"></span>new BarChartDisplay<span class="signature">(options)</span><span class="type-signature"></span></h4>
 
     
 
@@ -133,7 +133,7 @@
 
         <tr>
             
-                <td class="name"><code>color</code></td>
+                <td class="name"><code>colors</code></td>
             
 
             <td class="type">
@@ -160,12 +160,12 @@
             
                 <td class="default">
                 
-                    '#00e600'
+                    null
                 
                 </td>
             
 
-            <td class="description last"><p>Color of the signal.</p></td>
+            <td class="description last"><p>Colors of the bars.</p></td>
         </tr>
 
     
@@ -199,13 +199,12 @@
             
                 <td class="default">
                 
-                    -1
+                    -80
                 
                 </td>
             
 
-            <td class="description last"><p>Minimum value represented in the canvas.
- <em>dynamic parameter</em></p></td>
+            <td class="description last"><p>Minimum displayed value.</p></td>
         </tr>
 
     
@@ -239,13 +238,12 @@
             
                 <td class="default">
                 
-                    1
+                    6
                 
                 </td>
             
 
-            <td class="description last"><p>Maximum value represented in the canvas.
- <em>dynamic parameter</em></p></td>
+            <td class="description last"><p>Maximum displayed value.</p></td>
         </tr>
 
     
@@ -415,89 +413,6 @@
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>duration</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    1
-                
-                </td>
-            
-
-            <td class="description last"><p>Duration (in seconds) represented in
- the canvas. This parameter only exists for operators that display several
- consecutive frames on the canvas. <em>dynamic parameter</em></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>referenceTime</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p>Optionnal reference time the
- display should considerer as the origin. Is only usefull when synchronizing
- several display using the <code>DisplaySync</code> class. This parameter only exists
- for operators that display several consecutive frames on the canvas.</p></td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -542,7 +457,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client_sink_SignalDisplay.js.html">client/sink/SignalDisplay.js</a>, <a href="client_sink_SignalDisplay.js.html#line80">line 80</a>
+        <a href="client_sink_BarChartDisplay.js.html">client/sink/BarChartDisplay.js</a>, <a href="client_sink_BarChartDisplay.js.html#line80">line 80</a>
     </li></ul></dd>
     
 
@@ -569,23 +484,35 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>const eventIn = new lfo.source.EventIn({
-  frameType: 'signal',
-  sampleRate: 8,
-  frameSize: 4,
+    <pre class="prettyprint"><code>import * as lfo from 'waves-lfo/client';
+import * as lfo from 'waves-lfo/client';
+
+const frameSize = 5;
+const dt = 0.02;
+
+const eventIn = new lfo.source.EventIn({
+  frameSize: frameSize,
+  frameRate: 1 / dt,
+  frameType: 'vector',
 });
 
-const signalDisplay = new lfo.sink.SignalDisplay({
-  canvas: '#signal-canvas',
+const barChart = new lfo.sink.BarChartDisplay({
+  canvas: '#bar-chart',
 });
 
-eventIn.connect(signalDisplay);
+eventIn.connect(barChart);
 eventIn.start();
 
-// push triangle signal in the graph
-eventIn.process(0, [0, 0.5, 1, 0.5]);
-eventIn.process(0.5, [0, -0.5, -1, -0.5]);
-// ...</code></pre>
+const data = [0, 0.2, 0.4, 0.6, 0.8];
+
+(function generateData() {
+  for (let i = 0; i &lt; frameSize; i++)
+    data[i] = (data[i] + 0.001) % 1;
+
+  eventIn.process(null, data);
+
+  setTimeout(generateData, dt * 1000);
+}());</code></pre>
 
 
 

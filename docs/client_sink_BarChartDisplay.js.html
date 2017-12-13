@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lfo (Low Frequency Operators) - Source: node/sink/DataToFile.js</title>
+    <title>lfo (Low Frequency Operators) - Source: client/sink/BarChartDisplay.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,7 +20,7 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Source: node/sink/DataToFile.js</h1>
+    <h1 class="page-title">Source: client/sink/BarChartDisplay.js</h1>
     
 
     
@@ -30,175 +30,132 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import BaseLfo from '../../core/BaseLfo';
-import fse from 'fs-extra';
-import fs from 'fs';
-import util from 'util';
+            <pre class="prettyprint source linenums"><code>import BaseDisplay from './BaseDisplay';
+import Fft from '../../common/operator/Fft';
+import { getColors } from '../utils/display-utils';
+
 
 const definitions = {
-  filename: {
-    type: 'string',
-    default: null,
-    constant: true,
+  scale: {
+    type: 'float',
+    default: 1,
+    metas: { kind: 'dynamic' },
   },
-  format: {
-    type: 'enum',
-    default: 'txt',
-    list: ['txt', 'json', 'csv'],
+  colors: {
+    type: 'any',
+    default: getColors('bar-chart'),
+    nullable: true,
+    metas: { kind: 'dynamic' },
   },
-  // header: {
-  //   type: 'boolean',
-  //   default: false,
-  // },
+  min: {
+    type: 'float',
+    default: 0,
+    metas: { kind: 'dynamic' },
+  },
+  max: {
+    type: 'float',
+    default: 1,
+    metas: { kind: 'dynamic' },
+  }
 };
 
 
 /**
- * Record input frames into a file.
+ * Display a bar chart from an incomming `vector` input.
+ *
+ * @memberof module:client.sink
  *
  * @param {Object} options - Override default parameters.
- * @param {String} [options.filename=null] - Path of the output file.
- * @param {String} [options.format='txt'] - Format in which the data should
- *  be stored. Available options: 'txt', 'json' or 'csv'.
- *
- * @memberof module:node.sink
- *
- * @todo - add an option to store the `streamParams`
+ * @param {String} [options.colors=null] - Colors of the bars.
+ * @param {Number} [options.min=-80] - Minimum displayed value.
+ * @param {Number} [options.max=6] - Maximum displayed value.
+ * @param {Number} [options.width=300] - Width of the canvas.
+ *  _dynamic parameter_
+ * @param {Number} [options.height=150] - Height of the canvas.
+ *  _dynamic parameter_
+ * @param {Element|CSSSelector} [options.container=null] - Container element
+ *  in which to insert the canvas. _constant parameter_
+ * @param {Element|CSSSelector} [options.canvas=null] - Canvas element
+ *  in which to draw. _constant parameter_
  *
  * @example
- * import path from 'path';
- * import EventIn from '../src/common/source/EventIn';
- * import Logger from '../src/common/sink/Logger';
- * import DataToFile from '../src/node/sink/DataToFile';
+ * import * as lfo from 'waves-lfo/client';
+ * import * as lfo from 'waves-lfo/client';
  *
- * const eventIn = new EventIn({
- *   frameSize: 2,
- *   frameRate: 1,
+ * const frameSize = 5;
+ * const dt = 0.02;
+ *
+ * const eventIn = new lfo.source.EventIn({
+ *   frameSize: frameSize,
+ *   frameRate: 1 / dt,
  *   frameType: 'vector',
  * });
  *
- * const dataToFile = new DataToFile({
- *   filename: path.join(__dirname, './node_sink.DataToFile.test.json'),
- *   format: 'json',
+ * const barChart = new lfo.sink.BarChartDisplay({
+ *   canvas: '#bar-chart',
  * });
  *
- * const logger = new Logger({
- *   data: true,
- * });
- *
- * eventIn.connect(logger);
- * eventIn.connect(dataToFile);
+ * eventIn.connect(barChart);
  * eventIn.start();
  *
- * let time = 0;
- * const period = 1;
+ * const data = [0, 0.2, 0.4, 0.6, 0.8];
  *
- * (function loop(){
- *   const data = [Math.random(), Math.random()];
- *   eventIn.process(time, data);
+ * (function generateData() {
+ *   for (let i = 0; i &lt; frameSize; i++)
+ *     data[i] = (data[i] + 0.001) % 1;
  *
- *   time += period;
+ *   eventIn.process(null, data);
  *
- *   if (time &lt; 20)
- *     setTimeout(loop, 300);
- *   else
- *     eventIn.stop();
+ *   setTimeout(generateData, dt * 1000);
  * }());
  */
-class DataToFile extends BaseLfo {
+class BarChartDisplay extends BaseDisplay {
   constructor(options = {}) {
-    super(definitions, options);
-
-    this.firstRow = true;
+    super(definitions, options, false);
   }
 
   /** @private */
   processStreamParams(prevStreamParams) {
     this.prepareStreamParams(prevStreamParams);
-
-    const filename = this.params.get('filename');
-    this.file = fs.createWriteStream(filename);
-
-    const format = this.params.get('format');
-
-    switch (format) {
-      case 'txt':
-        break;
-      case 'json':
-        this.file.write('[\n');
-        break;
-      case 'csv':
-        const { description, frameSize } = this.streamParams;
-
-        let header = 'time';
-
-        if (description !== null &amp;&amp; description.length) {
-          header += ',' + description.join(',');
-        } else {
-          for (let i = 0; i &lt; frameSize; i++)
-            header += ',row-' + i;
-        }
-
-        header += '\n';
-
-        this.file.write(header);
-        break;
-    }
+    this.propagateStreamParams();
   }
 
   /** @private */
-  finalizeStream(endTime) {
-    const format = this.params.get('format');
+  processVector(frame) {
+    const frameSize = this.streamParams.frameSize;
+    const width = this.canvasWidth;
+    const height = this.canvasHeight;
+    const colors = this.params.get('colors');
+    const data = frame.data;
 
-    switch (format) {
-      case 'txt':
-        break;
-      case 'json':
-        this.file.write('\n]');
-        break;
-      case 'csv':
-        // this.file.write(endTime.toString());
-        break;
+    const barWidth = width / frameSize;
+    const ctx = this.ctx;
+
+    // error handling needs review...
+    let error = 0;
+
+    for (let i = 0; i &lt; frameSize; i++) {
+      const x1Float = i * barWidth + error;
+      const x1Int = Math.round(x1Float);
+      const x2Float = x1Float + (barWidth - error);
+      const x2Int = Math.round(x2Float);
+
+      error = x2Int - x2Float;
+
+      if (x1Int !== x2Int) {
+        const width = x2Int - x1Int;
+        const y = this.getYPosition(data[i]);
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(x1Int, y, width, height - y);
+      } else {
+        error -= barWidth;
+      }
     }
-  }
-
-  // process any kind of stream
-  /** @private */
-  processSignal() {}
-  /** @private */
-  processVector() {}
-  /** @private */
-  processScalar() {}
-
-  /** @private */
-  processFrame(frame) {
-    const format = this.params.get('format');
-    let str;
-
-    switch (format) {
-      case 'txt':
-        str = util.format('%s\n', frame.data);
-        break;
-      case 'json':
-        frame.data = Array.from(frame.data);
-        str = JSON.stringify(frame);
-
-        if (!this.firstRow)
-          str = ',\n' + str;
-
-        this.firstRow = false;
-        break;
-      case 'csv':
-        str = frame.time + ',';
-        str += util.format('%s\n', frame.data);
-        break;
-    }
-
-    this.file.write(str);
   }
 }
 
-export default DataToFile;
+export default BarChartDisplay;
 </code></pre>
         </article>
     </section>

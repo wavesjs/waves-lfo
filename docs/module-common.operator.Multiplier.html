@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>lfo (Low Frequency Operators) - Class: MovingAverage</title>
+    <title>lfo (Low Frequency Operators) - Class: Multiplier</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -20,7 +20,7 @@
 
     <!-- if home page assume a title is already present in README -->
     
-    <h1 class="page-title">Class: MovingAverage</h1>
+    <h1 class="page-title">Class: Multiplier</h1>
     
 
     
@@ -32,12 +32,11 @@
 
 <header>
     
-        <h2>MovingAverage</h2>
+        <h2>Multiplier</h2>
         
-            <div class="class-description"><p>Compute a moving average operation on the incomming frames (<code>scalar</code> or
-<code>vector</code> type). If the input is of type vector, the moving average is
-computed for each dimension in parallel. If the source sample rate is defined
-frame time is shifted to the middle of the window defined by the order.</p>
+            <div class="class-description"><p>Multiply a given signal or vector by a given factor. On vector
+streams, <code>factor</code> can be an array of values to apply on each dimension of the
+vector frames.</p>
 <p><em>support <code>standalone</code> usage</em></p></div>
         
     
@@ -52,7 +51,7 @@ frame time is shifted to the middle of the window defined by the order.</p>
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="MovingAverage"><span class="type-signature"></span>new MovingAverage<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Multiplier"><span class="type-signature"></span>new Multiplier<span class="signature">(options)</span><span class="type-signature"></span></h4>
 
     
 
@@ -107,7 +106,7 @@ frame time is shifted to the middle of the window defined by the order.</p>
 
             
 
-            <td class="description last"><p>Override default parameters.</p>
+            <td class="description last"><p>override default values</p>
                 <h6>Properties</h6>
                 
 
@@ -137,13 +136,16 @@ frame time is shifted to the middle of the window defined by the order.</p>
 
         <tr>
             
-                <td class="name"><code>order</code></td>
+                <td class="name"><code>factor</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">Number</span>
+|
+
+<span class="param-type">Array</span>
 
 
             
@@ -164,53 +166,14 @@ frame time is shifted to the middle of the window defined by the order.</p>
             
                 <td class="default">
                 
-                    10
+                    1
                 
                 </td>
             
 
-            <td class="description last"><p>Number of successive values on which
- the average is computed.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>fill</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    0
-                
-                </td>
-            
-
-            <td class="description last"><p>Value to fill the ring buffer with before
- the first input frame.</p></td>
+            <td class="description last"><p>factor or array of factor to
+ apply on the incomming frame. Setting an array is only defined in case of
+ a vector stream.</p></td>
         </tr>
 
     
@@ -258,7 +221,7 @@ frame time is shifted to the middle of the window defined by the order.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="common_operator_MovingAverage.js.html">common/operator/MovingAverage.js</a>, <a href="common_operator_MovingAverage.js.html#line69">line 69</a>
+        <a href="common_operator_Multiplier.js.html">common/operator/Multiplier.js</a>, <a href="common_operator_Multiplier.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -266,13 +229,6 @@ frame time is shifted to the middle of the window defined by the order.</p>
 
     
 
-    
-    <dt class="tag-todo">To Do:</dt>
-    <dd class="tag-todo">
-        <ul>
-            <li>- Implement `processSignal` ?</li>
-        </ul>
-    </dd>
     
 </dl>
 
@@ -294,33 +250,17 @@ frame time is shifted to the middle of the window defined by the order.</p>
     
     <pre class="prettyprint"><code>import * as lfo from 'waves-lfo/common';
 
-const eventIn = new lfo.source.EventIn({
+const eventIn = new lfo.operator.EventIn({
+  type: 'vector',
   frameSize: 2,
-  frameType: 'vector'
+  frameRate: 0,
 });
+const scaler = new lfo.operator.Multiplier({ factor: 0.1 });
 
-const movingAverage = new lfo.operator.MovingAverage({
-  order: 5,
-  fill: 0
-});
+eventIn.connect(scaler);
 
-const logger = new lfo.sink.Logger({ data: true });
-
-eventIn.connect(movingAverage);
-movingAverage.connect(logger);
-
-eventIn.start();
-
-eventIn.process(null, [1, 1]);
-> [0.2, 0.2]
-eventIn.process(null, [1, 1]);
-> [0.4, 0.4]
-eventIn.process(null, [1, 1]);
-> [0.6, 0.6]
-eventIn.process(null, [1, 1]);
-> [0.8, 0.8]
-eventIn.process(null, [1, 1]);
-> [1, 1]</code></pre>
+eventIn.process(null, [2, 3]);
+> [0.2, 0.3]</code></pre>
 
 
 
@@ -347,15 +287,14 @@ eventIn.process(null, [1, 1]);
 
     
 
-    <h4 class="name" id="inputScalar"><span class="type-signature"></span>inputScalar<span class="signature">(value)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id="inputSignal"><span class="type-signature"></span>inputSignal<span class="signature">(data)</span><span class="type-signature"> &rarr; {Array}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>Use the <code>MovingAverage</code> operator in <code>standalone</code> mode (i.e. outside of a
-graph) with a <code>scalar</code> input.</p>
+    <p>Use the <code>Multiplier</code> operator in standalone mode.</p>
 </div>
 
 
@@ -391,183 +330,15 @@ graph) with a <code>scalar</code> input.</p>
 
         <tr>
             
-                <td class="name"><code>value</code></td>
+                <td class="name"><code>data</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Float32Array</span>
+|
 
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Value to feed the moving average with.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="common_operator_MovingAverage.js.html">common/operator/MovingAverage.js</a>, <a href="common_operator_MovingAverage.js.html#line161">line 161</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <ul>
-<li>Average value.</li>
-</ul>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import * as lfo from 'waves-lfo/client';
-
-const movingAverage = new lfo.operator.MovingAverage({ order: 5 });
-movingAverage.initStream({ frameSize: 1, frameType: 'scalar' });
-
-movingAverage.inputScalar(1);
-> 0.2
-movingAverage.inputScalar(1);
-> 0.4
-movingAverage.inputScalar(1);
-> 0.6</code></pre>
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="inputVector"><span class="type-signature"></span>inputVector<span class="signature">(values)</span><span class="type-signature"> &rarr; {Float32Array}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Use the <code>MovingAverage</code> operator in <code>standalone</code> mode (i.e. outside of a
-graph) with a <code>vector</code> input.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>values</code></td>
-            
-
-            <td class="type">
-            
-                
 <span class="param-type">Array</span>
 
 
@@ -578,7 +349,7 @@ graph) with a <code>vector</code> input.</p>
 
             
 
-            <td class="description last"><p>Values to feed the moving average with.</p></td>
+            <td class="description last"><p>Input signal.</p></td>
         </tr>
 
     
@@ -619,7 +390,7 @@ graph) with a <code>vector</code> input.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="common_operator_MovingAverage.js.html">common/operator/MovingAverage.js</a>, <a href="common_operator_MovingAverage.js.html#line202">line 202</a>
+        <a href="common_operator_Multiplier.js.html">common/operator/Multiplier.js</a>, <a href="common_operator_Multiplier.js.html#line92">line 92</a>
     </li></ul></dd>
     
 
@@ -647,7 +418,7 @@ graph) with a <code>vector</code> input.</p>
         
 <div class="param-desc">
     <ul>
-<li>Average value for each dimension.</li>
+<li>Scaled signal.</li>
 </ul>
 </div>
 
@@ -659,7 +430,7 @@ graph) with a <code>vector</code> input.</p>
     </dt>
     <dd>
         
-<span class="param-type">Float32Array</span>
+<span class="param-type">Array</span>
 
 
     </dd>
@@ -670,17 +441,178 @@ graph) with a <code>vector</code> input.</p>
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>import * as lfo from 'waves-lfo/client';
+    <pre class="prettyprint"><code>const scaler = new Multiplier({ factor: 0.1 });
+scaler.initStream({ frameType: 'signal', frameSize: 2 });
 
-const movingAverage = new lfo.operator.MovingAverage({ order: 5 });
-movingAverage.initStream({ frameSize: 2, frameType: 'scalar' });
+scaler.inputVector([1, 2]);
+> [0.1, 0.2]</code></pre>
 
-movingAverage.inputArray([1, 1]);
-> [0.2, 0.2]
-movingAverage.inputArray([1, 1]);
-> [0.4, 0.4]
-movingAverage.inputArray([1, 1]);
-> [0.6, 0.6]</code></pre>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="inputVector"><span class="type-signature"></span>inputVector<span class="signature">(data)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Use the <code>Multiplier</code> operator in standalone mode.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Float32Array</span>
+|
+
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Input vector</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="common_operator_Multiplier.js.html">common/operator/Multiplier.js</a>, <a href="common_operator_Multiplier.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Scaled values</li>
+</ul>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const scaler = new Multiplier({ factor: [2, 4] });
+scaler.initStream({ frameType: 'vector', frameSize: 2 });
+
+scaler.inputVector([3, 2]);
+> [6, 8]</code></pre>
 
 
 
