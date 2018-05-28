@@ -48,7 +48,6 @@ const definitions = {
  *
  * @example
  * import * as lfo from 'waves-lfo/client';
- * import * as lfo from 'waves-lfo/client';
  *
  * const frameSize = 5;
  * const dt = 0.02;

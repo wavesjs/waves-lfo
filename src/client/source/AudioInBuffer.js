@@ -148,6 +148,8 @@ class AudioInBuffer extends SourceMixin(BaseLfo) {
     const that = this;
     let i = 0;
 
+    // @todo refactor sync mode, create Maximum call stack size exceeded errors
+    // with large buffers, use a loop instead of recursive call.
     function slice() {
       const offset = i * frameSize;
       const nbrCopy = Math.min(length - offset, frameSize);
@@ -173,8 +175,8 @@ class AudioInBuffer extends SourceMixin(BaseLfo) {
     };
 
     // allow the following to do the expected thing:
-    // audioIn.connect(recorder);
-    // audioIn.start();
+    // audioInBuffer.connect(recorder);
+    // audioInBuffer.start();
     // recorder.start();
     setTimeout(slice, 0);
   }
